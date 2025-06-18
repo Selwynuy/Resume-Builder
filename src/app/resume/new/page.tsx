@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { getTemplate, templates } from '@/lib/templates'
 import { useAutoSave } from '@/hooks/useAutoSave'
+import { DndProvider, useDrag, useDrop } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
 
 interface PersonalInfo {
   name: string
@@ -34,6 +36,63 @@ interface Education {
 interface Skill {
   name: string
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+}
+
+// Draggable Section Component
+interface DraggableSectionProps {
+  id: string
+  index: number
+  moveSection: (dragIndex: number, hoverIndex: number) => void
+  children: React.ReactNode
+}
+
+const DraggableSection: React.FC<DraggableSectionProps> = ({
+  id,
+  index,
+  moveSection,
+  children,
+}) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: 'section',
+    item: { id, index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+
+  const [, drop] = useDrop({
+    accept: 'section',
+    hover: (item: { id: string; index: number }) => {
+      if (item.index !== index) {
+        moveSection(item.index, index)
+        item.index = index
+      }
+    },
+  })
+
+  const ref = (node: HTMLDivElement | null) => {
+    drag(node)
+    drop(node)
+  }
+
+  return (
+    <div
+      ref={ref}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+      className={`transition-all duration-200 ${isDragging ? 'scale-105 shadow-lg' : ''}`}
+    >
+      <div className="relative">
+        <div className="absolute -left-8 top-6 flex items-center justify-center w-6 h-6 bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing hover:bg-gray-200">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-gray-500">
+            <path d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+        </div>
+        <div className="group">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function NewResumePage() {
@@ -66,6 +125,7 @@ export default function NewResumePage() {
   const [showTemplateSelector, setShowTemplateSelector] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
+  const [sectionOrder, setSectionOrder] = useState(['experience', 'education', 'skills'])
   
   const template = getTemplate(currentTemplate)
 
@@ -136,6 +196,225 @@ export default function NewResumePage() {
   const switchTemplate = (templateId: string) => {
     setCurrentTemplate(templateId)
     setShowTemplateSelector(false)
+  }
+
+  const moveSection = (dragIndex: number, hoverIndex: number) => {
+    const newOrder = [...sectionOrder]
+    const draggedItem = newOrder[dragIndex]
+    newOrder.splice(dragIndex, 1)
+    newOrder.splice(hoverIndex, 0, draggedItem)
+    setSectionOrder(newOrder)
+  }
+
+  const renderSection = (sectionType: string, index: number) => {
+    switch (sectionType) {
+      case 'experience':
+        return (
+          <DraggableSection
+            key="experience"
+            id="experience"
+            index={index}
+            moveSection={moveSection}
+          >
+            <div className="glass-card p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold mb-3 text-slate-800">Experience</h2>
+                <button
+                  onClick={addExperience}
+                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
+                >
+                  Add Experience
+                </button>
+              </div>
+              
+              {experiences.map((exp, expIndex) => (
+                <div key={expIndex} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-sm font-medium text-gray-700">Experience {expIndex + 1}</h3>
+                    {experiences.length > 1 && (
+                      <button
+                        onClick={() => removeItem(expIndex, 'experience')}
+                        className="text-red-500 text-sm hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <input
+                      type="text"
+                      placeholder="Company"
+                      value={exp.company}
+                      onChange={(e) => updateExperience(expIndex, 'company', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Position"
+                      value={exp.position}
+                      onChange={(e) => updateExperience(expIndex, 'position', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Start Date"
+                      value={exp.startDate}
+                      onChange={(e) => updateExperience(expIndex, 'startDate', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="End Date"
+                      value={exp.endDate}
+                      onChange={(e) => updateExperience(expIndex, 'endDate', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                  <textarea
+                    placeholder="Job description and achievements"
+                    value={exp.description}
+                    onChange={(e) => updateExperience(expIndex, 'description', e.target.value)}
+                    rows={3}
+                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+              ))}
+            </div>
+          </DraggableSection>
+        )
+
+      case 'education':
+        return (
+          <DraggableSection
+            key="education"
+            id="education"
+            index={index}
+            moveSection={moveSection}
+          >
+            <div className="glass-card p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold mb-3 text-slate-800">Education</h2>
+                <button
+                  onClick={addEducation}
+                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
+                >
+                  Add Education
+                </button>
+              </div>
+              
+              {education.map((edu, eduIndex) => (
+                <div key={eduIndex} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-sm font-medium text-gray-700">Education {eduIndex + 1}</h3>
+                    {education.length > 1 && (
+                      <button
+                        onClick={() => removeItem(eduIndex, 'education')}
+                        className="text-red-500 text-sm hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="School/University"
+                      value={edu.school}
+                      onChange={(e) => updateEducation(eduIndex, 'school', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Degree"
+                      value={edu.degree}
+                      onChange={(e) => updateEducation(eduIndex, 'degree', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Field of Study"
+                      value={edu.field}
+                      onChange={(e) => updateEducation(eduIndex, 'field', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Graduation Date"
+                      value={edu.graduationDate}
+                      onChange={(e) => updateEducation(eduIndex, 'graduationDate', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <input
+                      type="text"
+                      placeholder="GPA (optional)"
+                      value={edu.gpa}
+                      onChange={(e) => updateEducation(eduIndex, 'gpa', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DraggableSection>
+        )
+
+      case 'skills':
+        return (
+          <DraggableSection
+            key="skills"
+            id="skills"
+            index={index}
+            moveSection={moveSection}
+          >
+            <div className="glass-card p-6 rounded-2xl">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold mb-3 text-slate-800">Skills</h2>
+                <button
+                  onClick={addSkill}
+                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
+                >
+                  Add Skill
+                </button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {skills.map((skill, skillIndex) => (
+                  <div key={skillIndex} className="flex items-center space-x-3">
+                    <input
+                      type="text"
+                      placeholder="Skill name"
+                      value={skill.name}
+                      onChange={(e) => updateSkill(skillIndex, 'name', e.target.value)}
+                      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                    <select
+                      value={skill.level}
+                      onChange={(e) => updateSkill(skillIndex, 'level', e.target.value)}
+                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    >
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                      <option value="Expert">Expert</option>
+                    </select>
+                    {skills.length > 1 && (
+                      <button
+                        onClick={() => removeItem(skillIndex, 'skill')}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DraggableSection>
+        )
+
+      default:
+        return null
+    }
   }
 
   useEffect(() => {
@@ -215,7 +494,8 @@ export default function NewResumePage() {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-12">
+    <DndProvider backend={HTML5Backend}>
+      <div className="min-h-screen pt-32 pb-12">
       <div className="container mx-auto px-4 py-4 lg:py-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 space-y-4 lg:space-y-0">
           <div>
@@ -390,186 +670,28 @@ export default function NewResumePage() {
               </div>
             </div>
 
-            {/* Experience Section */}
-            <div className="glass-card p-6 rounded-2xl">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold mb-3 text-slate-800">Experience</h2>
-                <button
-                  onClick={addExperience}
-                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
-                >
-                  Add Experience
-                </button>
+            {/* Section Reordering Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-blue-800 text-sm">
+                  <strong>💡 Tip:</strong> Hover over sections and use the drag handle to reorder them. The preview will update automatically!
+                </p>
               </div>
-              
-              {experiences.map((exp, index) => (
-                <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-sm font-medium text-gray-700">Experience {index + 1}</h3>
-                    {experiences.length > 1 && (
-                      <button
-                        onClick={() => removeItem(index, 'experience')}
-                        className="text-red-500 text-sm hover:text-red-700"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                    <input
-                      type="text"
-                      placeholder="Company"
-                      value={exp.company}
-                      onChange={(e) => updateExperience(index, 'company', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Position"
-                      value={exp.position}
-                      onChange={(e) => updateExperience(index, 'position', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Start Date"
-                      value={exp.startDate}
-                      onChange={(e) => updateExperience(index, 'startDate', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="End Date"
-                      value={exp.endDate}
-                      onChange={(e) => updateExperience(index, 'endDate', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                  <textarea
-                    placeholder="Job description and achievements"
-                    value={exp.description}
-                    onChange={(e) => updateExperience(index, 'description', e.target.value)}
-                    rows={3}
-                    className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-              ))}
             </div>
 
-            {/* Education Section */}
-            <div className="glass-card p-6 rounded-2xl">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold mb-3 text-slate-800">Education</h2>
-                <button
-                  onClick={addEducation}
-                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
-                >
-                  Add Education
-                </button>
+            {/* Draggable Sections */}
+            {sectionOrder.map((sectionType, index) => (
+              <div key={sectionType}>
+                {renderSection(sectionType, index)}
               </div>
-              
-              {education.map((edu, index) => (
-                <div key={index} className="border-b border-gray-200 pb-4 mb-4 last:border-b-0">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-sm font-medium text-gray-700">Education {index + 1}</h3>
-                    {education.length > 1 && (
-                      <button
-                        onClick={() => removeItem(index, 'education')}
-                        className="text-red-500 text-sm hover:text-red-700"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="School/University"
-                      value={edu.school}
-                      onChange={(e) => updateEducation(index, 'school', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Degree"
-                      value={edu.degree}
-                      onChange={(e) => updateEducation(index, 'degree', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Field of Study"
-                      value={edu.field}
-                      onChange={(e) => updateEducation(index, 'field', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Graduation Date"
-                      value={edu.graduationDate}
-                      onChange={(e) => updateEducation(index, 'graduationDate', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <input
-                      type="text"
-                      placeholder="GPA (optional)"
-                      value={edu.gpa}
-                      onChange={(e) => updateEducation(index, 'gpa', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Skills Section */}
-            <div className="glass-card p-6 rounded-2xl">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold mb-3 text-slate-800">Skills</h2>
-                <button
-                  onClick={addSkill}
-                  className="bg-primary-600 text-white px-3 py-1 rounded text-sm hover:bg-primary-700"
-                >
-                  Add Skill
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {skills.map((skill, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <input
-                      type="text"
-                      placeholder="Skill name"
-                      value={skill.name}
-                      onChange={(e) => updateSkill(index, 'name', e.target.value)}
-                      className="flex-1 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                    <select
-                      value={skill.level}
-                      onChange={(e) => updateSkill(index, 'level', e.target.value)}
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                      <option value="Expert">Expert</option>
-                    </select>
-                    {skills.length > 1 && (
-                      <button
-                        onClick={() => removeItem(index, 'skill')}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* Preview Section */}
-          <div className={`glass-card p-6 rounded-2xl h-fit sticky top-24 {isMobile && !showPreview ? 'hidden' : ''}`}>
+          <div className={`glass-card p-6 rounded-2xl h-fit sticky top-24 ${isMobile && !showPreview ? 'hidden' : ''}`}>
             <h2 className="text-xl font-semibold mb-4 text-slate-800">Resume Preview</h2>
             <div 
               className="border border-slate-200 p-6 rounded-xl min-h-[700px] bg-white" 
@@ -628,95 +750,134 @@ export default function NewResumePage() {
                 </div>
               )}
 
-              {/* Experience */}
-              {experiences.some(exp => exp.company || exp.position) && (
-                <div className="mb-6">
-                  <h3 
-                    className="font-semibold mb-3 text-lg"
-                    style={{ 
-                      borderBottom: template.id === 'classic' ? `1px solid ${template.colors.accent}` : 'none',
-                      paddingBottom: template.id === 'classic' ? '2px' : '0',
-                      backgroundColor: template.id === 'modern' ? template.colors.primary : 'transparent',
-                      color: template.id === 'modern' ? '#ffffff' : template.colors.primary,
-                      padding: template.id === 'modern' ? '5px 10px' : '0'
-                    }}
-                  >
-                    {template.id === 'creative' ? '✦ Experience' : 'Experience'}
-                  </h3>
-                  {experiences.map((exp, index) => (
-                    (exp.company || exp.position) && (
-                      <div key={index} className="mb-4">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium" style={{ color: template.colors.primary }}>{exp.position}</h4>
-                            <p 
-                              className="text-gray-600"
-                              style={{ 
-                                fontStyle: template.id === 'creative' ? 'italic' : 'normal',
-                                color: template.colors.secondary
-                              }}
-                            >
-                              {exp.company}
-                            </p>
-                          </div>
-                          {(exp.startDate || exp.endDate) && (
-                            <p className="text-gray-500 text-sm" style={{ color: template.colors.secondary }}>
-                              {exp.startDate} - {exp.endDate}
-                            </p>
-                          )}
-                        </div>
-                        {exp.description && (
-                          <p className="text-gray-700 mt-2 text-sm">{exp.description}</p>
-                        )}
+              {/* Dynamic sections in order */}
+              {sectionOrder.map((sectionType) => {
+                switch (sectionType) {
+                  case 'experience':
+                    return experiences.some(exp => exp.company || exp.position) && (
+                      <div key="experience" className="mb-6">
+                        <h3 
+                          className="font-semibold mb-3 text-lg"
+                          style={{ 
+                            borderBottom: template.id === 'classic' ? `1px solid ${template.colors.accent}` : 'none',
+                            paddingBottom: template.id === 'classic' ? '2px' : '0',
+                            backgroundColor: template.id === 'modern' ? template.colors.primary : 'transparent',
+                            color: template.id === 'modern' ? '#ffffff' : template.colors.primary,
+                            padding: template.id === 'modern' ? '5px 10px' : '0'
+                          }}
+                        >
+                          {template.id === 'creative' ? '✦ Experience' : 'Experience'}
+                        </h3>
+                        {experiences.map((exp, index) => (
+                          (exp.company || exp.position) && (
+                            <div key={index} className="mb-4">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium" style={{ color: template.colors.primary }}>{exp.position}</h4>
+                                  <p 
+                                    className="text-gray-600"
+                                    style={{ 
+                                      fontStyle: template.id === 'creative' ? 'italic' : 'normal',
+                                      color: template.colors.secondary
+                                    }}
+                                  >
+                                    {exp.company}
+                                  </p>
+                                </div>
+                                {(exp.startDate || exp.endDate) && (
+                                  <p className="text-gray-500 text-sm" style={{ color: template.colors.secondary }}>
+                                    {exp.startDate} - {exp.endDate}
+                                  </p>
+                                )}
+                              </div>
+                              {exp.description && (
+                                <p className="text-gray-700 mt-2 text-sm">{exp.description}</p>
+                              )}
+                            </div>
+                          )
+                        ))}
                       </div>
                     )
-                  ))}
-                </div>
-              )}
 
-              {/* Education */}
-              {education.some(edu => edu.school || edu.degree) && (
-                <div className="mb-6">
-                  <h3 className="font-semibold text-gray-900 mb-3 text-lg border-b border-gray-300 pb-1">Education</h3>
-                  {education.map((edu, index) => (
-                    (edu.school || edu.degree) && (
-                      <div key={index} className="mb-3">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium text-gray-900">{edu.degree} {edu.field && `in ${edu.field}`}</h4>
-                            <p className="text-gray-600">{edu.school}</p>
-                            {edu.gpa && <p className="text-gray-500 text-sm">GPA: {edu.gpa}</p>}
-                          </div>
-                          {edu.graduationDate && (
-                            <p className="text-gray-500 text-sm">{edu.graduationDate}</p>
-                          )}
+                  case 'education':
+                    return education.some(edu => edu.school || edu.degree) && (
+                      <div key="education" className="mb-6">
+                        <h3 
+                          className="font-semibold mb-3 text-lg"
+                          style={{ 
+                            borderBottom: template.id === 'classic' ? `1px solid ${template.colors.accent}` : 'none',
+                            paddingBottom: template.id === 'classic' ? '2px' : '0',
+                            backgroundColor: template.id === 'modern' ? template.colors.primary : 'transparent',
+                            color: template.id === 'modern' ? '#ffffff' : template.colors.primary,
+                            padding: template.id === 'modern' ? '5px 10px' : '0'
+                          }}
+                        >
+                          {template.id === 'creative' ? '✦ Education' : 'Education'}
+                        </h3>
+                        {education.map((edu, index) => (
+                          (edu.school || edu.degree) && (
+                            <div key={index} className="mb-3">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-medium" style={{ color: template.colors.primary }}>{edu.degree} {edu.field && `in ${edu.field}`}</h4>
+                                  <p 
+                                    className="text-gray-600"
+                                    style={{ 
+                                      fontStyle: template.id === 'creative' ? 'italic' : 'normal',
+                                      color: template.colors.secondary
+                                    }}
+                                  >
+                                    {edu.school}
+                                  </p>
+                                  {edu.gpa && <p className="text-gray-500 text-sm" style={{ color: template.colors.secondary }}>GPA: {edu.gpa}</p>}
+                                </div>
+                                {edu.graduationDate && (
+                                  <p className="text-gray-500 text-sm" style={{ color: template.colors.secondary }}>{edu.graduationDate}</p>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    )
+
+                  case 'skills':
+                    return skills.some(skill => skill.name) && (
+                      <div key="skills">
+                        <h3 
+                          className="font-semibold mb-3 text-lg"
+                          style={{ 
+                            borderBottom: template.id === 'classic' ? `1px solid ${template.colors.accent}` : 'none',
+                            paddingBottom: template.id === 'classic' ? '2px' : '0',
+                            backgroundColor: template.id === 'modern' ? template.colors.primary : 'transparent',
+                            color: template.id === 'modern' ? '#ffffff' : template.colors.primary,
+                            padding: template.id === 'modern' ? '5px 10px' : '0'
+                          }}
+                        >
+                          {template.id === 'creative' ? '✦ Skills' : 'Skills'}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          {skills.map((skill, index) => (
+                            skill.name && (
+                              <div key={index} className="flex justify-between items-center">
+                                <span style={{ color: template.colors.text }}>{skill.name}</span>
+                                <span className="text-sm" style={{ color: template.colors.secondary }}>{skill.level}</span>
+                              </div>
+                            )
+                          ))}
                         </div>
                       </div>
                     )
-                  ))}
-                </div>
-              )}
 
-              {/* Skills */}
-              {skills.some(skill => skill.name) && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 text-lg border-b border-gray-300 pb-1">Skills</h3>
-                  <div className="grid grid-cols-2 gap-2">
-                    {skills.map((skill, index) => (
-                      skill.name && (
-                        <div key={index} className="flex justify-between items-center">
-                          <span className="text-gray-700">{skill.name}</span>
-                          <span className="text-gray-500 text-sm">{skill.level}</span>
-                        </div>
-                      )
-                    ))}
-                  </div>
-                </div>
-              )}
+                  default:
+                    return null
+                }
+              })}
             </div>
           </div>
         </div>
       </div>
     </div>
+    </DndProvider>
   )
 } 
