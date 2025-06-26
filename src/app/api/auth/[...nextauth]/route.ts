@@ -1,9 +1,11 @@
-import NextAuth from 'next-auth'
+import NextAuth, { type NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import type { JWT } from 'next-auth/jwt'
+import type { Session } from 'next-auth'
 import connectDB from '@/lib/db'
 import User from '@/models/User'
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -41,25 +43,27 @@ const handler = NextAuth({
     })
   ],
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt' as const
   },
   pages: {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user: any }) {
       if (user) {
         token.id = user.id
       }
       return token
     },
-    async session({ session, token }) {
-      if (token) {
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (token && session.user) {
         session.user.id = token.id as string
       }
       return session
     }
   }
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST } 

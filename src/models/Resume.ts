@@ -1,35 +1,36 @@
 import mongoose from 'mongoose'
 
 const experienceSchema = new mongoose.Schema({
-  company: { type: String, required: true },
-  position: { type: String, required: true },
-  startDate: { type: String, required: true },
-  endDate: { type: String, required: true },
-  description: { type: String, required: true }
+  company: { type: String, required: false },
+  position: { type: String, required: false },
+  startDate: { type: String, required: false },
+  endDate: { type: String, required: false },
+  description: { type: String, required: false }
 })
 
 const educationSchema = new mongoose.Schema({
-  school: { type: String, required: true },
-  degree: { type: String, required: true },
+  school: { type: String, required: false },
+  degree: { type: String, required: false },
   field: { type: String },
-  graduationDate: { type: String, required: true },
+  graduationDate: { type: String, required: false },
   gpa: { type: String }
 })
 
 const skillSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  name: { type: String, required: false },
   level: { 
     type: String, 
     enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'],
-    required: true 
+    required: false,
+    default: 'Intermediate'
   }
 })
 
 const personalInfoSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  location: { type: String, required: true },
+  email: { type: String, required: false },
+  phone: { type: String, required: false },
+  location: { type: String, required: false },
   summary: { type: String }
 })
 
@@ -53,8 +54,11 @@ const resumeSchema = new mongoose.Schema({
   skills: [skillSchema],
   template: {
     type: String,
-    default: 'classic',
-    enum: ['classic', 'modern', 'minimal', 'creative']
+    default: 'classic'
+  },
+  isDraft: {
+    type: Boolean,
+    default: true
   },
   isPublic: {
     type: Boolean,
@@ -90,4 +94,11 @@ resumeSchema.post('save', async function(doc) {
   }
 })
 
-export default mongoose.models.Resume || mongoose.model('Resume', resumeSchema) 
+// Clear any existing model from cache to ensure fresh schema
+if (mongoose.models.Resume) {
+  delete mongoose.models.Resume
+}
+
+const Resume = mongoose.model('Resume', resumeSchema)
+
+export default Resume 

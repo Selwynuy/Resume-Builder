@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Template',
   }],
+  favorites: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Template',
+  }],
 });
 
 // Hash password before saving

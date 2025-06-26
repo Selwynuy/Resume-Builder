@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '../../auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
 import mongoose from 'mongoose'
@@ -10,7 +11,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -55,7 +56,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -118,7 +119,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
       return NextResponse.json(

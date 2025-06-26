@@ -7,9 +7,10 @@ interface AutoSaveData {
   education: any[]
   skills: any[]
   template: string
+  resumeId?: string
 }
 
-export const useAutoSave = (data: AutoSaveData, resumeId?: string) => {
+export const useAutoSave = (data: AutoSaveData) => {
   const { data: session } = useSession()
   const timeoutRef = useRef<NodeJS.Timeout>()
   const lastSavedRef = useRef<string>('')
@@ -30,18 +31,18 @@ export const useAutoSave = (data: AutoSaveData, resumeId?: string) => {
     // Set new timeout for 3 seconds
     timeoutRef.current = setTimeout(async () => {
       try {
-        const endpoint = resumeId ? `/api/resumes/${resumeId}` : '/api/resumes/autosave'
-        const method = resumeId ? 'PUT' : 'POST'
-
-        const response = await fetch(endpoint, {
-          method,
+        const response = await fetch('/api/resumes/autosave', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: JSON.stringify({
+            ...data,
+            resumeId: data.resumeId
+          })
         })
 
         if (response.ok) {
           lastSavedRef.current = currentData
-          // Show subtle save indicator
+          // Show save indicator
           const saveIndicator = document.getElementById('save-indicator')
           if (saveIndicator) {
             saveIndicator.textContent = '✓ Saved'
@@ -61,5 +62,5 @@ export const useAutoSave = (data: AutoSaveData, resumeId?: string) => {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [data, session, resumeId])
+  }, [data, session])
 } 
