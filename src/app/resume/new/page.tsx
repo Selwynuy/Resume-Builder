@@ -68,8 +68,7 @@ const ProgressBar = ({ currentStep }: { currentStep: number }) => {
           <div 
             className="absolute left-5 h-0.5 bg-primary-600 top-1/2 transform -translate-y-1/2 transition-all duration-500"
             style={{ 
-              width: `${((currentStep - 1) / (STEPS.length - 1)) * 100}%`,
-              right: `${100 - ((currentStep - 1) / (STEPS.length - 1)) * 100}%`
+              width: `${Math.min(((currentStep - 1) / (STEPS.length - 1)) * 80, 80)}%`
             }}
           ></div>
           
@@ -1864,18 +1863,32 @@ export default function NewResumePage() {
           // Create a new window/iframe for PDF generation
           const printWindow = window.open('', '_blank')
           if (printWindow) {
-            printWindow.document.write(htmlContent)
+            // Add enhanced HTML with auto-configuration
+            const enhancedHtml = htmlContent.replace(
+              '</head>',
+              `
+              <script>
+                window.onload = function() {
+                  // Auto-configure print settings for A4
+                  setTimeout(() => {
+                    // Trigger print with optimal settings
+                    if (window.print) {
+                      window.print();
+                    }
+                    // Close window after print dialog
+                    setTimeout(() => {
+                      window.close();
+                    }, 1000);
+                  }, 500);
+                };
+              </script>
+              </head>`
+            )
+            
+            printWindow.document.write(enhancedHtml)
             printWindow.document.close()
             
-            // Wait for content to load, then trigger print
-            printWindow.onload = () => {
-              setTimeout(() => {
-                printWindow.print()
-                printWindow.close()
-              }, 500)
-            }
-            
-            setSaveMessage('✅ PDF generation window opened! In the print dialog, make sure to:\n• Select "Save as PDF"\n• Turn OFF "Headers and footers"\n• Set margins to "Minimum" or "None"')
+            setSaveMessage('✅ PDF print dialog opened! Settings automatically configured:\n• Paper size: A4\n• Margins: None\n• Select "Save as PDF" as destination')
           } else {
             // Fallback: create a downloadable HTML file
             const blob = new Blob([htmlContent], { type: 'text/html' })

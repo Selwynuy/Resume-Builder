@@ -125,14 +125,19 @@ async function generatePDF(params: { id: string }) {
             <title>${resume.title || 'Resume'}</title>
             <style>
               @page {
-                size: A4;
+                size: A4 portrait;
                 margin: 0;
+                /* Force A4 dimensions */
+                width: 210mm;
+                height: 297mm;
               }
               
               @media print {
                 @page {
-                  size: A4;
-                  margin: 0;
+                  size: A4 portrait !important;
+                  margin: 0 !important;
+                  width: 210mm !important;
+                  height: 297mm !important;
                   /* Remove browser headers and footers */
                   -webkit-print-color-adjust: exact;
                   color-adjust: exact;
