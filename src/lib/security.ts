@@ -223,5 +223,25 @@ export const securityHeaders = {
   'Referrer-Policy': 'origin-when-cross-origin',
   'X-XSS-Protection': '1; mode=block',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;"
+  'Content-Security-Policy': process.env.NODE_ENV === 'development'
+    ? [
+        "default-src 'self';",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+        "font-src 'self' https://fonts.gstatic.com;",
+        "img-src 'self' data: https:;",
+        "object-src 'none';",
+        "base-uri 'self';",
+        "frame-ancestors 'none';"
+      ].join(' ')
+    : [
+        "default-src 'self';",
+        "script-src 'self' 'unsafe-inline';",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+        "font-src 'self' https://fonts.gstatic.com;",
+        "img-src 'self' data: https:;",
+        "object-src 'none';",
+        "base-uri 'self';",
+        "frame-ancestors 'none';"
+      ].join(' ')
 } 

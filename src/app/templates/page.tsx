@@ -91,16 +91,7 @@ export default function TemplatesPage() {
       return
     }
 
-    // Track download for all templates (now free)
-    try {
-      await fetch(`/api/templates/${template._id}/download`, {
-        method: 'POST'
-      })
-    } catch (error) {
-      console.error('Error tracking download:', error)
-    }
-    
-    // Navigate to resume builder with template
+    // No more download tracking here
     router.push(`/resume/new?customTemplate=${template._id}`)
   }
 

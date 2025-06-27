@@ -56,6 +56,8 @@ async function generatePDF(params: { id: string }) {
         console.log('🔍 Custom template found:', customTemplate ? 'YES' : 'NO')
         if (customTemplate) {
           console.log('🔍 Custom template name:', customTemplate.name)
+          // Increment downloads count for the custom template
+          await Template.findByIdAndUpdate(resume.template, { $inc: { downloads: 1 } })
         }
       } catch (error) {
         console.error('🔍 Error fetching custom template:', error)
