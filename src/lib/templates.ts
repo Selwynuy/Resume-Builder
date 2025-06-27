@@ -2,71 +2,76 @@ export interface Template {
   id: string
   name: string
   description: string
-  preview: string
-  category: 'modern' | 'classic' | 'creative' | 'minimal'
-  colors: {
+  preview?: string
+  category?: string
+  colors?: {
     primary: string
     secondary: string
     text: string
     accent: string
   }
+  // Community template specific fields
+  htmlTemplate?: string
+  cssStyles?: string
+  creator?: string
+  downloads?: number
+  rating?: number
+  isApproved?: boolean
 }
 
-export const templates: Template[] = [
-  {
-    id: 'classic',
-    name: 'Classic Professional',
-    description: 'Traditional, clean design perfect for corporate roles',
-    preview: '/templates/classic-preview.png',
-    category: 'classic',
-    colors: {
-      primary: '#000000',
-      secondary: '#666666',
-      text: '#000000',
-      accent: '#cccccc'
-    }
-  },
-  {
-    id: 'modern',
-    name: 'Modern Blue',
-    description: 'Contemporary design with blue accents',
-    preview: '/templates/modern-preview.png',
-    category: 'modern',
-    colors: {
-      primary: '#2563eb',
-      secondary: '#1e40af',
-      text: '#1f2937',
-      accent: '#3b82f6'
-    }
-  },
-  {
-    id: 'minimal',
-    name: 'Minimal Clean',
-    description: 'Simple, elegant design focusing on content',
-    preview: '/templates/minimal-preview.png',
-    category: 'minimal',
-    colors: {
-      primary: '#374151',
-      secondary: '#6b7280',
-      text: '#111827',
-      accent: '#e5e7eb'
-    }
-  },
-  {
-    id: 'creative',
-    name: 'Creative Purple',
-    description: 'Bold design for creative professionals',
-    preview: '/templates/creative-preview.png',
-    category: 'creative',
-    colors: {
-      primary: '#7c3aed',
-      secondary: '#5b21b6',
-      text: '#1f2937',
-      accent: '#a855f7'
-    }
-  }
-]
+// Remove built-in templates - now using only community templates
+export const templates: Template[] = []
 
-export const getTemplate = (id: string): Template => {
-  return templates.find(t => t.id === id) || templates[0]
+export const getTemplate = (id: string): Template | null => {
+  // For backward compatibility, return null for built-in template IDs
+  // The calling code should handle fetching community templates via API
+  console.warn(`getTemplate(${id}) called - built-in templates removed, use community templates`)
+  return null
+}
+
+// Default fallback template structure for error cases
+export const getDefaultTemplate = (): Template => {
+  return {
+    id: 'default',
+    name: 'Default Template',
+    description: 'Basic template structure',
+    htmlTemplate: `
+      <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <h1>{{personalInfo.name}}</h1>
+        <p>{{personalInfo.email}} | {{personalInfo.phone}}</p>
+        <p>{{personalInfo.location}}</p>
+        
+        <h2>Summary</h2>
+        <p>{{personalInfo.summary}}</p>
+        
+        <h2>Experience</h2>
+        {{#each experiences}}
+        <div style="margin-bottom: 15px;">
+          <h3>{{position}} at {{company}}</h3>
+          <p>{{startDate}} - {{endDate}}</p>
+          <p>{{description}}</p>
+        </div>
+        {{/each}}
+        
+        <h2>Education</h2>
+        {{#each education}}
+        <div style="margin-bottom: 10px;">
+          <h3>{{degree}} {{#if field}}in {{field}}{{/if}}</h3>
+          <p>{{school}} - {{graduationDate}}</p>
+        </div>
+        {{/each}}
+        
+        <h2>Skills</h2>
+        {{#each skills}}
+        <span style="margin-right: 15px;">{{name}} ({{level}})</span>
+        {{/each}}
+      </div>
+    `,
+    cssStyles: `
+      body { font-family: Arial, sans-serif; }
+      h1 { color: #2563eb; margin-bottom: 5px; }
+      h2 { color: #1e40af; border-bottom: 1px solid #e5e7eb; padding-bottom: 5px; }
+      h3 { color: #374151; margin-bottom: 3px; }
+    `
+  }
 } 

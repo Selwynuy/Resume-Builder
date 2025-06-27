@@ -75,32 +75,39 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
 
     // Add preview-specific adjustments
     const previewDefaults = forPreview ? `
-      /* Preview container adjustments */
+      /* A4 Preview container adjustments - only target the actual document, not our wrapper */
       .resume-document {
-        width: 100% !important;
-        max-width: 612px !important; /* 8.5 inches at 72 DPI */
-        min-height: 792px !important; /* 11 inches at 72 DPI */
-        margin: 0 auto !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-        padding: 54px !important; /* 0.75in = 54px */
+        width: 210mm !important; /* A4 width */
+        height: 297mm !important; /* A4 height */
+        margin: 0 !important;
+        padding: 20mm !important; /* Standard A4 margins */
         box-sizing: border-box !important;
-        transform: scale(0.9); /* Scale down slightly for better fit */
-        transform-origin: top;
-        overflow: hidden;
+        background: white !important;
+        overflow: hidden !important;
+        font-size: 12px !important; /* Standard document font size */
+        line-height: 1.4 !important;
       }
       
-      /* Ensure responsive behavior */
-      .content-wrapper {
-        gap: 18px !important; /* Convert 24pt to pixels */
-      }
-      
-      .right-column {
-        padding: 12px !important; /* Convert 16pt to pixels */
-      }
-      
-      /* Scale fonts slightly for readability */
+      /* Remove any conflicting transforms from templates */
       .resume-template {
-        font-size: 11px !important; /* Slightly larger than 11pt for screen */
+        transform: none !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      
+      /* Ensure content fits within A4 */
+      .content-wrapper, .main-content {
+        height: 100% !important;
+        overflow: hidden !important;
+      }
+      
+      /* Responsive adjustments for A4 */
+      .section {
+        margin-bottom: 15px !important;
+      }
+      
+      .header, .contact-info {
+        margin-bottom: 20px !important;
       }
     ` : ''
     

@@ -310,25 +310,7 @@ export default function TemplatesPage() {
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-              <div className="text-3xl font-bold text-blue-600">{customTemplates.length}</div>
-              <div className="text-gray-600">Templates Available</div>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-              <div className="text-3xl font-bold text-green-600">{customTemplates.filter(t => t.price === 0).length}</div>
-              <div className="text-gray-600">Free Templates</div>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-              <div className="text-3xl font-bold text-purple-600">{customTemplates.reduce((sum, t) => sum + t.downloads, 0)}</div>
-              <div className="text-gray-600">Total Downloads</div>
-            </div>
-            <div className="bg-white rounded-2xl p-6 shadow-sm border">
-              <div className="text-3xl font-bold text-orange-600">{new Set(customTemplates.map(t => t.creatorName)).size}</div>
-              <div className="text-gray-600">Template Creators</div>
-            </div>
-          </div>
+
 
           {/* Quick Filter Tags */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
