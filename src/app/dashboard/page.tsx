@@ -28,6 +28,9 @@ export default function DashboardPage() {
   const router = useRouter()
   const [resumes, setResumes] = useState<Resume[]>([])
   const [loading, setLoading] = useState(true)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [resumeToDelete, setResumeToDelete] = useState<Resume | null>(null)
+  const [deleting, setDeleting] = useState(false)
   const [quickStats, setQuickStats] = useState<QuickStats>({
     totalResumes: 0,
     draftResumes: 0,
@@ -84,44 +87,37 @@ export default function DashboardPage() {
     }
   }
 
-  const deleteResume = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this resume?')) return
+  const handleDeleteClick = (resume: Resume) => {
+    setResumeToDelete(resume)
+    setShowDeleteModal(true)
+  }
 
+  const confirmDelete = async () => {
+    if (!resumeToDelete) return
+
+    setDeleting(true)
     try {
-      const response = await fetch(`/api/resumes/${id}`, {
+      const response = await fetch(`/api/resumes/${resumeToDelete._id}`, {
         method: 'DELETE'
       })
 
       if (response.ok) {
-        setResumes(resumes.filter(resume => resume._id !== id))
+        setResumes(resumes.filter(resume => resume._id !== resumeToDelete._id))
+        setShowDeleteModal(false)
+        setResumeToDelete(null)
       } else {
         alert('Error deleting resume')
       }
     } catch (error) {
       alert('Error deleting resume')
+    } finally {
+      setDeleting(false)
     }
   }
 
-  const downloadPDF = async (resumeId: string, title: string) => {
-    try {
-      const response = await fetch(`/api/resumes/${resumeId}/export`)
-      
-      if (response.ok) {
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `${title}.pdf`
-        document.body.appendChild(link)
-        link.click()
-        link.remove()
-        window.URL.revokeObjectURL(url)
-      } else {
-        alert('Error downloading PDF')
-      }
-    } catch (error) {
-      alert('Error downloading PDF')
-    }
+  const cancelDelete = () => {
+    setShowDeleteModal(false)
+    setResumeToDelete(null)
   }
 
   if (status === 'loading' || loading) {
@@ -159,8 +155,6 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-
-
 
           {/* Enhanced Quick Actions */}
           <div className="max-w-7xl mx-auto mb-16">
@@ -314,20 +308,8 @@ export default function DashboardPage() {
                           {resume.isDraft ? 'Continue Editing' : 'Edit Resume'}
                         </Link>
                         
-                        {!resume.isDraft && (
-                          <button
-                            onClick={() => downloadPDF(resume._id, resume.title)}
-                            className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg"
-                            title="Download PDF"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                          </button>
-                        )}
-                        
                         <button
-                          onClick={() => deleteResume(resume._id)}
+                          onClick={() => handleDeleteClick(resume)}
                           className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300 shadow-lg"
                           title="Delete Resume"
                         >
@@ -344,6 +326,50 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl border border-white/20 p-8 max-w-md w-full mx-4 transform transition-all duration-300">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              
+              <h3 className="text-2xl font-bold text-slate-800 mb-3">Delete Resume</h3>
+              <p className="text-slate-600 mb-2">Are you sure you want to delete</p>
+              <p className="text-lg font-semibold text-slate-800 mb-6">"{resumeToDelete?.title}"?</p>
+              <p className="text-sm text-slate-500 mb-8">This action cannot be undone. All resume data will be permanently removed.</p>
+              
+              <div className="flex gap-4">
+                <button
+                  onClick={cancelDelete}
+                  disabled={deleting}
+                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                >
+                  {deleting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete Resume'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
