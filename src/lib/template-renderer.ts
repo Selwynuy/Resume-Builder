@@ -1,4 +1,5 @@
 import Handlebars from 'handlebars'
+import { sanitizeHtml, sanitizeTemplateContent, sanitizeCss } from './security'
 
 export interface TemplateData {
   htmlTemplate: string
@@ -63,15 +64,18 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
   try {
     registerHandlebarsHelpers()
     
-    const template = Handlebars.compile(htmlTemplate)
+    // Sanitize template content before compilation
+    const sanitizedTemplate = sanitizeTemplateContent(htmlTemplate)
+    const template = Handlebars.compile(sanitizedTemplate)
     const renderedHtml = template(resumeData)
     
-    // Convert print units to pixels for preview
-    const processedCss = forPreview ? cssStyles.replace(/(\d+(?:\.\d+)?)in/g, (match, num) => {
+    // Sanitize and convert print units to pixels for preview
+    const sanitizedCss = sanitizeCss(cssStyles)
+    const processedCss = forPreview ? sanitizedCss.replace(/(\d+(?:\.\d+)?)in/g, (match, num) => {
       return `${Math.round(parseFloat(num) * 72)}px` // Convert inches to pixels (72 DPI)
     }).replace(/(\d+(?:\.\d+)?)pt/g, (match, num) => {
       return `${Math.round(parseFloat(num) * 1.333)}px` // Convert points to pixels (1pt = 1.333px)
-    }) : cssStyles
+    }) : sanitizedCss
 
     // Add preview-specific adjustments
     const previewDefaults = forPreview ? `

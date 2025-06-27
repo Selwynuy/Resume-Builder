@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '../auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
+import { PersonalInfoSchema, ExperienceSchema, EducationSchema, SkillSchema, sanitizeError } from '@/lib/security'
 
 // GET - Fetch user's resumes
 export async function GET() {
@@ -45,6 +46,60 @@ export async function POST(req: Request) {
 
     const data = await req.json()
     const { personalInfo, experiences, education, skills, title, template, isDraft = false } = data
+
+    // Validate personal info
+    const personalInfoValidation = PersonalInfoSchema.safeParse(personalInfo)
+    if (!personalInfoValidation.success) {
+      return NextResponse.json(
+        { error: 'Invalid personal information: ' + personalInfoValidation.error.errors[0].message },
+        { status: 400 }
+      )
+    }
+
+    // Validate experiences
+    if (experiences && Array.isArray(experiences)) {
+      for (const exp of experiences) {
+        if (exp.company || exp.position) { // Only validate if not empty
+          const expValidation = ExperienceSchema.safeParse(exp)
+          if (!expValidation.success) {
+            return NextResponse.json(
+              { error: 'Invalid experience data: ' + expValidation.error.errors[0].message },
+              { status: 400 }
+            )
+          }
+        }
+      }
+    }
+
+    // Validate education
+    if (education && Array.isArray(education)) {
+      for (const edu of education) {
+        if (edu.school || edu.degree) { // Only validate if not empty
+          const eduValidation = EducationSchema.safeParse(edu)
+          if (!eduValidation.success) {
+            return NextResponse.json(
+              { error: 'Invalid education data: ' + eduValidation.error.errors[0].message },
+              { status: 400 }
+            )
+          }
+        }
+      }
+    }
+
+    // Validate skills
+    if (skills && Array.isArray(skills)) {
+      for (const skill of skills) {
+        if (skill.name) { // Only validate if not empty
+          const skillValidation = SkillSchema.safeParse(skill)
+          if (!skillValidation.success) {
+            return NextResponse.json(
+              { error: 'Invalid skill data: ' + skillValidation.error.errors[0].message },
+              { status: 400 }
+            )
+          }
+        }
+      }
+    }
 
     // Validate required fields for published resumes
     if (!isDraft) {
@@ -94,8 +149,9 @@ export async function POST(req: Request) {
     return NextResponse.json(resume, { status: 201 })
   } catch (error: any) {
     console.error('Resume creation error:', error)
+    const isDevelopment = process.env.NODE_ENV === 'development'
     return NextResponse.json(
-      { error: error.message || 'Failed to create resume' },
+      { error: sanitizeError(error, isDevelopment) },
       { status: 500 }
     )
   }

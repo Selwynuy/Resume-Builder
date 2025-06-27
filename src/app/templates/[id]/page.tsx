@@ -30,7 +30,7 @@ export default function TemplateDetailPage() {
   const { data: session } = useSession()
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
-  const [purchasing, setPurchasing] = useState(false)
+
 
   useEffect(() => {
     if (params.id) {
@@ -55,37 +55,7 @@ export default function TemplateDetailPage() {
     }
   }
 
-  const handlePurchase = async () => {
-    if (!session) {
-      router.push('/login')
-      return
-    }
 
-    if (template?.price === 0) {
-      // Free template - redirect to resume builder
-      router.push(`/resume/new?customTemplate=${template._id}`)
-      return
-    }
-
-    setPurchasing(true)
-    try {
-      const response = await fetch(`/api/templates/${template?._id}/purchase`, {
-        method: 'POST'
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        window.location.href = data.checkoutUrl
-      } else {
-        const errorData = await response.json()
-        alert(errorData.error || 'Error creating checkout session')
-      }
-    } catch (error) {
-      alert('Error purchasing template')
-    } finally {
-      setPurchasing(false)
-    }
-  }
 
   const handleUseTemplate = () => {
     if (!session) {
@@ -131,31 +101,15 @@ export default function TemplateDetailPage() {
                   <span className="font-medium">Downloads:</span>
                   <span>{template.downloads}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="font-medium">Price:</span>
-                  <span className="text-green-600 font-bold text-lg">
-                    {template.price === 0 ? 'Free' : `$${template.price}`}
-                  </span>
-                </div>
               </div>
 
               <div className="space-y-3">
-                {template.price === 0 ? (
-                  <button
-                    onClick={handleUseTemplate}
-                    className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    Use This Template
-                  </button>
-                ) : (
-                  <button
-                    onClick={handlePurchase}
-                    disabled={purchasing}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                  >
-                    {purchasing ? 'Processing...' : `Purchase for $${template.price}`}
-                  </button>
-                )}
+                <button
+                  onClick={handleUseTemplate}
+                  className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Use This Template
+                </button>
                 
                 <button
                   onClick={() => router.push('/templates')}
@@ -168,7 +122,7 @@ export default function TemplateDetailPage() {
               {!template.isApproved && (
                 <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <p className="text-yellow-800 text-sm">
-                    ⚠️ This template is pending approval and not yet available for purchase.
+                    ⚠️ This template is pending approval and not yet available.
                   </p>
                 </div>
               )}

@@ -120,7 +120,7 @@ export async function POST(
       userName: session.user.name || 'Anonymous',
       rating,
       comment: comment || '',
-      isVerifiedPurchase: false // TODO: Check if user actually purchased/used template
+      isVerified: false // User has used the template system
     })
     
     await review.save()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ResumeData, PersonalInfo, Experience, Education, Skill } from './types'
 import { renderTemplate } from '@/lib/template-renderer'
+import { useSafeHtml } from '@/hooks/useSafeHtml'
 
 interface ReviewStepProps {
   resumeData: ResumeData
@@ -685,7 +686,7 @@ export const ReviewStep = ({
                     transform: 'scale(0.55)', // 65% scaling
                     transformOrigin: 'center top',
                   }}
-                  dangerouslySetInnerHTML={{ __html: getResumePreview() }}
+                  dangerouslySetInnerHTML={{ __html: useSafeHtml(getResumePreview()) }}
                 />
               </div>
             </div>

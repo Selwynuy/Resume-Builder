@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import dbConnect from '@/lib/db'
 import Template from '@/models/Template'
 import User from '@/models/User'
+import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss, sanitizeError } from '@/lib/security'
 
 // GET /api/templates - Fetch all public templates
 export async function GET(request: NextRequest) {
@@ -117,13 +118,32 @@ export async function POST(request: NextRequest) {
       layout
     } = body
 
-    // Validate required fields
-    if (!name || !description || !htmlTemplate || !placeholders) {
+    // Validate template metadata
+    const metadataValidation = TemplateMetadataSchema.safeParse({
+      name,
+      description,
+      category: category || 'professional',
+      price: price || 0
+    })
+    
+    if (!metadataValidation.success) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Invalid template data: ' + metadataValidation.error.errors[0].message },
         { status: 400 }
       )
     }
+
+    // Validate required fields
+    if (!htmlTemplate || !placeholders) {
+      return NextResponse.json(
+        { error: 'HTML template and placeholders are required' },
+        { status: 400 }
+      )
+    }
+
+    // Sanitize template content
+    const sanitizedHtml = sanitizeTemplateContent(htmlTemplate)
+    const sanitizedCss = sanitizeCss(cssStyles || '')
 
     // Get user details  
     const userId = session.user.id || session.user.email
@@ -138,14 +158,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create template
+    // Create template with sanitized content
     const templateData = {
-      name,
-      description,
+      name: name.trim(),
+      description: description.trim(),
       category: category || 'professional',
       price: price || 0,
-      htmlTemplate,
-      cssStyles: cssStyles || '',
+      htmlTemplate: sanitizedHtml,
+      cssStyles: sanitizedCss,
       placeholders,
       layout: layout || 'single-column',
       createdBy: user._id,
@@ -174,15 +194,12 @@ export async function POST(request: NextRequest) {
     )
   } catch (error: any) {
     console.error('Error creating template:', error)
-    console.error('Error stack:', error.stack)
-    console.error('Error message:', error.message)
     
-    // Return more specific error information
+    const isDevelopment = process.env.NODE_ENV === 'development'
     return NextResponse.json(
       { 
-        error: 'Failed to create template',
-        details: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        error: sanitizeError(error, isDevelopment),
+        stack: isDevelopment ? error.stack : undefined
       },
       { status: 500 }
     )

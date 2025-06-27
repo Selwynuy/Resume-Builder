@@ -36,7 +36,7 @@ export default function TemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('popular')
-  const [priceFilter, setPriceFilter] = useState('all')
+
   const [loading, setLoading] = useState(true)
   const [showBuiltIn, setShowBuiltIn] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<CustomTemplate | null>(null)
@@ -52,25 +52,7 @@ export default function TemplatesPage() {
       fetchUserFavorites()
     }
 
-    // Handle purchase success/cancellation from URL params
-    const urlParams = new URLSearchParams(window.location.search)
-    const purchaseSuccess = urlParams.get('purchase_success')
-    const purchaseCancelled = urlParams.get('purchase_cancelled')
-    const templateId = urlParams.get('template_id')
 
-    if (purchaseSuccess === 'true' && templateId) {
-      setShowSuccessMessage('🎉 Purchase successful! You can now use this template.')
-      setTimeout(() => setShowSuccessMessage(''), 5000)
-      // Clean up URL parameters
-      window.history.replaceState({}, '', '/templates')
-    }
-
-    if (purchaseCancelled === 'true') {
-      setShowSuccessMessage('❌ Purchase cancelled. You can try again anytime.')
-      setTimeout(() => setShowSuccessMessage(''), 5000)
-      // Clean up URL parameters
-      window.history.replaceState({}, '', '/templates')
-    }
   }, [session])
 
   const fetchCustomTemplates = async () => {
@@ -202,10 +184,7 @@ export default function TemplatesPage() {
     const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          template.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-    const matchesPrice = priceFilter === 'all' || 
-                        (priceFilter === 'free' && template.price === 0) ||
-                        (priceFilter === 'paid' && template.price > 0)
-    return matchesCategory && matchesSearch && matchesPrice
+    return matchesCategory && matchesSearch
   })
 
   const filteredBuiltInTemplates = templates.filter(template => {
@@ -223,10 +202,7 @@ export default function TemplatesPage() {
         return b.rating - a.rating
       case 'newest':
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      case 'price-low':
-        return a.price - b.price
-      case 'price-high':
-        return b.price - a.price
+
       default:
         return 0
     }
@@ -333,19 +309,13 @@ export default function TemplatesPage() {
               🆕 Recently Added
             </button>
             <button
-              onClick={() => {setPriceFilter('free'); setSelectedCategory('all')}}
-              className={`px-4 py-2 rounded-full transition-colors ${priceFilter === 'free' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              🆓 Free Only
-            </button>
-            <button
-              onClick={() => {setSelectedCategory('professional'); setPriceFilter('all')}}
+              onClick={() => {setSelectedCategory('professional')}}
               className={`px-4 py-2 rounded-full transition-colors ${selectedCategory === 'professional' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
             >
               💼 Professional
             </button>
             <button
-              onClick={() => {setSelectedCategory('creative'); setPriceFilter('all')}}
+              onClick={() => {setSelectedCategory('creative')}}
               className={`px-4 py-2 rounded-full transition-colors ${selectedCategory === 'creative' ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
             >
               🎨 Creative
@@ -384,16 +354,6 @@ export default function TemplatesPage() {
               </select>
 
               <select
-                value={priceFilter}
-                onChange={(e) => setPriceFilter(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="all">All Prices</option>
-                <option value="free">Free Only</option>
-                <option value="paid">Premium Only</option>
-              </select>
-
-              <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
                 className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -401,8 +361,6 @@ export default function TemplatesPage() {
                 <option value="popular">🔥 Most Popular</option>
                 <option value="rating">⭐ Highest Rated</option>
                 <option value="newest">🆕 Newest</option>
-                <option value="price-low">💰 Price: Low to High</option>
-                <option value="price-high">💎 Price: High to Low</option>
               </select>
             </div>
           </div>
