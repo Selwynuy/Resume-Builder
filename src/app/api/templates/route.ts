@@ -93,8 +93,6 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession()
     
-    console.log('Session:', session) // Debug log
-    
     if (!session?.user) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -103,10 +101,8 @@ export async function POST(request: NextRequest) {
     }
 
     await dbConnect()
-    console.log('Database connected successfully') // Debug log
 
     const body = await request.json()
-    console.log('Request body:', JSON.stringify(body, null, 2)) // Debug log
     const {
       name,
       description,
@@ -147,7 +143,6 @@ export async function POST(request: NextRequest) {
 
     // Get user details  
     const userId = session.user.id || session.user.email
-    console.log('User ID:', userId) // Debug log
     
     // Always try to find by email first since session.user.id might not be set properly
     const user = await User.findOne({ email: session.user.email })
@@ -178,12 +173,8 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    console.log('Template data:', templateData) // Debug log
-    
     const template = new Template(templateData)
     const savedTemplate = await template.save()
-    
-    console.log('Template saved:', savedTemplate._id) // Debug log
 
     return NextResponse.json(
       { 
@@ -198,8 +189,7 @@ export async function POST(request: NextRequest) {
     const isDevelopment = process.env.NODE_ENV === 'development'
     return NextResponse.json(
       { 
-        error: sanitizeError(error, isDevelopment),
-        stack: isDevelopment ? error.stack : undefined
+        error: sanitizeError(error, isDevelopment)
       },
       { status: 500 }
     )

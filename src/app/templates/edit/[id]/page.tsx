@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { renderTemplate, validateTemplate, extractPlaceholders } from '@/lib/template-renderer'
+import { useSafeHtml } from '@/hooks/useSafeHtml'
 
 // Sample data for previews
 const sampleData = {
@@ -289,7 +290,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
                 {activeTab === 'preview' && (
                   <div>
                     <div className="border border-gray-200 rounded-lg p-4 bg-white min-h-[500px] max-h-[500px] overflow-auto">
-                      <div dangerouslySetInnerHTML={{ __html: getPreviewHtml() }} />
+                      <div dangerouslySetInnerHTML={{ __html: useSafeHtml(getPreviewHtml()) }} />
                     </div>
                   </div>
                 )}

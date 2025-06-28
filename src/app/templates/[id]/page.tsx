@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
+import { useSafeHtml } from '@/hooks/useSafeHtml'
 
 interface Template {
   _id: string
@@ -152,7 +153,7 @@ export default function TemplateDetailPage() {
                       fontFamily: 'Arial, sans-serif'
                     }}
                     dangerouslySetInnerHTML={{
-                      __html: (() => {
+                      __html: useSafeHtml((() => {
                         try {
                           return renderTemplate(
                             template.htmlTemplate || '', 
@@ -170,7 +171,7 @@ export default function TemplateDetailPage() {
                             </div>
                           `
                         }
-                      })()
+                      })())
                     }}
                   />
                 </div>

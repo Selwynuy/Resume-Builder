@@ -77,7 +77,7 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
         setExperiences(resume.experiences.length > 0 ? resume.experiences : [{ company: '', position: '', startDate: '', endDate: '', description: '' }])
         setEducation(resume.education.length > 0 ? resume.education : [{ school: '', degree: '', field: '', graduationDate: '', gpa: '' }])
         setSkills(resume.skills.length > 0 ? resume.skills : [{ name: '', level: 'Intermediate' }])
-        setCurrentTemplate(resume.template || 'classic')
+        setCurrentTemplate(resume.template || '')
       } else if (response.status === 404) {
         alert('Resume not found')
         router.push('/dashboard')

@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { templates } from '@/lib/templates'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
+import { useSafeHtml } from '@/hooks/useSafeHtml'
 
 interface CustomTemplate {
   _id: string
@@ -38,7 +38,6 @@ export default function TemplatesPage() {
   const [sortBy, setSortBy] = useState('popular')
 
   const [loading, setLoading] = useState(true)
-  const [showBuiltIn, setShowBuiltIn] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<CustomTemplate | null>(null)
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
@@ -51,8 +50,6 @@ export default function TemplatesPage() {
     if (session) {
       fetchUserFavorites()
     }
-
-
   }, [session])
 
   const fetchCustomTemplates = async () => {
@@ -79,10 +76,6 @@ export default function TemplatesPage() {
     } catch (error) {
       console.error('Error fetching favorites:', error)
     }
-  }
-
-  const handleSelectBuiltInTemplate = (templateId: string) => {
-    router.push(`/resume/new?template=${templateId}`)
   }
 
   const handleSelectCustomTemplate = async (template: CustomTemplate) => {
@@ -178,13 +171,6 @@ export default function TemplatesPage() {
     return matchesCategory && matchesSearch
   })
 
-  const filteredBuiltInTemplates = templates.filter(template => {
-    const matchesCategory = selectedCategory === 'all' || template.category === selectedCategory
-    const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
-
   const sortedCustomTemplates = [...filteredCustomTemplates].sort((a, b) => {
     switch (sortBy) {
       case 'popular':
@@ -193,7 +179,6 @@ export default function TemplatesPage() {
         return b.rating - a.rating
       case 'newest':
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-
       default:
         return 0
     }
@@ -205,10 +190,9 @@ export default function TemplatesPage() {
       return renderTemplate(template.htmlTemplate, template.cssStyles, sampleData, true)
     } catch (error) {
       console.error('Template preview error:', error)
-      return `<div style="padding: 2rem; color: #666; text-align: center; font-family: Arial, sans-serif;">
-        <div style="font-size: 48px; margin-bottom: 1rem;">📄</div>
-        <div>Preview not available</div>
-        <div style="font-size: 12px; margin-top: 1rem; opacity: 0.7;">${error instanceof Error ? error.message : 'Unknown error'}</div>
+      return `<div style="padding: 20px; text-align: center; color: #666; font-family: Arial;">
+        <div style="font-size: 24px; margin-bottom: 8px;">📄</div>
+        <div>Preview unavailable</div>
       </div>`
     }
   }
@@ -276,8 +260,6 @@ export default function TemplatesPage() {
               </Link>
             </div>
           </div>
-
-
 
           {/* Quick Filter Tags */}
           <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -391,7 +373,7 @@ export default function TemplatesPage() {
                           ) : (
                             <div 
                               className="w-full h-full overflow-hidden"
-                              dangerouslySetInnerHTML={{ __html: getTemplatePreview(template) }}
+                              dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(template)) }}
                               style={{ transform: 'scale(0.15)', transformOrigin: 'top left', width: '666%', height: '666%' }}
                             />
                           )}
@@ -459,53 +441,6 @@ export default function TemplatesPage() {
                   </div>
                 </section>
               )}
-              {/* Built-in Templates */}
-              {showBuiltIn && filteredBuiltInTemplates.length > 0 && (
-                <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                      <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm mr-3">Built-in</span>
-                      Professional Templates
-                    </h2>
-                      </div>
-                      
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredBuiltInTemplates.map((template) => (
-                      <div key={template.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                        <div className="bg-gradient-to-br from-gray-100 to-gray-200 h-48 flex items-center justify-center">
-                          <div className="text-6xl">📄</div>
-                      </div>
-                        
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                              {template.name}
-                            </h3>
-                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-lg text-sm font-medium">
-                              Free
-                            </span>
-                    </div>
-
-                          <p className="text-gray-600 mb-4">{template.description}</p>
-                      
-                      <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-500 capitalize bg-gray-100 px-2 py-1 rounded">
-                          {template.category}
-                        </span>
-                            
-                            <button
-                              onClick={() => handleSelectBuiltInTemplate(template.id)}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                            >
-                              Use Template
-                            </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-                </section>
-              )}
 
               {/* Community Templates */}
               <section>
@@ -543,7 +478,7 @@ export default function TemplatesPage() {
                       ) : (
                             <div 
                               className="w-full h-full overflow-hidden"
-                              dangerouslySetInnerHTML={{ __html: getTemplatePreview(template) }}
+                              dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(template)) }}
                               style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '285%', height: '285%' }}
                             />
                           )}
@@ -642,7 +577,7 @@ export default function TemplatesPage() {
                 <div className="p-6 overflow-y-auto flex-1">
                   <div 
                     className="border rounded-lg overflow-hidden"
-                    dangerouslySetInnerHTML={{ __html: getTemplatePreview(selectedTemplate) }}
+                    dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(selectedTemplate)) }}
                   />
                 </div>
                 

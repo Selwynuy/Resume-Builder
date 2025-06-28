@@ -244,4 +244,18 @@ export const securityHeaders = {
         "base-uri 'self';",
         "frame-ancestors 'none';"
       ].join(' ')
-} 
+}
+
+// Password validation schema
+export const PasswordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters long')
+  .max(128, 'Password too long')
+  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number')
+  .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Password contains invalid characters')
+
+// Registration schema
+export const RegistrationSchema = z.object({
+  name: PersonalInfoSchema.shape.name,
+  email: PersonalInfoSchema.shape.email,
+  password: PasswordSchema
+}) 

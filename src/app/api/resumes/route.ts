@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       experiences: experiences || [],
       education: education || [],
       skills: skills || [],
-      template: template || 'classic',
+      template: template || '',
       isDraft
     })
 

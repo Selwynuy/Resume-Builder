@@ -1,115 +1,6 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
-import { Template, getTemplate } from './templates'
 import { renderTemplate } from './template-renderer'
 import { renderToStaticMarkup } from 'react-dom/server'
-
-const createStyles = (template: Template) => StyleSheet.create({
-  page: {
-    fontFamily: 'Helvetica',
-    fontSize: 11,
-    paddingTop: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingBottom: 20,
-    color: template.colors.text,
-  },
-  header: {
-    borderBottom: template.id === 'minimal' ? 0 : 1,
-    borderBottomColor: template.colors.accent,
-    paddingBottom: template.id === 'minimal' ? 0 : 10,
-    backgroundColor: template.id === 'creative' ? template.colors.primary : 'transparent',
-    padding: template.id === 'creative' ? 15 : 0,
-    margin: template.id === 'creative' ? -60 : 0,
-    marginBottom: template.id === 'creative' ? 20 : 20,
-    marginTop: template.id === 'creative' ? -50 : 0,
-  },
-  name: {
-    fontSize: template.id === 'creative' ? 28 : 24,
-    fontFamily: 'Helvetica-Bold',
-    marginBottom: 5,
-    color: template.id === 'creative' ? '#ffffff' : template.colors.primary,
-    textAlign: template.id === 'modern' ? 'center' : 'left',
-  },
-  contactInfo: {
-    fontSize: 10,
-    color: template.id === 'creative' ? '#ffffff' : template.colors.secondary,
-    marginBottom: 2,
-    textAlign: template.id === 'modern' ? 'center' : 'left',
-  },
-  section: {
-    marginBottom: 15,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontFamily: 'Helvetica-Bold',
-    marginBottom: 8,
-    borderBottom: template.id === 'classic' ? 1 : 0,
-    borderBottomColor: template.colors.accent,
-    paddingBottom: template.id === 'classic' ? 2 : 0,
-    backgroundColor: template.id === 'modern' ? template.colors.primary : 'transparent',
-    color: template.id === 'modern' ? '#ffffff' : template.colors.primary,
-    padding: template.id === 'modern' ? '5 10' : 0,
-    marginLeft: template.id === 'modern' ? -10 : 0,
-    marginRight: template.id === 'modern' ? -10 : 0,
-  },
-  jobTitle: {
-    fontSize: 12,
-    fontFamily: 'Helvetica-Bold',
-    marginBottom: 2,
-    color: template.colors.primary,
-  },
-  company: {
-    fontSize: 11,
-    marginBottom: 2,
-    fontFamily: template.id === 'creative' ? 'Helvetica-Oblique' : 'Helvetica',
-  },
-  dates: {
-    fontSize: 10,
-    color: template.colors.secondary,
-    marginBottom: 5,
-  },
-  description: {
-    fontSize: 10,
-    lineHeight: 1.4,
-    marginBottom: 10,
-  },
-  skillsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: template.id === 'modern' ? 5 : 10,
-  },
-  skill: {
-    fontSize: 10,
-    marginBottom: 3,
-    backgroundColor: template.id === 'modern' ? template.colors.accent : 'transparent',
-    color: template.id === 'modern' ? '#ffffff' : template.colors.text,
-    padding: template.id === 'modern' ? '3 8' : 0,
-    borderRadius: template.id === 'modern' ? 10 : 0,
-  },
-  summary: {
-    fontSize: 11,
-    lineHeight: 1.4,
-    marginBottom: 15,
-    fontFamily: template.id === 'creative' ? 'Helvetica-Oblique' : 'Helvetica',
-    backgroundColor: template.id === 'minimal' ? '#f9f9f9' : 'transparent',
-    padding: template.id === 'minimal' ? 10 : 0,
-    borderLeft: template.id === 'minimal' ? `3 solid ${template.colors.primary}` : 0,
-    paddingLeft: template.id === 'minimal' ? 15 : 0,
-  },
-  modernSidebar: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 5,
-    backgroundColor: template.colors.primary,
-  },
-  customTemplate: {
-    fontSize: 10,
-    lineHeight: 1.3,
-    color: '#333333',
-  }
-})
 
 interface ResumeData {
   personalInfo: {
@@ -356,121 +247,187 @@ const CustomTemplatePDF = ({ data }: { data: ResumeData }) => {
   )
 }
 
+// Default styles for basic PDF structure
+const defaultStyles = StyleSheet.create({
+  page: {
+    padding: 30,
+    fontFamily: 'Helvetica'
+  },
+  header: {
+    borderBottom: 1,
+    borderBottomColor: '#2563eb',
+    paddingBottom: 10,
+    marginBottom: 20
+  },
+  name: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2563eb',
+    marginBottom: 5
+  },
+  contactInfo: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 2
+  },
+  section: {
+    marginBottom: 20
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#1e40af',
+    marginBottom: 10,
+    borderBottom: 1,
+    borderBottomColor: '#e5e7eb',
+    paddingBottom: 2
+  },
+  jobTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#374151',
+    marginBottom: 3
+  },
+  company: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 2
+  },
+  dates: {
+    fontSize: 11,
+    color: '#9ca3af',
+    marginBottom: 5
+  },
+  description: {
+    fontSize: 11,
+    lineHeight: 1.4,
+    marginTop: 5
+  },
+  summary: {
+    fontSize: 12,
+    lineHeight: 1.5,
+    color: '#374151'
+  },
+  educationItem: {
+    marginBottom: 8
+  },
+  degree: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#374151',
+    marginBottom: 3
+  },
+  school: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginBottom: 2
+  },
+  graduation: {
+    fontSize: 11,
+    color: '#9ca3af'
+  },
+  skillsGrid: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10
+  },
+  skillItem: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    fontSize: 11
+  },
+  skillName: {
+    color: '#374151'
+  },
+  skillLevel: {
+    color: '#6b7280',
+    fontSize: 10
+  }
+})
+
 export const ResumePDF = ({ data }: { data: ResumeData }) => {
-  console.log('🔍 PDF Generator - Template:', data.template)
-  console.log('🔍 PDF Generator - Has custom template?', !!data.customTemplate)
-  console.log('🔍 PDF Generator - Custom template name:', data.customTemplate?.name)
-  
   // If it's a custom template, use the simplified PDF version
   if (data.customTemplate) {
-    console.log('🔍 PDF Generator - Using CustomTemplatePDF')
     return <CustomTemplatePDF data={data} />
   }
 
-  console.log('🔍 PDF Generator - Using built-in template:', data.template)
-
-  // Otherwise use the original built-in template logic
-  const template = getTemplate(data.template || 'classic')
-  const styles = createStyles(template)
-  const sectionOrder = data.sectionOrder || ['experience', 'education', 'skills']
-
-  const renderSection = (sectionType: string) => {
-    switch (sectionType) {
-      case 'experience':
-        return data.experiences.length > 0 && data.experiences.some(exp => exp.company || exp.position) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {template.id === 'creative' ? '✦ Experience' : 'Experience'}
-            </Text>
-            {data.experiences.map((exp, index) => (
-              (exp.company || exp.position) && (
-                <View key={index} style={{ marginBottom: 10 }}>
-                  <Text style={styles.jobTitle}>{exp.position}</Text>
-                  <Text style={styles.company}>{exp.company}</Text>
-                  {(exp.startDate || exp.endDate) && (
-                    <Text style={styles.dates}>{exp.startDate} - {exp.endDate}</Text>
-                  )}
-                  {exp.description && <Text style={styles.description}>{exp.description}</Text>}
-                </View>
-              )
-            ))}
-          </View>
-        )
-
-      case 'education':
-        return data.education.length > 0 && data.education.some(edu => edu.school || edu.degree) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {template.id === 'creative' ? '✦ Education' : 'Education'}
-            </Text>
-            {data.education.map((edu, index) => (
-              (edu.school || edu.degree) && (
-                <View key={index} style={{ marginBottom: 8 }}>
-                  <Text style={styles.jobTitle}>
-                    {edu.degree} {edu.field && `in ${edu.field}`}
-                  </Text>
-                  <Text style={styles.company}>{edu.school}</Text>
-                  <Text style={styles.dates}>{edu.graduationDate}</Text>
-                  {edu.gpa && <Text style={styles.dates}>GPA: {edu.gpa}</Text>}
-                </View>
-              )
-            ))}
-          </View>
-        )
-
-      case 'skills':
-        return data.skills.length > 0 && data.skills.some(skill => skill.name) && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {template.id === 'creative' ? '✦ Skills' : 'Skills'}
-            </Text>
-            <View style={styles.skillsContainer}>
-              {data.skills.map((skill, index) => (
-                skill.name && (
-                  <Text key={index} style={styles.skill}>
-                    {template.id === 'modern' ? skill.name : `${skill.name} (${skill.level})`}
-                  </Text>
-                )
-              ))}
-            </View>
-          </View>
-        )
-
-      default:
-        return null
-    }
-  }
-
+  // Return a basic PDF structure if no template is available
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Modern template sidebar */}
-        {template.id === 'modern' && <View style={styles.modernSidebar} />}
-
+      <Page size="A4" style={defaultStyles.page}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.name}>{data.personalInfo.name}</Text>
-          {data.personalInfo.email && <Text style={styles.contactInfo}>{data.personalInfo.email}</Text>}
-          {data.personalInfo.phone && <Text style={styles.contactInfo}>{data.personalInfo.phone}</Text>}
-          {data.personalInfo.location && <Text style={styles.contactInfo}>{data.personalInfo.location}</Text>}
+        <View style={defaultStyles.header}>
+          <Text style={defaultStyles.name}>{data.personalInfo.name}</Text>
+          {data.personalInfo.email && <Text style={defaultStyles.contactInfo}>{data.personalInfo.email}</Text>}
+          {data.personalInfo.phone && <Text style={defaultStyles.contactInfo}>{data.personalInfo.phone}</Text>}
+          {data.personalInfo.location && <Text style={defaultStyles.contactInfo}>{data.personalInfo.location}</Text>}
         </View>
 
         {/* Summary */}
         {data.personalInfo.summary && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {template.id === 'creative' ? '✦ Professional Summary' : 'Professional Summary'}
-            </Text>
-            <Text style={styles.summary}>{data.personalInfo.summary}</Text>
+          <View style={defaultStyles.section}>
+            <Text style={defaultStyles.sectionTitle}>Professional Summary</Text>
+            <Text style={defaultStyles.summary}>{data.personalInfo.summary}</Text>
           </View>
         )}
 
-        {/* Dynamic sections in custom order */}
-        {sectionOrder.map((sectionType) => (
-          <View key={sectionType}>
-            {renderSection(sectionType)}
+        {/* Experience */}
+        {data.experiences.length > 0 && data.experiences.some(exp => exp.company || exp.position) && (
+          <View style={defaultStyles.section}>
+            <Text style={defaultStyles.sectionTitle}>Experience</Text>
+            {data.experiences.map((exp, index) => (
+              (exp.company || exp.position) && (
+                <View key={index} style={{ marginBottom: 10 }}>
+                  <Text style={defaultStyles.jobTitle}>{exp.position}</Text>
+                  <Text style={defaultStyles.company}>{exp.company}</Text>
+                  {(exp.startDate || exp.endDate) && (
+                    <Text style={defaultStyles.dates}>{exp.startDate} - {exp.endDate}</Text>
+                  )}
+                  {exp.description && <Text style={defaultStyles.description}>{exp.description}</Text>}
+                </View>
+              )
+            ))}
           </View>
-        ))}
+        )}
+
+        {/* Education */}
+        {data.education.length > 0 && data.education.some(edu => edu.school || edu.degree) && (
+          <View style={defaultStyles.section}>
+            <Text style={defaultStyles.sectionTitle}>Education</Text>
+            {data.education.map((edu, index) => (
+              (edu.school || edu.degree) && (
+                <View key={index} style={defaultStyles.educationItem}>
+                  <Text style={defaultStyles.degree}>
+                    {edu.degree} {edu.field && `in ${edu.field}`}
+                  </Text>
+                  <Text style={defaultStyles.school}>{edu.school}</Text>
+                  <Text style={defaultStyles.graduation}>{edu.graduationDate}</Text>
+                  {edu.gpa && <Text style={defaultStyles.graduation}>GPA: {edu.gpa}</Text>}
+                </View>
+              )
+            ))}
+          </View>
+        )}
+
+        {/* Skills */}
+        {data.skills.length > 0 && data.skills.some(skill => skill.name) && (
+          <View style={defaultStyles.section}>
+            <Text style={defaultStyles.sectionTitle}>Skills</Text>
+            <View style={defaultStyles.skillsGrid}>
+              {data.skills.map((skill, index) => (
+                skill.name && (
+                  <View key={index} style={defaultStyles.skillItem}>
+                    <Text style={defaultStyles.skillName}>{skill.name}</Text>
+                    <Text style={defaultStyles.skillLevel}>{skill.level}</Text>
+                  </View>
+                )
+              ))}
+            </View>
+          </View>
+        )}
       </Page>
     </Document>
   )

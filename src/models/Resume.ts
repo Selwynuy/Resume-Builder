@@ -54,7 +54,7 @@ const resumeSchema = new mongoose.Schema({
   skills: [skillSchema],
   template: {
     type: String,
-    default: 'classic'
+    required: true
   },
   isDraft: {
     type: Boolean,

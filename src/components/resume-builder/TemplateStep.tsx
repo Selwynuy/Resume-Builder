@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
+import { useSafeHtml } from '@/hooks/useSafeHtml'
 
 interface TemplateStepProps {
   selectedTemplate: string
@@ -16,6 +17,24 @@ export const TemplateStep = ({
 }: TemplateStepProps) => {
   const [allTemplates, setAllTemplates] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
+  const getTemplatePreviewHtml = (template: any) => {
+    try {
+      const sampleData = getSampleResumeData()
+      return renderTemplate(
+        template.htmlTemplate || '', 
+        template.cssStyles || '', 
+        sampleData, 
+        true
+      )
+    } catch (error) {
+      console.error('Template preview error:', error)
+      return `<div style="padding: 20px; text-align: center; color: #666; font-family: Arial;">
+        <div style="font-size: 24px; margin-bottom: 8px;">📄</div>
+        <div>Preview unavailable</div>
+      </div>`
+    }
+  }
 
   useEffect(() => {
     const fetchAllTemplates = async () => {
@@ -117,23 +136,7 @@ export const TemplateStep = ({
                 className="w-full h-full transform scale-[0.4] origin-top-left"
                 style={{ width: '250%', height: '250%' }}
                 dangerouslySetInnerHTML={{
-                  __html: (() => {
-                    try {
-                      const sampleData = getSampleResumeData()
-                      return renderTemplate(
-                        template.htmlTemplate || '', 
-                        template.cssStyles || '', 
-                        sampleData, 
-                        true
-                      )
-                    } catch (error) {
-                      console.error('Template preview error:', error)
-                      return `<div style="padding: 20px; text-align: center; color: #666; font-family: Arial;">
-                        <div style="font-size: 24px; margin-bottom: 8px;">📄</div>
-                        <div>Preview unavailable</div>
-                      </div>`
-                    }
-                  })()
+                  __html: useSafeHtml(getTemplatePreviewHtml(template))
                 }}
               />
             </div>

@@ -129,25 +129,21 @@ export default function NewResumePage() {
   // Function to fetch full template data
   const fetchTemplateData = async (templateId: string) => {
     if (!templateId || templateId === 'undefined') {
-      console.log('❌ Invalid templateId:', templateId)
       setSelectedTemplateData(null)
       return
     }
     
-    console.log('🔍 Fetching community template data for:', templateId)
     try {
       const response = await fetch(`/api/templates/${templateId}`)
       if (response.ok) {
         const data = await response.json()
         const template = data.template
-        console.log('✅ Community template fetched:', template)
         setSelectedTemplateData(template)
       } else {
-        console.log('❌ API fetch failed for template:', templateId)
         setSelectedTemplateData(null)
       }
     } catch (error) {
-      console.error('Error fetching template data:', error)
+      console.error('Error fetching template:', error)
       setSelectedTemplateData(null)
     }
   }
@@ -156,10 +152,8 @@ export default function NewResumePage() {
   useEffect(() => {
     const initialTemplate = searchParams.get('template') || searchParams.get('customTemplate') || resumeData.template
     if (initialTemplate) {
-      console.log('🚀 Component mounted, fetching template:', initialTemplate)
       fetchTemplateData(initialTemplate)
     } else {
-      console.log('🚀 Component mounted, no initial template specified')
       setSelectedTemplateData(null)
     }
   }, [])
@@ -167,7 +161,6 @@ export default function NewResumePage() {
   // Load template data when template changes
   useEffect(() => {
     if (resumeData.template) {
-      console.log('📝 Template changed to:', resumeData.template)
       fetchTemplateData(resumeData.template)
     }
   }, [resumeData.template])
@@ -176,7 +169,6 @@ export default function NewResumePage() {
   useEffect(() => {
     const resumeId = searchParams.get('id') || searchParams.get('edit')
     if (resumeId && session?.user && status === 'authenticated') {
-      console.log('Session ready, loading resume data for ID:', resumeId)
       setIsEditMode(true)
       setEditingResumeId(resumeId)
       loadResumeData(resumeId)
@@ -203,7 +195,7 @@ export default function NewResumePage() {
           throw new Error('Invalid JSON response from server')
         }
         
-        const templateToUse = searchParams.get('template') || searchParams.get('customTemplate') || resume.template || 'classic'
+        const templateToUse = searchParams.get('template') || searchParams.get('customTemplate') || resume.template || ''
         
         setResumeData({
           personalInfo: resume.personalInfo || {

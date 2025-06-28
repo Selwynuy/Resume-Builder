@@ -40,73 +40,55 @@ async function generatePDF(params: { id: string }) {
       )
     }
 
-  console.log('🔍 PDF Export Debug - Resume template:', resume.template)
-  console.log('🔍 PDF Export Debug - Template type:', typeof resume.template)
-  console.log('🔍 PDF Export Debug - Is built-in template?', ['classic', 'modern', 'creative', 'minimal'].includes(resume.template))
-
-  // Fetch community template data if it's a custom template
+  // Fetch community template data
   let customTemplate = null
-  if (resume.template && !['classic', 'modern', 'creative', 'minimal'].includes(resume.template)) {
-    console.log('🔍 Attempting to fetch custom template with ID:', resume.template)
-    
+  if (resume.template) {
     // Check if the template ID is a valid ObjectId
     if (mongoose.Types.ObjectId.isValid(resume.template)) {
       try {
         customTemplate = await Template.findById(resume.template)
-        console.log('🔍 Custom template found:', customTemplate ? 'YES' : 'NO')
         if (customTemplate) {
-          console.log('🔍 Custom template name:', customTemplate.name)
           // Increment downloads count for the custom template
           await Template.findByIdAndUpdate(resume.template, { $inc: { downloads: 1 } })
         }
       } catch (error) {
-        console.error('🔍 Error fetching custom template:', error)
+        console.error('Error fetching custom template:', error)
       }
-    } else {
-      console.log('🔍 Template ID is not a valid ObjectId:', resume.template)
     }
   }
 
-    // Transform resume data to match expected format
-    const resumeData = {
-      personalInfo: {
-        name: resume.personalInfo.name || '',
-        email: resume.personalInfo.email || '',
-        phone: resume.personalInfo.phone || '',
-        location: resume.personalInfo.location || '',
-        summary: resume.personalInfo.summary || ''
-      },
-      experiences: resume.experiences.map((exp: any) => ({
-        company: exp.company || '',
-        position: exp.position || '',
-        startDate: exp.startDate || '',
-        endDate: exp.endDate || '',
-        description: exp.description || ''
-      })),
-      education: resume.education.map((edu: any) => ({
-        school: edu.school || '',
-        degree: edu.degree || '',
-        field: edu.field || '',
-        graduationDate: edu.graduationDate || '',
-        gpa: edu.gpa || ''
-      })),
-      skills: resume.skills.map((skill: any) => ({
-        name: skill.name || '',
-        level: skill.level || 'Intermediate'
+  // Transform resume data to match expected format
+  const resumeData = {
+    personalInfo: {
+      name: resume.personalInfo.name || '',
+      email: resume.personalInfo.email || '',
+      phone: resume.personalInfo.phone || '',
+      location: resume.personalInfo.location || '',
+      summary: resume.personalInfo.summary || ''
+    },
+    experiences: resume.experiences.map((exp: any) => ({
+      company: exp.company || '',
+      position: exp.position || '',
+      startDate: exp.startDate || '',
+      endDate: exp.endDate || '',
+      description: exp.description || ''
     })),
-    template: resume.template || 'classic',
+    education: resume.education.map((edu: any) => ({
+      school: edu.school || '',
+      degree: edu.degree || '',
+      field: edu.field || '',
+      graduationDate: edu.graduationDate || '',
+      gpa: edu.gpa || ''
+    })),
+    skills: resume.skills.map((skill: any) => ({
+      name: skill.name || '',
+      level: skill.level || 'Intermediate'
+    })),
+    template: resume.template || '',
     customTemplate: customTemplate
   }
 
-  console.log('🔍 Final resumeData for PDF:', {
-    template: resumeData.template,
-    hasCustomTemplate: !!resumeData.customTemplate,
-    customTemplateName: resumeData.customTemplate?.name
-  })
-
   // All templates are now community templates - generate HTML for PDF printing
-  console.log('🔍 Generating HTML for community template PDF')
-  
   try {
     // Use the same renderTemplate function used everywhere else
     const htmlContent = renderTemplate(
@@ -223,7 +205,7 @@ async function generatePDF(params: { id: string }) {
       },
     })
   } catch (error) {
-    console.error('🔍 Error generating community template HTML:', error)
+    console.error('Error generating community template HTML:', error)
     
     // Return error response
     return NextResponse.json(

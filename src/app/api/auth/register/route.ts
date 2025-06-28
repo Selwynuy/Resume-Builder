@@ -1,32 +1,17 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import User from '@/models/User';
-import { PersonalInfoSchema, sanitizeError } from '@/lib/security';
+import { RegistrationSchema, sanitizeError } from '@/lib/security';
 
 export async function POST(req: Request) {
   try {
     const { email, password, name } = await req.json();
 
-    // Validate input
-    const validation = PersonalInfoSchema.pick({ name: true, email: true }).safeParse({ name, email });
+    // Validate input using the new registration schema
+    const validation = RegistrationSchema.safeParse({ name, email, password });
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid input: ' + validation.error.errors[0].message },
-        { status: 400 }
-      );
-    }
-
-    // Password validation
-    if (!password || password.length < 6) {
-      return NextResponse.json(
-        { error: 'Password must be at least 6 characters long' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length > 128) {
-      return NextResponse.json(
-        { error: 'Password too long' },
         { status: 400 }
       );
     }
