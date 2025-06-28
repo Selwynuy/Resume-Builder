@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { renderTemplate, validateTemplate, extractPlaceholders } from '@/lib/template-renderer'
-import { useSafeHtml } from '@/hooks/useSafeHtml'
+import { sanitizeTemplateContent } from '@/lib/security'
 
 // Sample data for previews
 const sampleData = {
@@ -162,13 +162,17 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     }
   }
 
-  const getPreviewHtml = () => {
-    try {
-      return renderTemplate(htmlTemplate, cssStyles, sampleData)
-    } catch (error) {
-      return `<div style="color: red; padding: 1rem;">Template Error: ${error}</div>`
+  let previewResult: { html: string; css: string }
+  try {
+    previewResult = renderTemplate(htmlTemplate, cssStyles, sampleData)
+  } catch (error) {
+    previewResult = {
+      html: `<div style=\"color: red; padding: 1rem;\">Template Error: ${error}</div>`,
+      css: ''
     }
   }
+  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+  const previewCss = previewResult.css
 
   if (status === 'loading' || loading) {
     return (
@@ -289,8 +293,9 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
 
                 {activeTab === 'preview' && (
                   <div>
+                    <style>{previewCss}</style>
                     <div className="border border-gray-200 rounded-lg p-4 bg-white min-h-[500px] max-h-[500px] overflow-auto">
-                      <div dangerouslySetInnerHTML={{ __html: useSafeHtml(getPreviewHtml()) }} />
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
                     </div>
                   </div>
                 )}

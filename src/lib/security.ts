@@ -123,7 +123,7 @@ export const sanitizeHtml = (html: string): string => {
 }
 
 // Template content sanitization (more restrictive)
-export const sanitizeTemplateContent = (html: string): string => {
+export const sanitizeTemplateContent = (html: string, forPreview: boolean = false): string => {
   if (typeof window === 'undefined') {
     // Server-side basic sanitization
     return html
@@ -140,10 +140,11 @@ export const sanitizeTemplateContent = (html: string): string => {
       'div', 'span', 'p', 'br', 'strong', 'em', 'b', 'i', 'u',
       'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
       'table', 'tr', 'td', 'th', 'thead', 'tbody',
-      'section', 'article', 'header', 'footer'
+      'section', 'article', 'header', 'footer',
+      ...(forPreview ? ['style'] : [])
     ],
-    ALLOWED_ATTR: ['class'],
-    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style', 'meta'],
+    ALLOWED_ATTR: ['class', ...(forPreview ? ['style'] : [])],
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'meta'],
     FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
   })
 }

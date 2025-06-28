@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
-import { useSafeHtml } from '@/hooks/useSafeHtml'
+import { sanitizeTemplateContent } from '@/lib/security'
 
 interface Template {
   _id: string
@@ -32,7 +32,6 @@ export default function TemplateDetailPage() {
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
 
-
   useEffect(() => {
     if (params.id) {
       fetchTemplate(params.id as string)
@@ -56,8 +55,6 @@ export default function TemplateDetailPage() {
     }
   }
 
-
-
   const handleUseTemplate = () => {
     if (!session) {
       router.push('/login')
@@ -68,6 +65,25 @@ export default function TemplateDetailPage() {
 
   // Get consistent sample data for preview
   const sampleData = getSampleResumeData()
+
+  let previewResult: { html: string; css: string } = { html: '', css: '' }
+  if (template) {
+    try {
+      previewResult = renderTemplate(
+        template.htmlTemplate || '',
+        template.cssStyles || '',
+        sampleData,
+        true
+      )
+    } catch (error) {
+      previewResult = {
+        html: `<div style=\"color: red; padding: 1rem;\">Template Error: ${error}</div>`,
+        css: ''
+      }
+    }
+  }
+  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+  const previewCss = previewResult.css
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>
@@ -134,8 +150,8 @@ export default function TemplateDetailPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Template Preview</h2>
-              
               <div className="border border-gray-200 rounded-lg bg-white shadow-lg mx-auto overflow-hidden">
+                <style>{previewCss}</style>
                 <div 
                   className="transform scale-75 origin-top-left"
                   style={{ 
@@ -152,27 +168,7 @@ export default function TemplateDetailPage() {
                       lineHeight: '1.4',
                       fontFamily: 'Arial, sans-serif'
                     }}
-                    dangerouslySetInnerHTML={{
-                      __html: useSafeHtml((() => {
-                        try {
-                          return renderTemplate(
-                            template.htmlTemplate || '', 
-                            template.cssStyles || '', 
-                            sampleData,
-                            true // Enable preview mode
-                          )
-                        } catch (error) {
-                          console.error('Template preview error:', error)
-                          return `
-                            <div style="text-align: center; padding: 50px; color: #666;">
-                              <h3>Preview Unavailable</h3>
-                              <p>Unable to render template preview</p>
-                              <p style="font-size: 10px; margin-top: 20px;">Error: ${error instanceof Error ? error.message : 'Unknown error'}</p>
-                            </div>
-                          `
-                        }
-                      })())
-                    }}
+                    dangerouslySetInnerHTML={{ __html: previewHtml }}
                   />
                 </div>
               </div>

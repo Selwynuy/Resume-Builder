@@ -60,12 +60,12 @@ export function registerHandlebarsHelpers() {
 /**
  * Render HTML template with resume data
  */
-export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeData: ResumeData, forPreview: boolean = true): string {
+export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeData: ResumeData, forPreview: boolean = true): { html: string, css: string } {
   try {
     registerHandlebarsHelpers()
     
     // Sanitize template content before compilation
-    const sanitizedTemplate = sanitizeTemplateContent(htmlTemplate)
+    const sanitizedTemplate = sanitizeTemplateContent(htmlTemplate, forPreview)
     const template = Handlebars.compile(sanitizedTemplate)
     const renderedHtml = template(resumeData)
     
@@ -115,16 +115,11 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
       }
     ` : ''
     
-    // Combine HTML with CSS
-    return `
-      <style>
-        ${previewDefaults}
-        ${processedCss}
-      </style>
-      <div class="resume-template">
-        ${renderedHtml}
-      </div>
-    `
+    // Return HTML and CSS separately
+    return {
+      html: renderedHtml,
+      css: `${previewDefaults}\n${processedCss}`
+    }
   } catch (error) {
     throw new Error(`Failed to render template: ${error}`)
   }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { ResumeData, PersonalInfo, Experience, Education, Skill } from './types'
 import { renderTemplate } from '@/lib/template-renderer'
-import { useSafeHtml } from '@/hooks/useSafeHtml'
+import { sanitizeTemplateContent } from '@/lib/security'
 
 interface ReviewStepProps {
   resumeData: ResumeData
@@ -190,6 +190,10 @@ export const ReviewStep = ({
 
   const completionPercentage = getCompletionPercentage()
 
+  const preview = getResumePreview()
+  const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview, true) : sanitizeTemplateContent(preview.html, true)
+  const previewCss = typeof preview === 'string' ? '' : preview.css || ''
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="text-center mb-6">
@@ -222,8 +226,6 @@ export const ReviewStep = ({
           </button>
         </div>
       </div>
-
-
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Resume Data with Inline Editing */}
@@ -686,8 +688,10 @@ export const ReviewStep = ({
                     transform: 'scale(0.55)', // 65% scaling
                     transformOrigin: 'center top',
                   }}
-                  dangerouslySetInnerHTML={{ __html: useSafeHtml(getResumePreview()) }}
-                />
+                >
+                  <style>{previewCss}</style>
+                  <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                </div>
               </div>
             </div>
           </div>

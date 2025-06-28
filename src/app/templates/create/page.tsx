@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData, getBuiltInTemplates } from '@/lib/template-renderer'
-import { useSafeHtml } from '@/hooks/useSafeHtml'
+import { sanitizeTemplateContent } from '@/lib/security'
 
 interface TemplateMetadata {
   name: string
@@ -35,6 +35,18 @@ export default function CreateTemplatePage() {
 
   const sampleData = getSampleResumeData()
   const builtInTemplates = getBuiltInTemplates()
+
+  let previewResult: { html: string; css: string }
+  try {
+    previewResult = renderTemplate(htmlTemplate, cssStyles, sampleData)
+  } catch (error) {
+    previewResult = {
+      html: `<div style="color: red; padding: 1rem;">Template Error: ${error}</div>`,
+      css: ''
+    }
+  }
+  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+  const previewCss = previewResult.css
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -123,14 +135,6 @@ export default function CreateTemplatePage() {
       alert(`Error ${isEditing ? 'updating' : 'publishing'} template`)
     } finally {
       setIsPublishing(false)
-    }
-  }
-
-  const getPreviewHtml = () => {
-    try {
-      return renderTemplate(htmlTemplate, cssStyles, sampleData)
-    } catch (error) {
-      return `<div style="color: red; padding: 1rem;">Template Error: ${error}</div>`
     }
   }
 
@@ -247,8 +251,9 @@ export default function CreateTemplatePage() {
 
                 {activeTab === 'preview' && (
                   <div>
+                    <style>{previewCss}</style>
                     <div className="border border-gray-200 rounded-lg p-4 bg-white min-h-[500px] max-h-[500px] overflow-auto">
-                      <div dangerouslySetInnerHTML={{ __html: useSafeHtml(getPreviewHtml()) }} />
+                      <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
                     </div>
                   </div>
                 )}

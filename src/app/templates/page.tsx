@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
-import { useSafeHtml } from '@/hooks/useSafeHtml'
+import { sanitizeTemplateContent } from '@/lib/security'
 
 interface CustomTemplate {
   _id: string
@@ -197,6 +197,25 @@ export default function TemplatesPage() {
     }
   }
 
+  function getSanitizedPreviewAndCss(template: CustomTemplate) {
+    const preview = getTemplatePreview(template)
+    if (typeof preview === 'string') {
+      return { html: sanitizeTemplateContent(preview, true), css: '' }
+    }
+    return {
+      html: sanitizeTemplateContent(preview.html, true),
+      css: preview.css || ''
+    }
+  }
+
+  // Precompute sanitized previews and CSS for trending and community templates
+  const trendingTemplates = sortedCustomTemplates.slice(0, 4)
+  const trendingPreviews = trendingTemplates.map(getSanitizedPreviewAndCss)
+  const communityPreviews = sortedCustomTemplates.map(getSanitizedPreviewAndCss)
+
+  // Precompute sanitized preview and CSS for modal
+  const selectedTemplatePreview = selectedTemplate ? getSanitizedPreviewAndCss(selectedTemplate) : { html: '', css: '' }
+
   const renderStars = (rating: number, size: 'sm' | 'md' = 'sm') => {
     const stars = []
     const fullStars = Math.floor(rating)
@@ -353,7 +372,7 @@ export default function TemplatesPage() {
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {sortedCustomTemplates.slice(0, 4).map((template, index) => (
+                    {trendingTemplates.map((template, index) => (
                       <div key={template._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative border-2 border-yellow-200">
                         {/* Trending Badge */}
                         <div className="absolute top-3 left-3 z-10">
@@ -371,11 +390,13 @@ export default function TemplatesPage() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div 
-                              className="w-full h-full overflow-hidden"
-                              dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(template)) }}
-                              style={{ transform: 'scale(0.15)', transformOrigin: 'top left', width: '666%', height: '666%' }}
-                            />
+                            <div className="w-full h-full overflow-hidden" style={{ position: 'relative' }}>
+                              <style>{trendingPreviews[index].css}</style>
+                              <div
+                                dangerouslySetInnerHTML={{ __html: trendingPreviews[index].html }}
+                                style={{ transform: 'scale(0.15)', transformOrigin: 'top left', width: '666%', height: '666%' }}
+                              />
+                            </div>
                           )}
                           
                           {/* Favorite Button */}
@@ -465,7 +486,7 @@ export default function TemplatesPage() {
               </div>
             ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedCustomTemplates.map((template) => (
+                    {sortedCustomTemplates.map((template, idx) => (
                       <div key={template._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative">
                     {/* Preview */}
                         <div className="bg-gray-50 h-80 relative">
@@ -476,11 +497,13 @@ export default function TemplatesPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                            <div 
-                              className="w-full h-full overflow-hidden"
-                              dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(template)) }}
-                              style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '285%', height: '285%' }}
-                            />
+                            <div className="w-full h-full overflow-hidden" style={{ position: 'relative' }}>
+                              <style>{communityPreviews[idx].css}</style>
+                              <div
+                                dangerouslySetInnerHTML={{ __html: communityPreviews[idx].html }}
+                                style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '285%', height: '285%' }}
+                              />
+                            </div>
                           )}
                           
                           {/* Favorite Button */}
@@ -575,10 +598,10 @@ export default function TemplatesPage() {
                 </div>
                 
                 <div className="p-6 overflow-y-auto flex-1">
-                  <div 
-                    className="border rounded-lg overflow-hidden"
-                    dangerouslySetInnerHTML={{ __html: useSafeHtml(getTemplatePreview(selectedTemplate)) }}
-                  />
+                  <div className="border rounded-lg overflow-hidden" style={{ position: 'relative' }}>
+                    <style>{selectedTemplatePreview.css}</style>
+                    <div dangerouslySetInnerHTML={{ __html: selectedTemplatePreview.html }} />
+                  </div>
                 </div>
                 
                 <div className="p-6 border-t bg-gray-50 flex-shrink-0">
