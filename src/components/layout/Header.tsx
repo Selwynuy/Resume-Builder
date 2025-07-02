@@ -31,7 +31,7 @@ const navItems = [
   },
   {
     name: "Create Resume",
-    href: "/create",
+    href: "/resume/new",
     dropdown: [
       { name: "From Scratch", href: "/create/new" },
       { name: "Import LinkedIn", href: "/create/linkedin" },
