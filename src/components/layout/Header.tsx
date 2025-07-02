@@ -76,10 +76,10 @@ export default function Header() {
               onMouseEnter={() => setActiveDropdown(item.name)}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <button className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-colors duration-200">
+              <Link href={item.href} className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-colors duration-200">
                 <span>{item.name}</span>
                 <ChevronDown className="w-4 h-4" />
-              </button>
+              </Link>
               {activeDropdown === item.name && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 animate-in fade-in-0 zoom-in-95 duration-200">
                   {item.dropdown.map((dropdownItem) => (
