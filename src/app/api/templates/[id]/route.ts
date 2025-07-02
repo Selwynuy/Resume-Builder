@@ -41,6 +41,8 @@ export async function DELETE(
       )
     }
 
+    console.log('API TEMPLATE DEBUG:', template)
+
     return NextResponse.json({ message: 'Template deleted successfully' })
   } catch (error) {
     console.error('Error deleting template:', error)
@@ -104,6 +106,8 @@ export async function GET(
         { status: 404 }
       )
     }
+
+    console.log('API TEMPLATE FULL DEBUG:', template)
 
     return NextResponse.json({ template })
   } catch (error) {
@@ -169,6 +173,8 @@ export async function PUT(
         { status: 404 }
       )
     }
+
+    console.log('API TEMPLATE DEBUG:', template)
 
     return NextResponse.json({ message: 'Template updated successfully', templateId: template._id })
   } catch (error) {

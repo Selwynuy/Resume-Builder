@@ -86,10 +86,11 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     try {
       const response = await fetch(`/api/templates/${params.id}`)
       if (response.ok) {
-        const template = await response.json()
+        const { template } = await response.json()
         
         // Check if user owns this template
-        if (template.createdBy !== session?.user?.id) {
+        console.log('DEBUG: template.createdBy =', template.createdBy, 'session.user.id =', session?.user?.id)
+        if (String(template.createdBy) !== String(session?.user?.id)) {
           alert('You can only edit your own templates')
           router.push('/dashboard')
           return
