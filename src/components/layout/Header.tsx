@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
 import {
   ChevronDown,
@@ -54,6 +54,7 @@ export default function Header() {
   const { data: session } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [accountDropdownOpen, setAccountDropdownOpen] = useState(false)
 
   return (
     <header className="w-full bg-white/80 backdrop-blur-md border-b border-slate-200/50 fixed top-0 left-0 z-50">
@@ -99,9 +100,40 @@ export default function Header() {
         {/* Account Button */}
         <div className="hidden md:flex items-center space-x-4">
           {session ? (
-            <Link href="/dashboard" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium">
-              My Account
-            </Link>
+            <div className="relative">
+              <button
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2"
+                onClick={() => setAccountDropdownOpen((v) => !v)}
+              >
+                <span>My Account</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              {accountDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                    onClick={() => setAccountDropdownOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/billing"
+                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                    onClick={() => setAccountDropdownOpen(false)}
+                  >
+                    Billing
+                  </Link>
+                  <hr className="my-2 border-slate-200" />
+                  <button
+                    onClick={() => { setAccountDropdownOpen(false); signOut(); }}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <Link href="/login" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium">
               Sign In
