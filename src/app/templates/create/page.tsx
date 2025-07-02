@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData, getBuiltInTemplates } from '@/lib/template-renderer'
+import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
 
 interface TemplateMetadata {
@@ -78,7 +78,6 @@ export default function CreateTemplatePage() {
   const [showSettings, setShowSettings] = useState(false)
 
   const sampleData = getSampleResumeData()
-  const builtInTemplates = getBuiltInTemplates()
 
   let previewResult: { html: string; css: string }
   try {
