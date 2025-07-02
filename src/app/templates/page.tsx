@@ -393,7 +393,6 @@ export default function TemplatesPage() {
               <section>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
-                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm mr-3">Templates</span>
                     Available Templates ({sortedCustomTemplates.length})
                   </h2>
                 </div>
@@ -412,7 +411,6 @@ export default function TemplatesPage() {
               </div>
             ) : (
                   <div className="px-4 py-8">
-                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Available Templates ({sortedCustomTemplates.length})</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
                       {sortedCustomTemplates.map((template, idx) => (
                         <div key={template._id} className="flex flex-col items-center w-full h-full">
