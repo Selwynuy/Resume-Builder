@@ -37,7 +37,7 @@ function ensureWrapper(html: string) {
 function TemplatePreview({ html, css }: { html: string; css: string }) {
   const sampleData = getSampleResumeData();
   const { html: renderedHtml, css: renderedCss } = renderTemplate(ensureWrapper(html), css, sampleData, true);
-  const scale = 0.392;
+  const scale = 0.35;
   return (
     <div
       className="bg-white shadow-lg rounded-md border w-full max-w-[320px] aspect-[8.5/11] overflow-hidden flex items-center justify-center"

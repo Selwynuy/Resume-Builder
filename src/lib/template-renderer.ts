@@ -84,7 +84,6 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
         width: 8.5in; 
         height: 11in;
         margin: 0;
-        padding: 0.4in;
         box-sizing: border-box;
         background: white;
         overflow: hidden;
