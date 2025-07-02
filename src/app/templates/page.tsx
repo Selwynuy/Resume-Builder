@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -26,6 +26,40 @@ interface CustomTemplate {
   createdAt: string
   tags?: string[]
   isApproved: boolean
+}
+
+function ensureWrapper(html: string) {
+  return html.includes('resume-document')
+    ? html
+    : `<div class="resume-document">${html}</div>`;
+}
+
+function TemplatePreview({ html, css }: { html: string; css: string }) {
+  const sampleData = getSampleResumeData();
+  const { html: renderedHtml, css: renderedCss } = renderTemplate(ensureWrapper(html), css, sampleData, true);
+  const scale = 0.392;
+  return (
+    <div
+      className="bg-white shadow-lg rounded-md border w-full max-w-[320px] aspect-[8.5/11] overflow-hidden flex items-center justify-center"
+      style={{ position: "relative" }}
+    >
+      <style>{renderedCss}</style>
+      <div
+        dangerouslySetInnerHTML={{ __html: renderedHtml }}
+        style={{
+          width: 816,
+          height: 1056,
+          transform: `scale(${scale})`,
+          transformOrigin: "center center",
+          pointerEvents: "none",
+          background: "#fff",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      />
+    </div>
+  );
 }
 
 export default function TemplatesPage() {
@@ -251,6 +285,10 @@ export default function TemplatesPage() {
     { value: 'academic', label: 'Academic', count: customTemplates.filter(t => t.category === 'academic').length }
   ]
 
+  console.log('First template htmlTemplate:', sortedCustomTemplates[0]?.htmlTemplate);
+  console.log('First template cssStyles:', sortedCustomTemplates[0]?.cssStyles);
+  console.log('First communityPreview:', communityPreviews[0]);
+
   return (
     <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
@@ -390,11 +428,17 @@ export default function TemplatesPage() {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full overflow-hidden" style={{ position: 'relative' }}>
+                            <div className="w-full h-full overflow-hidden flex justify-center items-start" style={{ position: 'relative' }}>
                               <style>{trendingPreviews[index].css}</style>
                               <div
                                 dangerouslySetInnerHTML={{ __html: trendingPreviews[index].html }}
-                                style={{ transform: 'scale(0.15)', transformOrigin: 'top left', width: '666%', height: '666%' }}
+                                style={{ 
+                                  width: '816px', 
+                                  height: '1056px', 
+                                  transform: 'scale(0.18)', 
+                                  transformOrigin: 'top center',
+                                  pointerEvents: 'none'
+                                }}
                               />
                             </div>
                           )}
@@ -426,7 +470,6 @@ export default function TemplatesPage() {
                               <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
                                 {template.name}
                               </h3>
-                              <p className="text-xs text-gray-500">by {template.creatorName}</p>
                             </div>
                             <div className="text-right">
                               {template.price === 0 ? (
@@ -485,90 +528,36 @@ export default function TemplatesPage() {
                 </Link>
               </div>
             ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {sortedCustomTemplates.map((template, idx) => (
-                      <div key={template._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative">
-                    {/* Preview */}
-                        <div className="bg-gray-50 h-80 relative">
-                      {template.previewImage ? (
-                        <img
-                          src={template.previewImage}
-                          alt={template.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                            <div className="w-full h-full overflow-hidden" style={{ position: 'relative' }}>
-                              <style>{communityPreviews[idx].css}</style>
-                              <div
-                                dangerouslySetInnerHTML={{ __html: communityPreviews[idx].html }}
-                                style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '285%', height: '285%' }}
-                              />
+                  <div className="px-4 py-8">
+                    <h2 className="text-2xl font-semibold mb-6">Premium Templates ({sortedCustomTemplates.length})</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
+                      {sortedCustomTemplates.map((template, idx) => (
+                        <div key={template._id} className="flex flex-col items-center w-full h-full">
+                          <TemplatePreview html={template.htmlTemplate} css={template.cssStyles} />
+                          <div className="w-full mt-2 bg-white shadow rounded-md p-4 flex flex-col gap-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-lg">{template.name}</span>
+                              {template.price === 0 ? (
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Free</span>
+                              ) : (
+                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Premium</span>
+                              )}
                             </div>
-                          )}
-                          
-                          {/* Favorite Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleFavorite(template._id)
-                            }}
-                            className="absolute top-3 right-3 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-sm hover:bg-opacity-100 transition-all"
-                          >
-                            {favorites.includes(template._id) ? '❤️' : '🤍'}
-                          </button>
-                          
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
-                            <button
-                              onClick={() => setSelectedTemplate(template)}
-                              className="bg-white bg-opacity-90 text-gray-800 px-4 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 font-medium"
-                            >
-                              👁 Preview
-                        </button>
-                      </div>
-                    </div>
-
-                        <div className="p-6">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-1">
-                                {template.name}
-                              </h3>
-                              <p className="text-sm text-gray-500">by {template.creatorName}</p>
+                            <p className="text-sm text-gray-600">{template.description}</p>
+                            <div className="flex items-center text-xs text-gray-500">
+                              <span>★ {template.rating.toFixed(1)} ({template.ratingCount} reviews)</span>
+                              <span className="ml-auto flex items-center gap-1"><svg width="16" height="16" fill="currentColor" className="inline"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-2.33 0-7 1.17-7 3.5V15h14v-2.5C15 10.17 10.33 9 8 9z"/></svg>{template.downloads}</span>
                             </div>
-                            <div className="text-right">
-                              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-sm font-semibold">
-                                Free
-                              </span>
-                            </div>
-                          </div>
-                          
-                          <p className="text-gray-600 mb-4">{template.description}</p>
-                          
-                          <div className="flex items-center mb-4">
-                            {renderStars(template.rating)}
-                            <span className="ml-2 text-sm text-gray-600">
-                              {template.rating.toFixed(1)} ({template.ratingCount} reviews)
-                        </span>
-                      </div>
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center text-sm text-gray-500">
-                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                            </svg>
-                            {template.downloads}
-                            </div>
-                            
                             <button
                               onClick={() => handleSelectCustomTemplate(template)}
-                              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                              className="mt-2 w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 transition"
                             >
                               Use Template
                             </button>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 )}
               </section>

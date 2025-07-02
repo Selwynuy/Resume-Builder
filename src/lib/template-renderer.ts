@@ -79,39 +79,39 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
 
     // Add preview-specific adjustments
     const previewDefaults = forPreview ? `
-      /* A4 Preview container adjustments - only target the actual document, not our wrapper */
+      /* US Letter Preview container adjustments - only target the actual document, not our wrapper */
       .resume-document {
-        width: 210mm !important; /* A4 width */
-        height: 297mm !important; /* A4 height */
-        margin: 0 !important;
-        padding: 20mm !important; /* Standard A4 margins */
-        box-sizing: border-box !important;
-        background: white !important;
-        overflow: hidden !important;
-        font-size: 12px !important; /* Standard document font size */
-        line-height: 1.4 !important;
+        width: 8.5in; 
+        height: 11in;
+        margin: 0;
+        padding: 0.2in;
+        box-sizing: border-box;
+        background: white;
+        overflow: hidden;
+        font-size: 12px;
+        line-height: 1.4;
       }
       
       /* Remove any conflicting transforms from templates */
       .resume-template {
-        transform: none !important;
-        width: 100% !important;
-        height: 100% !important;
+        transform: none;
+        width: 100%;
+        height: 100%;
       }
       
-      /* Ensure content fits within A4 */
+      /* Ensure content fits within Letter */
       .content-wrapper, .main-content {
-        height: 100% !important;
-        overflow: hidden !important;
+        height: 100%;
+        overflow: hidden;
       }
       
-      /* Responsive adjustments for A4 */
+      /* Responsive adjustments for Letter */
       .section {
-        margin-bottom: 15px !important;
+        margin-bottom: 15px;
       }
       
       .header, .contact-info {
-        margin-bottom: 20px !important;
+        margin-bottom: 20px;
       }
     ` : ''
     

@@ -62,10 +62,12 @@ export async function GET(request: NextRequest) {
       .populate('createdBy', 'name')
       .lean()
 
-    // Transform data to include creator name
+    // Transform data to include creator name and always include htmlTemplate/cssStyles
     const transformedTemplates = templates.map(template => ({
       ...template,
-      creatorName: (template.createdBy as any)?.name || 'Unknown'
+      creatorName: (template.createdBy as any)?.name || 'Unknown',
+      htmlTemplate: template.htmlTemplate,
+      cssStyles: template.cssStyles,
     }))
 
     const total = await Template.countDocuments(query)

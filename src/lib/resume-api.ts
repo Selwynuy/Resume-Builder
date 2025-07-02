@@ -1,0 +1,269 @@
+// Resume API utility functions
+
+export async function fetchTemplateData(templateId: string): Promise<any> {
+  if (!templateId || templateId === 'undefined') {
+    return null
+  }
+  try {
+    const response = await fetch(`/api/templates/${templateId}`)
+    if (response.ok) {
+      const data = await response.json()
+      return data.template
+    } else {
+      return null
+    }
+  } catch (error) {
+    return null
+  }
+}
+
+export async function loadResumeData(resumeId: string, searchParams: URLSearchParams): Promise<any> {
+  try {
+    const response = await fetch(`/api/resumes/${resumeId}`)
+    if (response.ok) {
+      const text = await response.text()
+      if (!text) throw new Error('Empty response from server')
+      let resume
+      try {
+        resume = JSON.parse(text)
+      } catch {
+        throw new Error('Invalid JSON response from server')
+      }
+      const templateToUse = searchParams.get('template') || searchParams.get('customTemplate') || resume.template || ''
+      return {
+        personalInfo: resume.personalInfo || {
+          name: '', email: '', phone: '', location: '', summary: ''
+        },
+        experiences: resume.experiences?.length > 0 ? resume.experiences : [
+          { company: '', position: '', startDate: '', endDate: '', description: '' }
+        ],
+        education: resume.education?.length > 0 ? resume.education : [
+          { school: '', degree: '', field: '', graduationDate: '', gpa: '' }
+        ],
+        skills: resume.skills?.length > 0 ? resume.skills : [
+          { name: '', level: 'Intermediate' }
+        ],
+        template: templateToUse
+      }
+    } else {
+      const errorText = await response.text()
+      let errorMessage = 'Failed to load resume data'
+      try {
+        const errorJson = JSON.parse(errorText)
+        errorMessage = errorJson.error || errorMessage
+      } catch {
+        errorMessage = errorText || errorMessage
+      }
+      throw new Error(errorMessage)
+    }
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to load resume data')
+  }
+}
+
+export async function saveResume({
+  session,
+  resumeData,
+  isEditMode,
+  editingResumeId,
+  router,
+  setIsEditMode,
+  setEditingResumeId,
+  setSaveMessage,
+  setIsLoading
+}: any): Promise<void> {
+  if (!session?.user?.email) {
+    alert('Please sign in to save your resume')
+    return
+  }
+  setIsLoading(true)
+  setSaveMessage('')
+  try {
+    const hasMinimumData = resumeData.personalInfo.name && 
+                          resumeData.personalInfo.email && 
+                          resumeData.personalInfo.phone && 
+                          resumeData.personalInfo.location &&
+                          resumeData.experiences.some((exp: any) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
+    const payload = {
+      title: `${resumeData.personalInfo.name || 'Untitled'} - Resume`,
+      personalInfo: resumeData.personalInfo,
+      experiences: resumeData.experiences.filter((exp: any) => 
+        exp.position?.trim() && 
+        exp.company?.trim() && 
+        exp.startDate?.trim() && 
+        exp.endDate?.trim() && 
+        exp.description?.trim()
+      ),
+      education: resumeData.education.filter((edu: any) => 
+        edu.school?.trim() && 
+        edu.degree?.trim() && 
+        edu.graduationDate?.trim()
+      ),
+      skills: resumeData.skills.filter((skill: any) => 
+        skill.name?.trim() && 
+        skill.level?.trim()
+      ),
+      template: resumeData.template,
+      isDraft: !hasMinimumData
+    }
+    const url = isEditMode && editingResumeId 
+      ? `/api/resumes/${editingResumeId}` 
+      : '/api/resumes'
+    const method = isEditMode && editingResumeId ? 'PUT' : 'POST'
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+    if (response.ok) {
+      const result = await response.json()
+      const successMessage = isEditMode 
+        ? (payload.isDraft ? '✅ Resume updated as draft!' : '✅ Resume updated successfully!')
+        : (payload.isDraft ? '✅ Resume saved as draft!' : '✅ Resume saved successfully!')
+      setSaveMessage(successMessage)
+      if (!isEditMode && result._id) {
+        setIsEditMode(true)
+        setEditingResumeId(result._id)
+        const newUrl = new URL(window.location.href)
+        newUrl.searchParams.set('id', result._id)
+        window.history.replaceState({}, '', newUrl.toString())
+      }
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 2000)
+    } else {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to save resume')
+    }
+  } catch (error: any) {
+    setSaveMessage(`❌ Error: ${error.message}`)
+  } finally {
+    setIsLoading(false)
+  }
+}
+
+export async function exportPDF({
+  session,
+  resumeData,
+  isEditMode,
+  editingResumeId,
+  setIsEditMode,
+  setEditingResumeId,
+  setSaveMessage,
+  setIsLoading,
+  router
+}: any): Promise<void> {
+  if (!session?.user?.email) {
+    alert('Please sign in to export your resume')
+    return
+  }
+  setIsLoading(true)
+  setSaveMessage('')
+  try {
+    const hasRequiredData = resumeData.personalInfo.name && 
+                           resumeData.personalInfo.email && 
+                           resumeData.personalInfo.phone && 
+                           resumeData.personalInfo.location &&
+                           resumeData.experiences.some((exp: any) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
+    if (!hasRequiredData) {
+      throw new Error('Please complete all required fields (personal info and at least one complete work experience) before exporting PDF')
+    }
+    const payload = {
+      title: `${resumeData.personalInfo.name || 'Untitled'} - Resume`,
+      personalInfo: resumeData.personalInfo,
+      experiences: resumeData.experiences.filter((exp: any) => 
+        exp.position?.trim() && 
+        exp.company?.trim() && 
+        exp.startDate?.trim() && 
+        exp.endDate?.trim() && 
+        exp.description?.trim()
+      ),
+      education: resumeData.education.filter((edu: any) => 
+        edu.school?.trim() && 
+        edu.degree?.trim() && 
+        edu.graduationDate?.trim()
+      ),
+      skills: resumeData.skills.filter((skill: any) => 
+        skill.name?.trim() && 
+        skill.level?.trim()
+      ),
+      template: resumeData.template,
+      isDraft: false
+    }
+    const url = isEditMode && editingResumeId 
+      ? `/api/resumes/${editingResumeId}` 
+      : '/api/resumes'
+    const method = isEditMode && editingResumeId ? 'PUT' : 'POST'
+    const saveResponse = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!saveResponse.ok) {
+      const errorData = await saveResponse.json()
+      throw new Error(errorData.error || 'Failed to save resume before export')
+    }
+    const savedResume = await saveResponse.json()
+    const resumeIdForPdf = isEditMode && editingResumeId ? editingResumeId : savedResume._id
+    const pdfResponse = await fetch(`/api/resumes/${resumeIdForPdf}/export`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    if (pdfResponse.ok) {
+      const contentType = pdfResponse.headers.get('Content-Type')
+      if (contentType?.includes('text/html')) {
+        const htmlContent = await pdfResponse.text()
+        const resumeTitle = pdfResponse.headers.get('X-Resume-Title') || 'Resume'
+        const printWindow = window.open('', '_blank')
+        if (printWindow) {
+          const enhancedHtml = htmlContent.replace(
+            '</head>',
+            `\n              <script>\n                window.onload = function() {\n                  setTimeout(() => {\n                    if (window.print) {\n                      window.print();\n                    }\n                    setTimeout(() => {\n                      window.close();\n                    }, 1000);\n                  }, 500);\n                };\n              </script>\n              </head>`
+          )
+          printWindow.document.write(enhancedHtml)
+          printWindow.document.close()
+          setSaveMessage('✅ PDF print dialog opened!')
+        } else {
+          const blob = new Blob([htmlContent], { type: 'text/html' })
+          const url = window.URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `${resumeTitle}.html`
+          document.body.appendChild(link)
+          link.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(link)
+          setSaveMessage('✅ HTML file downloaded!')
+        }
+      } else {
+        const blob = await pdfResponse.blob()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${resumeData.personalInfo.name || 'Resume'}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(link)
+        setSaveMessage('✅ PDF downloaded successfully!')
+      }
+    } else {
+      try {
+        const errorData = await pdfResponse.json()
+        throw new Error(errorData.error || 'Failed to export PDF')
+      } catch {
+        throw new Error(`Failed to export PDF: ${pdfResponse.statusText}`)
+      }
+    }
+  } catch (error: any) {
+    setSaveMessage(`❌ Error: ${error.message}`)
+  } finally {
+    setIsLoading(false)
+  }
+} 
