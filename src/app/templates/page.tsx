@@ -285,7 +285,7 @@ export default function TemplatesPage() {
   console.log('First communityPreview:', getSanitizedPreviewAndCss(sortedCustomTemplates[0]).html);
 
   return (
-    <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen pt-12 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Success Message */}
@@ -295,22 +295,15 @@ export default function TemplatesPage() {
             </div>
           )}
 
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-5xl font-bold gradient-text mb-6">Template Marketplace</h1>
-            <p className="text-slate-600 text-xl mb-8 max-w-3xl mx-auto">
-              Discover professional resume templates crafted by our community. 
-              Choose from free and premium options or create your own.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/resume/new"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-2xl hover:scale-105 transition-all duration-300 font-semibold shadow-lg"
-              >
-                📝 Build Resume
-              </Link>
-            </div>
+          {/* Small heading and Build Resume button above filters */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Browse Templates</h1>
+            <Link
+              href="/resume/new"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition-all duration-300 font-semibold shadow text-sm"
+            >
+              📝 Build Resume
+            </Link>
           </div>
 
           {/* Quick Filter Tags */}
@@ -398,11 +391,11 @@ export default function TemplatesPage() {
             <div className="space-y-12">
               {/* Community Templates */}
               <section>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-                    <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg text-sm mr-3">Community</span>
-                    Premium Templates ({sortedCustomTemplates.length})
-                </h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-800 flex items-center">
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm mr-3">Templates</span>
+                    Available Templates ({sortedCustomTemplates.length})
+                  </h2>
                 </div>
 
                 {sortedCustomTemplates.length === 0 ? (
@@ -419,7 +412,7 @@ export default function TemplatesPage() {
               </div>
             ) : (
                   <div className="px-4 py-8">
-                    <h2 className="text-2xl font-semibold mb-6">Premium Templates ({sortedCustomTemplates.length})</h2>
+                    <h2 className="text-xl sm:text-2xl font-semibold mb-4">Available Templates ({sortedCustomTemplates.length})</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
                       {sortedCustomTemplates.map((template, idx) => (
                         <div key={template._id} className="flex flex-col items-center w-full h-full">
