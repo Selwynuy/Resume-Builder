@@ -242,11 +242,6 @@ export default function TemplatesPage() {
     }
   }
 
-  // Precompute sanitized previews and CSS for trending and community templates
-  const trendingTemplates = sortedCustomTemplates.slice(0, 4)
-  const trendingPreviews = trendingTemplates.map(getSanitizedPreviewAndCss)
-  const communityPreviews = sortedCustomTemplates.map(getSanitizedPreviewAndCss)
-
   // Precompute sanitized preview and CSS for modal
   const selectedTemplatePreview = selectedTemplate ? getSanitizedPreviewAndCss(selectedTemplate) : { html: '', css: '' }
 
@@ -287,7 +282,7 @@ export default function TemplatesPage() {
 
   console.log('First template htmlTemplate:', sortedCustomTemplates[0]?.htmlTemplate);
   console.log('First template cssStyles:', sortedCustomTemplates[0]?.cssStyles);
-  console.log('First communityPreview:', communityPreviews[0]);
+  console.log('First communityPreview:', getSanitizedPreviewAndCss(sortedCustomTemplates[0]).html);
 
   return (
     <div className="min-h-screen pt-32 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
@@ -401,118 +396,13 @@ export default function TemplatesPage() {
             </div>
           ) : (
             <div className="space-y-12">
-              {/* Featured/Trending Templates */}
-              {customTemplates.length > 0 && (
-                <section>
-                  <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-gray-800 mb-4">🔥 Trending Templates</h2>
-                    <p className="text-gray-600">Most popular templates this week</p>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {trendingTemplates.map((template, index) => (
-                      <div key={template._id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative border-2 border-yellow-200">
-                        {/* Trending Badge */}
-                        <div className="absolute top-3 left-3 z-10">
-                          <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
-                            #{index + 1} Trending
-                </span>
-                        </div>
-                        
-                        {/* Preview */}
-                        <div className="bg-gray-50 h-48 relative">
-                          {template.previewImage ? (
-                            <img 
-                              src={template.previewImage} 
-                              alt={template.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full overflow-hidden flex justify-center items-start" style={{ position: 'relative' }}>
-                              <style>{trendingPreviews[index].css}</style>
-                              <div
-                                dangerouslySetInnerHTML={{ __html: trendingPreviews[index].html }}
-                                style={{ 
-                                  width: '816px', 
-                                  height: '1056px', 
-                                  transform: 'scale(0.18)', 
-                                  transformOrigin: 'top center',
-                                  pointerEvents: 'none'
-                                }}
-                              />
-                            </div>
-                          )}
-                          
-                          {/* Favorite Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              toggleFavorite(template._id)
-                            }}
-                            className="absolute top-3 right-3 w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-sm hover:bg-opacity-100 transition-all"
-                          >
-                            {favorites.includes(template._id) ? '❤️' : '🤍'}
-                          </button>
-                          
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300 flex items-center justify-center">
-                            <button
-                              onClick={() => setSelectedTemplate(template)}
-                              className="bg-white bg-opacity-90 text-gray-800 px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 font-medium text-sm"
-                            >
-                              👁 Preview
-                            </button>
-                          </div>
-                        </div>
-                        
-                        <div className="p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h3 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition-colors mb-1 line-clamp-1">
-                                {template.name}
-                              </h3>
-                            </div>
-                            <div className="text-right">
-                              {template.price === 0 ? (
-                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
-                                  Free
-                                </span>
-                              ) : (
-                                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                                  ${template.price}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              {renderStars(template.rating, 'sm')}
-                              <span className="ml-1 text-xs text-gray-600">
-                                ({template.ratingCount})
-                              </span>
-                            </div>
-                            
-                            <div className="flex items-center text-xs text-gray-500">
-                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                              </svg>
-                              {template.downloads}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
               {/* Community Templates */}
               <section>
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl font-bold text-gray-800 flex items-center">
                     <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg text-sm mr-3">Community</span>
                     Premium Templates ({sortedCustomTemplates.length})
-            </h2>
+                </h2>
                 </div>
 
                 {sortedCustomTemplates.length === 0 ? (
