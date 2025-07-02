@@ -196,7 +196,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
       })
       if (response.ok) {
         alert('Template updated successfully!')
-        router.push('/dashboard?tab=templates')
+        // Stay on the page after save
       } else {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to update template.')
