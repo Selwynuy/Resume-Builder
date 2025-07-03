@@ -266,3 +266,22 @@ POST /api/templates/:id/purchase
 - Template popularity
 - Revenue tracking
 - Conversion rates 
+
+## AI Integration: Google Gemini API
+
+### Setup
+- Add your Gemini API key to your environment variables as `GEMINI_API_KEY`.
+- The utility is located at `src/lib/gemini.ts`.
+
+### Usage
+```ts
+import { getGeminiCompletion } from '@/lib/gemini'
+
+const result = await getGeminiCompletion('Write a professional summary for a software engineer.')
+```
+- Supports options for system prompt, temperature, and max tokens.
+- Handles rate limiting (1.5s between calls) and logs errors.
+
+### Testing
+- Tests are in `src/lib/gemini.test.ts` (Jest).
+- Mocks fetch and environment variable for safe testing. 
