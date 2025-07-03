@@ -233,7 +233,7 @@ export const PersonalInfoStep = ({
       {/* AI Suggestion Modal */}
       {aiModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto relative">
             <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
             <h4 className="font-semibold text-lg mb-2 text-primary-700">AI Suggestion</h4>
             {aiLoading ? (
@@ -258,6 +258,11 @@ export const PersonalInfoStep = ({
                 className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300"
                 onClick={closeModal}
               >Dismiss</button>
+              <button
+                className="px-4 py-2 rounded bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 border border-slate-300"
+                onClick={() => aiSuggestion && navigator.clipboard.writeText(aiSuggestion)}
+                disabled={!aiSuggestion}
+              >Copy</button>
             </div>
           </div>
         </div>

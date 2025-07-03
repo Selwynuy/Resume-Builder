@@ -786,7 +786,7 @@ export const ReviewStep = ({
       {/* AI Modal */}
       {aiModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg relative">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto relative">
             <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
             <h4 className="font-semibold text-lg mb-2 text-primary-700">
               {aiModal.type === 'ats' ? 'ATS Scan / Job Match' :
