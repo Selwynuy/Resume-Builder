@@ -44,6 +44,10 @@ export const ReviewStep = ({
   removeSkill
 }: ReviewStepProps) => {
   const [editingSection, setEditingSection] = useState<string | null>(null)
+  const [aiModal, setAiModal] = useState<{ open: boolean; type: string }>({ open: false, type: '' })
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiResult, setAiResult] = useState('')
 
   const getCompletionPercentage = () => {
     let totalFields = 0
@@ -194,6 +198,49 @@ export const ReviewStep = ({
   const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview, true) : sanitizeTemplateContent(preview.html, true)
   const previewCss = typeof preview === 'string' ? '' : preview.css || ''
 
+  const handleAI = async (type: string) => {
+    setAiLoading(true)
+    setAiError('')
+    setAiResult('')
+    let url = ''
+    let body: any = {}
+    if (type === 'ats' || type === 'job-match') {
+      url = '/api/ai/job-match'
+      body = { resume: JSON.stringify(resumeData), jobDescription: '' } // Optionally allow user to paste job desc
+    } else if (type === 'feedback') {
+      url = '/api/ai/feedback'
+      body = { sectionText: JSON.stringify(resumeData) }
+    } else if (type === 'cover-letter') {
+      url = '/api/ai/cover-letter'
+      body = { resume: JSON.stringify(resumeData), jobDescription: '' }
+    } else if (type === 'interview-prep') {
+      url = '/api/ai/interview-prep'
+      body = { resume: JSON.stringify(resumeData), jobDescription: '' }
+    }
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
+      const data = await res.json()
+      setAiResult(data.result || data.coverLetter || data.feedback || data.suggestion || data.error || '')
+      if (data.error) setAiError(data.error)
+    } catch (e: any) {
+      setAiError(e.message || 'AI error')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+  const openModal = (type: string) => {
+    setAiModal({ open: true, type })
+    setAiResult('')
+    setAiError('')
+    handleAI(type)
+  }
+  const closeModal = () => setAiModal({ open: false, type: '' })
+  const regenerate = () => handleAI(aiModal.type)
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="text-center mb-6">
@@ -202,6 +249,32 @@ export const ReviewStep = ({
           Review
         </h3>
         <p className="text-slate-600">Finalize your resume</p>
+        <div className="flex flex-wrap gap-2 justify-center mb-4">
+          <button
+            className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700"
+            onClick={() => openModal('ats')}
+          >
+            ATS Scan
+          </button>
+          <button
+            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
+            onClick={() => openModal('feedback')}
+          >
+            AI Feedback
+          </button>
+          <button
+            className="px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700"
+            onClick={() => openModal('cover-letter')}
+          >
+            Cover Letter
+          </button>
+          <button
+            className="px-4 py-2 rounded bg-amber-600 text-white font-semibold hover:bg-amber-700"
+            onClick={() => openModal('interview-prep')}
+          >
+            Interview Prep
+          </button>
+        </div>
       </div>
 
       {/* Template Selector */}
@@ -706,6 +779,39 @@ export const ReviewStep = ({
               : 'bg-green-50 border border-green-200 text-green-700'
           }`}>
             {saveMessage}
+          </div>
+        </div>
+      )}
+
+      {/* AI Modal */}
+      {aiModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg relative">
+            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
+            <h4 className="font-semibold text-lg mb-2 text-primary-700">
+              {aiModal.type === 'ats' ? 'ATS Scan / Job Match' :
+                aiModal.type === 'feedback' ? 'AI Feedback' :
+                aiModal.type === 'cover-letter' ? 'AI Cover Letter' :
+                aiModal.type === 'interview-prep' ? 'Interview Prep' : ''}
+            </h4>
+            {aiLoading ? (
+              <div className="text-center py-8 text-slate-500">Generating...</div>
+            ) : aiError ? (
+              <div className="text-red-500 mb-4">{aiError}</div>
+            ) : aiResult ? (
+              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50 max-h-96 overflow-y-auto">{aiResult}</div>
+            ) : null}
+            <div className="flex gap-2 justify-end mt-4">
+              <button
+                className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50"
+                onClick={regenerate}
+                disabled={aiLoading}
+              >Regenerate</button>
+              <button
+                className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300"
+                onClick={closeModal}
+              >Dismiss</button>
+            </div>
           </div>
         </div>
       )}

@@ -47,7 +47,7 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 - [x] Integrate AI bullet suggestion in ExperienceStep (frontend)
 - [x] Integrate AI summary suggestion in PersonalInfoStep (frontend)
 - [x] Integrate AI skills suggestion in SkillsStep (frontend)
-- [ ] Integrate AI in review step (ATS/job match, feedback, cover letter)
+- [x] Integrate AI in review step (ATS/job match, feedback, cover letter, interview prep)
 - [ ] Add voice input for experience/summary
 - [ ] Match UI/UX to current design
 - [ ] Update documentation and onboarding
