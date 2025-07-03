@@ -306,40 +306,6 @@ export default function TemplatesPage() {
             </Link>
           </div>
 
-          {/* Quick Filter Tags */}
-          <div className="flex flex-wrap justify-center gap-3 mb-8">
-            <button
-              onClick={() => {setSortBy('popular'); setSelectedCategory('all')}}
-              className={`px-4 py-2 rounded-full transition-colors ${sortBy === 'popular' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              🔥 Most Popular
-            </button>
-            <button
-              onClick={() => {setSortBy('rating'); setSelectedCategory('all')}}
-              className={`px-4 py-2 rounded-full transition-colors ${sortBy === 'rating' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              ⭐ Top Rated
-            </button>
-            <button
-              onClick={() => {setSortBy('newest'); setSelectedCategory('all')}}
-              className={`px-4 py-2 rounded-full transition-colors ${sortBy === 'newest' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              🆕 Recently Added
-            </button>
-            <button
-              onClick={() => {setSelectedCategory('professional')}}
-              className={`px-4 py-2 rounded-full transition-colors ${selectedCategory === 'professional' ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              💼 Professional
-            </button>
-            <button
-              onClick={() => {setSelectedCategory('creative')}}
-              className={`px-4 py-2 rounded-full transition-colors ${selectedCategory === 'creative' ? 'bg-orange-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
-            >
-              🎨 Creative
-            </button>
-          </div>
-
           {/* Filters */}
           <div className="bg-white rounded-2xl shadow-sm border p-6 mb-8">
             <div className="flex flex-col lg:flex-row gap-6">
