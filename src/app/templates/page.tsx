@@ -280,10 +280,6 @@ export default function TemplatesPage() {
     { value: 'academic', label: 'Academic', count: customTemplates.filter(t => t.category === 'academic').length }
   ]
 
-  console.log('First template htmlTemplate:', sortedCustomTemplates[0]?.htmlTemplate);
-  console.log('First template cssStyles:', sortedCustomTemplates[0]?.cssStyles);
-  console.log('First communityPreview:', getSanitizedPreviewAndCss(sortedCustomTemplates[0]).html);
-
   return (
     <div className="min-h-screen pt-12 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
