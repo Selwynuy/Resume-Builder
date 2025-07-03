@@ -123,7 +123,7 @@ export default function Header() {
                     onClick={() => setAccountDropdownOpen(false)}
                   >
                     Billing
-                  </Link>
+            </Link>
                   <hr className="my-2 border-slate-200" />
                   <button
                     onClick={() => { setAccountDropdownOpen(false); signOut(); }}
@@ -137,14 +137,14 @@ export default function Header() {
           ) : (
             <Link href="/login" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium">
               Sign In
-            </Link>
+          </Link>
           )}
           {/* Mobile menu button */}
           <button className="md:hidden ml-2 p-2 rounded hover:bg-gray-200" onClick={() => setMobileMenuOpen(v => !v)}>
             {mobileMenuOpen ? <X className="h-7 w-7 text-gray-700" /> : <Menu className="h-7 w-7 text-gray-700" />}
-          </button>
-        </div>
-      </div>
+                </button>
+                  </div>
+                </div>
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-white border-t border-slate-200 px-4 py-4">
@@ -167,17 +167,17 @@ export default function Header() {
             </div>
           ))}
           <hr className="border-slate-200" />
-          {session ? (
+              {session ? (
             <Link href="/dashboard" className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium block text-center mt-4">
-              My Account
-            </Link>
-          ) : (
+                  My Account
+                  </Link>
+              ) : (
             <Link href="/login" className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-lg font-medium block text-center mt-4">
-              Sign In
-            </Link>
-          )}
-        </div>
-      )}
+                  Sign In
+                  </Link>
+              )}
+          </div>
+        )}
     </header>
   )
 } 

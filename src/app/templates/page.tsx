@@ -76,14 +76,10 @@ export default function TemplatesPage() {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
   const [submittingReview, setSubmittingReview] = useState(false)
-  const [favorites, setFavorites] = useState<string[]>([])
   const [showSuccessMessage, setShowSuccessMessage] = useState('')
 
   useEffect(() => {
     fetchCustomTemplates()
-    if (session) {
-      fetchUserFavorites()
-    }
   }, [session])
 
   const fetchCustomTemplates = async () => {
@@ -97,18 +93,6 @@ export default function TemplatesPage() {
       console.error('Error fetching templates:', error)
     } finally {
       setLoading(false)
-    }
-  }
-
-  const fetchUserFavorites = async () => {
-    try {
-      const response = await fetch('/api/user/favorites')
-      if (response.ok) {
-        const data = await response.json()
-        setFavorites(data.favorites || [])
-      }
-    } catch (error) {
-      console.error('Error fetching favorites:', error)
     }
   }
 
@@ -147,53 +131,6 @@ export default function TemplatesPage() {
       alert('Error submitting review')
     } finally {
       setSubmittingReview(false)
-    }
-  }
-
-  const toggleFavorite = async (templateId: string) => {
-    if (!session) return
-    
-    const isCurrentlyFavorited = favorites.includes(templateId)
-    const action = isCurrentlyFavorited ? 'remove' : 'add'
-    
-    // Optimistic update
-    setFavorites(prev => 
-      isCurrentlyFavorited 
-        ? prev.filter(id => id !== templateId)
-        : [...prev, templateId]
-    )
-    
-    try {
-      const response = await fetch('/api/user/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, action })
-      })
-      
-      if (response.ok) {
-        const data = await response.json()
-        setFavorites(data.favorites)
-        
-        // Show success message
-        const actionText = action === 'add' ? 'added to' : 'removed from'
-        setShowSuccessMessage(`Template ${actionText} favorites!`)
-        setTimeout(() => setShowSuccessMessage(''), 3000)
-      } else {
-        // Revert optimistic update on error
-        setFavorites(prev => 
-          isCurrentlyFavorited 
-            ? [...prev, templateId]
-            : prev.filter(id => id !== templateId)
-        )
-      }
-    } catch (error) {
-      console.error('Error updating favorites:', error)
-      // Revert optimistic update on error
-      setFavorites(prev => 
-        isCurrentlyFavorited 
-          ? [...prev, templateId]
-          : prev.filter(id => id !== templateId)
-      )
     }
   }
 

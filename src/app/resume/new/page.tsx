@@ -168,10 +168,10 @@ export default function NewResumePage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-slate-600">
             {authStatus === 'loading' ? 'Loading...' : 'Loading resume data...'}
-          </p>
-        </div>
-      </div>
-    )
+                                  </p>
+                              </div>
+                            </div>
+                          )
   }
 
   if (authStatus === 'unauthenticated') {
@@ -183,12 +183,12 @@ export default function NewResumePage() {
           <Link href="/login" className="btn-gradient">
             Sign In
           </Link>
-        </div>
-      </div>
-    )
+                        </div>
+                      </div>
+                    )
   }
 
-  return (
+    return (
     <>
       <div className="min-h-screen pt-32 pb-12">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -198,49 +198,49 @@ export default function NewResumePage() {
             {renderCurrentStep()}
           </div>
 
-          <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center">
+          <button
+            onClick={prevStep}
+            disabled={currentStep === 1}
+            className={`
+              px-6 py-3 rounded-xl font-medium transition-all duration-300
+              ${currentStep === 1 
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+              }
+            `}
+          >
+            ← Previous
+          </button>
+
+          <div className="text-center">
+            <span className="text-sm text-slate-500">
+              Step {currentStep} of {STEPS.length}
+            </span>
+                              </div>
+
+          {currentStep < STEPS.length ? (
             <button
-              onClick={prevStep}
-              disabled={currentStep === 1}
+              onClick={nextStep}
+              disabled={!canProceed()}
               className={`
                 px-6 py-3 rounded-xl font-medium transition-all duration-300
-                ${currentStep === 1 
+                ${!canProceed()
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                  : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:scale-105'
                 }
               `}
             >
-              ← Previous
+              Next →
             </button>
-
-            <div className="text-center">
-              <span className="text-sm text-slate-500">
-                Step {currentStep} of {STEPS.length}
-              </span>
+          ) : (
+            <div className="px-6 py-3 text-slate-500 text-sm">
+              ✨ All steps completed! Use the buttons above to save or export.
+          </div>
+              )}
             </div>
-
-            {currentStep < STEPS.length ? (
-              <button
-                onClick={nextStep}
-                disabled={!canProceed()}
-                className={`
-                  px-6 py-3 rounded-xl font-medium transition-all duration-300
-                  ${!canProceed()
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:scale-105'
-                  }
-                `}
-              >
-                Next →
-              </button>
-            ) : (
-              <div className="px-6 py-3 text-slate-500 text-sm">
-                ✨ All steps completed! Use the buttons above to save or export.
-              </div>
-            )}
           </div>
         </div>
-      </div>
-    </>
+      </>
   )
 } 

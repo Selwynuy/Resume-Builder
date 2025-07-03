@@ -175,11 +175,11 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     }
     setSaving(true)
     try {
-      const validation = validateTemplate(htmlTemplate, cssStyles)
-      if (!validation.isValid) {
-        alert(`Template validation failed: ${validation.errors.join(', ')}`)
-        return
-      }
+    const validation = validateTemplate(htmlTemplate, cssStyles)
+    if (!validation.isValid) {
+      alert(`Template validation failed: ${validation.errors.join(', ')}`)
+      return
+    }
       const placeholders = extractPlaceholders(htmlTemplate)
       const url = `/api/templates/${params.id}`
       const method = 'PUT'
@@ -272,7 +272,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button
+                  <button
             onClick={() => setShowSettings(true)}
             className="p-2 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
             title="Settings"
@@ -281,15 +281,15 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.01c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.01 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.01 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.01c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.01c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.01-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.01-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.01z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-          </button>
-          <button
+                  </button>
+                  <button
             onClick={handleSave}
             disabled={saving || !metadata.name.trim() || !metadata.category || !metadata.description.trim()}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {saving ? 'Saving...' : 'Save Template'}
-          </button>
-        </div>
+                  </button>
+                </div>
       </div>
       {/* Code Editor Panels */}
       <div className="flex w-full bg-gray-50 border-b border-gray-200" style={{ minHeight: '260px' }}>
@@ -299,29 +299,29 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
             <span className="text-red-500 font-semibold mr-2">●</span>
             <span className="text-sm font-medium">HTML</span>
           </div>
-          <textarea
-            value={htmlTemplate}
+                    <textarea
+                      value={htmlTemplate}
             onChange={e => setHtmlTemplate(e.target.value)}
             className="w-full h-56 bg-gray-50 text-gray-900 font-mono text-sm p-4 focus:outline-none resize-none border-none"
             placeholder="<!-- Write your HTML template here -->"
             spellCheck={false}
           />
-        </div>
+                    </div>
         {/* CSS Panel */}
         <div className="flex-1">
           <div className="flex items-center px-4 py-2 bg-gray-100 border-b border-gray-200">
             <span className="text-blue-500 font-semibold mr-2">★</span>
             <span className="text-sm font-medium">CSS</span>
-          </div>
-          <textarea
-            value={cssStyles}
+                  </div>
+                    <textarea
+                      value={cssStyles}
             onChange={e => setCssStyles(e.target.value)}
             className="w-full h-56 bg-gray-50 text-gray-900 font-mono text-sm p-4 focus:outline-none resize-none border-none"
             placeholder="/* Write your CSS here */"
             spellCheck={false}
-          />
-        </div>
-      </div>
+                    />
+                  </div>
+                    </div>
       {/* Error Message */}
       {error && (
         <div className="bg-red-100 text-red-700 px-4 py-2 text-sm text-center">{error}</div>
