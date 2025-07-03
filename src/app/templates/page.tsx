@@ -298,12 +298,6 @@ export default function TemplatesPage() {
           {/* Small heading and Build Resume button above filters */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Browse Templates</h1>
-            <Link
-              href="/resume/new"
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition-all duration-300 font-semibold shadow text-sm"
-            >
-              📝 Build Resume
-            </Link>
           </div>
 
           {/* Filters */}
