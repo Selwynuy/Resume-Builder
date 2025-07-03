@@ -225,6 +225,10 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
+        {/* Resume Scoring Card */}
+        {resumes.length > 0 && (
+          <ResumeScoreCard resume={resumes[0]} />
+        )}
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
@@ -384,6 +388,77 @@ export default function Dashboard() {
           </div>
         )}
       </main>
+    </div>
+  )
+}
+
+function ResumeScoreCard({ resume }: { resume: Resume }) {
+  const [score, setScore] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+
+  useEffect(() => {
+    const fetchScore = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const res = await fetch("/api/ai/score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ resume: resume.personalInfo.name + "\n" + resume.title })
+        })
+        if (!res.ok) throw new Error(await res.text())
+        setScore(await res.json())
+      } catch (e: any) {
+        setError(e.message || "Error scoring resume")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchScore()
+  }, [resume])
+
+  return (
+    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md mb-8">
+      <CardContent className="p-6">
+        <h2 className="text-xl font-bold mb-2 text-primary-700 flex items-center gap-2">
+          <FileCheck className="h-5 w-5 text-green-600" /> Resume Score
+        </h2>
+        {loading ? (
+          <div className="text-slate-500">Scoring...</div>
+        ) : error ? (
+          <div className="text-red-500">{error}</div>
+        ) : score ? (
+          <div className="space-y-2">
+            <div className="flex gap-4 flex-wrap">
+              <ScoreBar label="Overall" value={score.overallScore} color="bg-blue-500" />
+              <ScoreBar label="ATS" value={score.atsScore} color="bg-green-500" />
+              <ScoreBar label="Keyword Match" value={score.keywordMatch} color="bg-yellow-500" />
+              <ScoreBar label="Readability" value={score.readability} color="bg-purple-500" />
+            </div>
+            <div className="mt-4">
+              <h3 className="font-semibold text-slate-700 mb-1">Suggestions</h3>
+              <ul className="list-disc pl-6 text-slate-700 text-sm">
+                {score.suggestions?.map((s: string, i: number) => (
+                  <li key={i}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  )
+}
+
+function ScoreBar({ label, value, color }: { label: string, value: number, color: string }) {
+  return (
+    <div className="flex flex-col items-start min-w-[120px]">
+      <span className="text-xs font-medium text-slate-600 mb-1">{label}</span>
+      <div className="w-full bg-slate-200 rounded-full h-3 mb-1">
+        <div className={`${color} h-3 rounded-full`} style={{ width: `${value || 0}%` }}></div>
+      </div>
+      <span className="text-xs font-semibold text-slate-700">{value != null ? value + "%" : "N/A"}</span>
     </div>
   )
 }

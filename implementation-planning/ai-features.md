@@ -24,8 +24,7 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 - [x] Real-time feedback as user edits
 - [x] Interview prep (generate questions, suggest answers)
 
-### 5. Personalization & Voice Input
-- [ ] Voice-to-text resume builder
+### 5. Personalization
 - [ ] AI adapts to user's writing style
 
 ### 6. Analytics & Insights
@@ -48,7 +47,6 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 - [x] Integrate AI summary suggestion in PersonalInfoStep (frontend)
 - [x] Integrate AI skills suggestion in SkillsStep (frontend)
 - [x] Integrate AI in review step (ATS/job match, feedback, cover letter, interview prep)
-- [ ] Add voice input for experience/summary
 - [ ] Match UI/UX to current design
 - [ ] Update documentation and onboarding
 - [x] Verify all linter errors are fixed (backend)

@@ -285,3 +285,14 @@ const result = await getGeminiCompletion('Write a professional summary for a sof
 ### Testing
 - Tests are in `src/lib/gemini.test.ts` (Jest).
 - Mocks fetch and environment variable for safe testing. 
+
+# Changelog
+
+- AI Suggestion modals (PersonalInfoStep, ExperienceStep, SkillsStep) are now wide, scrollable, and include a Copy button for convenience.
+- Gemini API endpoint updated to use gemini-2.0-flash (v1beta).
+
+## AI Features
+
+- AI Suggestion modals now handle large responses gracefully with a wide, scrollable design.
+- Users can copy AI-generated suggestions to clipboard with a single click.
+- Gemini API integration uses the latest gemini-2.0-flash model for faster, more cost-effective suggestions. 
