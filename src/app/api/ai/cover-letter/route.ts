@@ -1,0 +1,14 @@
+import { NextResponse } from 'next/server'
+import { getGeminiCompletion } from '@/lib/gemini'
+
+export async function POST(req: Request) {
+  try {
+    const { resume, jobDescription } = await req.json()
+    if (!resume || !jobDescription) return NextResponse.json({ error: 'Missing resume or jobDescription' }, { status: 400 })
+    const prompt = `Write a personalized cover letter for this job application.\nResume:\n${resume}\nJob Description:\n${jobDescription}`
+    const coverLetter = await getGeminiCompletion(prompt)
+    return NextResponse.json({ coverLetter })
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message || 'AI error' }, { status: 500 })
+  }
+} 
