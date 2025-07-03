@@ -8,7 +8,7 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 ## Features & Subtasks
 
 ### 1. AI Resume Content Generation & Enhancement
-- [x] AI Bullet Point Writer (generate, rewrite, expand, shorten, impact)
+- [x] AI Bullet Point Writer (generate, rewrite, expand, shorten, impact) — ExperienceStep UI integrated
 - [x] AI Summary/Objective Generator
 - [x] AI Skills Suggestion
 - [x] Grammar & Style Enhancer
@@ -44,7 +44,8 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 - [x] Add tests for Gemini API utility
 - [x] Add backend endpoints for all AI features
 - [x] Add tests for endpoints and UI (backend endpoints tested)
-- [ ] Integrate AI buttons, modals, and feedback in frontend
+- [x] Integrate AI bullet suggestion in ExperienceStep (frontend)
+- [ ] Integrate AI in other resume steps (summary, skills, review)
 - [ ] Add voice input for experience/summary
 - [ ] Match UI/UX to current design
 - [ ] Update documentation and onboarding

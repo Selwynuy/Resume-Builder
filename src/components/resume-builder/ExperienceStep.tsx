@@ -1,4 +1,5 @@
 import { Experience } from './types'
+import { useState } from 'react'
 
 interface ExperienceStepProps {
   experiences: Experience[]
@@ -13,6 +14,48 @@ export const ExperienceStep = ({
   addExperience,
   removeExperience
 }: ExperienceStepProps) => {
+  const [aiModal, setAiModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null })
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiSuggestion, setAiSuggestion] = useState('')
+
+  const handleAISuggest = async (index: number) => {
+    setAiLoading(true)
+    setAiError('')
+    setAiSuggestion('')
+    try {
+      const res = await fetch('/api/ai/bullet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: experiences[index].description, mode: 'rewrite' })
+      })
+      const data = await res.json()
+      if (data.suggestion) setAiSuggestion(data.suggestion)
+      else setAiError(data.error || 'No suggestion returned')
+    } catch (e: any) {
+      setAiError(e.message || 'AI error')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  const openModal = (index: number) => {
+    setAiModal({ open: true, index })
+    setAiSuggestion('')
+    setAiError('')
+    handleAISuggest(index)
+  }
+  const closeModal = () => setAiModal({ open: false, index: null })
+  const applySuggestion = () => {
+    if (aiModal.index !== null && aiSuggestion) {
+      updateExperience(aiModal.index, 'description', aiSuggestion)
+      closeModal()
+    }
+  }
+  const regenerate = () => {
+    if (aiModal.index !== null) handleAISuggest(aiModal.index)
+  }
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center mb-8">
@@ -87,7 +130,16 @@ export const ExperienceStep = ({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Job Description</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center justify-between">
+                <span>Job Description</span>
+                <button
+                  type="button"
+                  className="ml-2 text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-2 py-1 transition-all duration-200"
+                  onClick={() => openModal(index)}
+                >
+                  AI Suggest
+                </button>
+              </label>
               <textarea
                 placeholder="Describe your key responsibilities and achievements..."
                 value={experience.description}
@@ -109,6 +161,39 @@ export const ExperienceStep = ({
           Add Another Position
         </button>
       </div>
+
+      {/* AI Suggestion Modal */}
+      {aiModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
+            <h4 className="font-semibold text-lg mb-2 text-primary-700">AI Suggestion</h4>
+            {aiLoading ? (
+              <div className="text-center py-8 text-slate-500">Generating suggestion...</div>
+            ) : aiError ? (
+              <div className="text-red-500 mb-4">{aiError}</div>
+            ) : aiSuggestion ? (
+              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50">{aiSuggestion}</div>
+            ) : null}
+            <div className="flex gap-2 justify-end mt-4">
+              <button
+                className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50"
+                onClick={regenerate}
+                disabled={aiLoading}
+              >Regenerate</button>
+              <button
+                className="px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50"
+                onClick={applySuggestion}
+                disabled={!aiSuggestion || aiLoading}
+              >Apply</button>
+              <button
+                className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300"
+                onClick={closeModal}
+              >Dismiss</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
