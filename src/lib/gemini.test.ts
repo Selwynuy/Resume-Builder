@@ -6,8 +6,8 @@ const fetch = require('node-fetch')
 describe('getGeminiCompletion', () => {
   const OLD_ENV = process.env
   beforeEach(() => {
-    jest.resetModules()
     process.env = { ...OLD_ENV, GEMINI_API_KEY: 'test-key' }
+    jest.resetModules()
   })
   afterAll(() => {
     process.env = OLD_ENV
@@ -24,7 +24,11 @@ describe('getGeminiCompletion', () => {
 
   it('throws if GEMINI_API_KEY is missing', async () => {
     process.env.GEMINI_API_KEY = ''
-    await expect(getGeminiCompletion('test')).rejects.toThrow('GEMINI_API_KEY not set')
+    jest.resetModules()
+    // Remove fetch mock for this test
+    jest.unmock('node-fetch')
+    const { getGeminiCompletion: freshGemini } = require('./gemini')
+    await expect(freshGemini('test')).rejects.toThrow('GEMINI_API_KEY not set')
   })
 
   it('throws on Gemini API error', async () => {

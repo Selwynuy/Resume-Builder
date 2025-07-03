@@ -83,6 +83,9 @@
     ### Plan Approval
     - Before starting any implementation, present the plan to the user and get explicit approval before proceeding with any code or documentation changes.
 
+    ### GitHub Commit Rule
+    - After every change or completed step, add a command for committing the change to GitHub (e.g., 'git add ... && git commit -m "<message>"').
+
     
     3. **Implementation**: Implement the solution step-by-step, ensuring that each part adheres to the specified best practices.
     4. **Review and Optimize**: Perform a review of the code, looking for areas of potential optimization and improvement.
