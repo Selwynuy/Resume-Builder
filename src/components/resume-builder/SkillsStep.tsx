@@ -1,4 +1,5 @@
 import { Skill } from './types'
+import { useState } from 'react'
 
 interface SkillsStepProps {
   skills: Skill[]
@@ -14,12 +15,89 @@ export const SkillsStep = ({
   removeSkill
 }: SkillsStepProps) => {
   const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
+  const [aiModal, setAiModal] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [aiSkills, setAiSkills] = useState<string[]>([])
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+
+  // Optionally, you could pass job title/industry from parent or context
+  const jobTitle = ''
+  const industry = ''
+
+  const handleAISuggest = async () => {
+    setAiLoading(true)
+    setAiError('')
+    setAiSkills([])
+    setSelected(new Set())
+    try {
+      const res = await fetch('/api/ai/skills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobTitle, industry })
+      })
+      const data = await res.json()
+      if (data.skills) setAiSkills(data.skills)
+      else setAiError(data.error || 'No skills returned')
+    } catch (e: any) {
+      setAiError(e.message || 'AI error')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+  const openModal = () => {
+    setAiModal(true)
+    setAiSkills([])
+    setAiError('')
+    setSelected(new Set())
+    handleAISuggest()
+  }
+  const closeModal = () => setAiModal(false)
+  const toggleSkill = (skill: string) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      if (next.has(skill)) next.delete(skill)
+      else next.add(skill)
+      return next
+    })
+  }
+  const addSelected = () => {
+    Array.from(selected).forEach(skill => {
+      // Only add if not already present
+      if (!skills.some(s => s.name.toLowerCase() === skill.toLowerCase())) {
+        updateSkill(skills.length, 'name', skill)
+        updateSkill(skills.length, 'level', 'Intermediate')
+        addSkill()
+      }
+    })
+    closeModal()
+  }
+  const addAll = () => {
+    aiSkills.forEach(skill => {
+      if (!skills.some(s => s.name.toLowerCase() === skill.toLowerCase())) {
+        updateSkill(skills.length, 'name', skill)
+        updateSkill(skills.length, 'level', 'Intermediate')
+        addSkill()
+      }
+    })
+    closeModal()
+  }
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center mb-8">
         <h3 className="text-lg font-semibold text-slate-800 mb-2">Your Skills</h3>
         <p className="text-slate-600">Showcase your technical and soft skills</p>
+      </div>
+
+      <div className="flex justify-end mb-4">
+        <button
+          type="button"
+          className="text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-3 py-2 transition-all duration-200"
+          onClick={openModal}
+        >
+          AI Suggest
+        </button>
       </div>
 
       <div className="space-y-4">
@@ -89,6 +167,51 @@ export const SkillsStep = ({
           Add Another Skill
         </button>
       </div>
+
+      {/* AI Suggestion Modal */}
+      {aiModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative">
+            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
+            <h4 className="font-semibold text-lg mb-2 text-primary-700">AI Skill Suggestions</h4>
+            {aiLoading ? (
+              <div className="text-center py-8 text-slate-500">Generating suggestions...</div>
+            ) : aiError ? (
+              <div className="text-red-500 mb-4">{aiError}</div>
+            ) : aiSkills.length ? (
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {aiSkills.map(skill => (
+                    <button
+                      key={skill}
+                      className={`px-3 py-1 rounded-full border text-sm ${selected.has(skill) ? 'bg-primary-600 text-white border-primary-600' : 'bg-slate-100 text-slate-700 border-slate-200'}`}
+                      onClick={() => toggleSkill(skill)}
+                    >
+                      {skill}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className="flex gap-2 justify-end mt-4">
+              <button
+                className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50"
+                onClick={addAll}
+                disabled={aiLoading || !aiSkills.length}
+              >Add All</button>
+              <button
+                className="px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50"
+                onClick={addSelected}
+                disabled={aiLoading || !selected.size}
+              >Add Selected</button>
+              <button
+                className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300"
+                onClick={closeModal}
+              >Dismiss</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
