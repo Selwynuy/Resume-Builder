@@ -1,3 +1,5 @@
+'use client'
+
 import { PersonalInfo } from './types'
 import { phoneRegex, nameRegex, locationRegex, INPUT_LIMITS } from '@/lib/security'
 import { useState } from 'react'
@@ -79,8 +81,15 @@ export const PersonalInfoStep = ({
       const res = await fetch('/api/ai/summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: personalInfo.summary, mode })
+        body: JSON.stringify({
+          text: personalInfo.summary,
+          mode: personalInfo.summary ? 'improve' : 'generate'
+        })
       })
+      if (!res.ok) {
+        const errorText = await res.text()
+        throw new Error(`API error: ${res.status} - ${errorText}`)
+      }
       const data = await res.json()
       if (data.suggestion) setAiSuggestion(data.suggestion)
       else setAiError(data.error || 'No suggestion returned')
@@ -125,7 +134,7 @@ export const PersonalInfoStep = ({
             value={personalInfo.name}
             onChange={(e) => validateAndUpdate('name', e.target.value)}
             maxLength={INPUT_LIMITS.NAME}
-            pattern="[a-zA-Z\s\-\.\']*"
+            pattern="[a-zA-Z .'-]*"
             className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 ${
               errors.name 
                 ? 'border-red-300 focus:ring-red-400 focus:border-red-400' 
@@ -180,6 +189,7 @@ export const PersonalInfoStep = ({
             value={personalInfo.location}
             onChange={(e) => validateAndUpdate('location', e.target.value)}
             maxLength={INPUT_LIMITS.LOCATION}
+            pattern="[a-zA-Z0-9 ,.'-]*"
             className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 ${
               errors.location 
                 ? 'border-red-300 focus:ring-red-400 focus:border-red-400' 

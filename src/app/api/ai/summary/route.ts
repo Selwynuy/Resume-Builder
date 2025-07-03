@@ -3,7 +3,9 @@ import { getGeminiCompletion } from '@/lib/gemini'
 
 export async function POST(req: Request) {
   try {
-    const { text, mode } = await req.json()
+    const body = await req.json()
+    console.log('AI summary POST body:', body)
+    const { text, mode } = body
     if (!mode) return NextResponse.json({ error: 'Missing mode' }, { status: 400 })
     let prompt = ''
     if (mode === 'generate') {
@@ -17,6 +19,7 @@ export async function POST(req: Request) {
     const suggestion = await getGeminiCompletion(prompt)
     return NextResponse.json({ suggestion })
   } catch (e: any) {
+    console.error('AI summary error:', e)
     return NextResponse.json({ error: e.message || 'AI error' }, { status: 500 })
   }
 } 

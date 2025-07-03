@@ -1,7 +1,13 @@
-const fetch = require('node-fetch')
+let fetchFn: typeof fetch;
+if (typeof fetch === 'function') {
+  fetchFn = fetch;
+} else {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  fetchFn = require('node-fetch');
+}
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
 
 // Simple in-memory rate limiter
 let lastCall = 0
@@ -26,7 +32,7 @@ export async function getGeminiCompletion(prompt: string, options: any = {}): Pr
   }
 
   try {
-    const res = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+    const res = await fetchFn(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
