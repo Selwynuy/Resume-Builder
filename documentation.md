@@ -286,6 +286,19 @@ const result = await getGeminiCompletion('Write a professional summary for a sof
 - Tests are in `src/lib/gemini.test.ts` (Jest).
 - Mocks fetch and environment variable for safe testing. 
 
+## Multi-Style AI Summary Modal (Personal Info Step)
+
+- Click the "AI Suggest" button in the Personal Info step to open the AI summary modal.
+- The modal displays 4 labeled summary options: Professional, Creative, Friendly, Technical.
+- Each option has:
+  - **Use**: Inserts the summary into your resume and closes the modal.
+  - **Copy**: Copies the summary to your clipboard (modal stays open).
+- The currently selected summary is highlighted.
+- Fully accessible: keyboard navigation, focus management, and ARIA labels.
+- UI/UX matches the current design system.
+
+No explanations are shown—just the summaries and labels for quick selection.
+
 # Changelog
 
 - AI Suggestion modals (PersonalInfoStep, ExperienceStep, SkillsStep) are now wide, scrollable, and include a Copy button for convenience.

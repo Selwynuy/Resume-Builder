@@ -19,6 +19,30 @@ export const PersonalInfoStep = ({
   const [aiError, setAiError] = useState('')
   const [aiSuggestion, setAiSuggestion] = useState('')
 
+  // 1. Add state for multi-style summaries
+  const [multiSummaries, setMultiSummaries] = useState<null | {
+    professional: string;
+    creative: string;
+    friendly: string;
+    technical: string;
+  }>(null);
+  const [multiLoading, setMultiLoading] = useState(false);
+  const [multiError, setMultiError] = useState<string | null>(null);
+  const [showMultiModal, setShowMultiModal] = useState(false);
+
+  // Helper to get/set multi-summaries in localStorage
+  const MULTI_SUMMARY_KEY = 'ai_summary_multi_suggestions';
+  function saveMultiSummariesToStorage(summaries: any) {
+    try { localStorage.setItem(MULTI_SUMMARY_KEY, JSON.stringify(summaries)); } catch {}
+  }
+  function getMultiSummariesFromStorage() {
+    try {
+      const raw = localStorage.getItem(MULTI_SUMMARY_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return null;
+  }
+
   const validateAndUpdate = (field: keyof PersonalInfo, value: string) => {
     const newErrors = { ...errors }
 
@@ -141,6 +165,44 @@ export const PersonalInfoStep = ({
 
   const regenerate = () => handleAISuggest(personalInfo.summary ? 'improve' : 'generate')
 
+  // 2. Update AI Suggest button to open multi-style modal
+  const handleMultiSuggest = async (force = false) => {
+    let cached = !force && getMultiSummariesFromStorage();
+    setShowMultiModal(true);
+    setMultiError(null);
+    if (cached) {
+      setMultiSummaries(cached);
+      setMultiLoading(false);
+      return;
+    }
+    setMultiSummaries(null);
+    setMultiLoading(true);
+    try {
+      const res = await fetch('/api/ai/summary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: personalInfo.summary ? 'improve' : 'generate', text: personalInfo.summary }),
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API error: ${res.status} - ${errorText}`);
+      }
+      const data = await res.json();
+      if (data.summaries) {
+        setMultiSummaries(data.summaries);
+        saveMultiSummariesToStorage(data.summaries);
+      } else setMultiError(data.error || 'AI error');
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setMultiError(e.message || 'AI error');
+      } else {
+        setMultiError('An unexpected error occurred');
+      }
+    } finally {
+      setMultiLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center mb-8">
@@ -157,7 +219,7 @@ export const PersonalInfoStep = ({
             value={personalInfo.name}
             onChange={(e) => validateAndUpdate('name', e.target.value)}
             maxLength={INPUT_LIMITS.NAME}
-            pattern="[a-zA-Z .'-]*"
+            pattern="[a-zA-Z .']*-"
             className={`w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 ${
               errors.name 
                 ? 'border-red-300 focus:ring-red-400 focus:border-red-400' 
@@ -228,7 +290,7 @@ export const PersonalInfoStep = ({
             <button
               type="button"
               className="ml-2 text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-2 py-1 transition-all duration-200"
-              onClick={openModal}
+              onClick={() => handleMultiSuggest()}
             >
               AI Suggest
             </button>
@@ -294,6 +356,77 @@ export const PersonalInfoStep = ({
           </div>
         </div>
       )}
+
+      {/* 3. Modal UI for multi-style summaries */}
+      {showMultiModal && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-30 dark:bg-opacity-60 transition-all z-40"></div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+            <div
+              className="bg-white rounded-xl shadow-2xl w-full max-w-lg sm:max-w-xl min-w-[280px] max-h-[80vh] p-3 sm:p-5 md:p-6 flex flex-col justify-center relative"
+              style={{ boxSizing: 'border-box' }}
+              tabIndex={-1}
+            >
+              <button
+                className="absolute -top-3 -right-3 p-2 bg-white rounded-full shadow focus:outline-none"
+                style={{ zIndex: 10 }}
+                onClick={() => setShowMultiModal(false)}
+                aria-label="Close"
+                autoFocus
+              >
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M6 6l12 12m0-12l-12 12"/></svg>
+              </button>
+              <div className="flex-1 overflow-y-auto h-[65vh]">
+                <h2 className="font-semibold mb-6 text-center text-lg sm:text-xl md:text-2xl">AI Summary Suggestions</h2>
+                <button
+                  className="mb-6 self-center px-5 py-2 rounded bg-primary-100 text-primary-700 font-semibold hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200"
+                  onClick={() => handleMultiSuggest(true)}
+                  disabled={multiLoading}
+                >Regenerate Suggestions</button>
+                {multiLoading && <div className="text-center py-12 text-lg">Loading...</div>}
+                {multiError && <div className="text-red-500 text-center py-6">{multiError}</div>}
+                {multiSummaries && (
+                  <div className="space-y-4 sm:space-y-6">
+                    {(['professional','creative','friendly','technical'] as const).map(style => (
+                      <div key={style} className={`border rounded-lg p-3 sm:p-5 md:p-8 bg-slate-50 ${personalInfo.summary === multiSummaries[style] ? 'ring-2 ring-primary-500 bg-primary-50' : ''}`}
+                        aria-selected={personalInfo.summary === multiSummaries[style]}
+                        tabIndex={0}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            updatePersonalInfo('summary', multiSummaries[style]);
+                            setShowMultiModal(false);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-medium capitalize text-base">{style}</span>
+                          <div className="flex gap-2">
+                            <button
+                              className={`px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200 ${personalInfo.summary === multiSummaries[style] ? 'ring-2 ring-primary-400' : ''}`}
+                              onClick={() => {
+                                updatePersonalInfo('summary', multiSummaries[style]);
+                                setShowMultiModal(false);
+                              }}
+                              aria-label={`Use ${style} summary`}
+                            >Use</button>
+                            <button
+                              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200"
+                              onClick={() => navigator.clipboard.writeText(multiSummaries[style])}
+                              aria-label={`Copy ${style} summary`}
+                            >Copy</button>
+                          </div>
+                        </div>
+                        <div className="text-base whitespace-pre-line leading-relaxed">{multiSummaries[style]}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+      {/* TODO: Update onboarding/docs to explain multi-style summary modal */}
     </div>
   )
 } 

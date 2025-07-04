@@ -298,7 +298,7 @@ export default function Dashboard() {
                         <Badge
                           className={
                             resume.isDraft
-                              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0'
+                            ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0'
                               : 'bg-green-100 text-green-800 hover:bg-green-100 border-0'
                           }
                         >
