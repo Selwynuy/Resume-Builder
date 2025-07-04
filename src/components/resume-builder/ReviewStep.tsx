@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ResumeData, PersonalInfo, Experience, Education, Skill } from './types'
 import { renderTemplate } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
+import type { Template } from '@/lib/templates'
 
 interface ReviewStepProps {
   resumeData: ResumeData
@@ -787,7 +788,11 @@ export const ReviewStep = ({
       {aiModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto relative">
-            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600" onClick={closeModal}>&times;</button>
+            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-400 rounded-full p-1" onClick={closeModal} aria-label="Close">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <h4 className="font-semibold text-lg mb-2 text-primary-700">
               {aiModal.type === 'ats' ? 'ATS Scan / Job Match' :
                 aiModal.type === 'feedback' ? 'AI Feedback' :
@@ -803,12 +808,12 @@ export const ReviewStep = ({
             ) : null}
             <div className="flex gap-2 justify-end mt-4">
               <button
-                className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50"
+                className="px-4 py-2 h-10 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200"
                 onClick={regenerate}
                 disabled={aiLoading}
               >Regenerate</button>
               <button
-                className="px-4 py-2 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300"
+                className="px-4 py-2 h-10 rounded bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
                 onClick={closeModal}
               >Dismiss</button>
             </div>
