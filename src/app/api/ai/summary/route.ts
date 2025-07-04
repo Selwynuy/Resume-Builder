@@ -5,7 +5,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json()
     console.log('AI summary POST body:', body)
-    const { text, mode } = body
+    const { text, mode, stylePrompt } = body
     if (!mode) return NextResponse.json({ error: 'Missing mode' }, { status: 400 })
     let prompt = ''
     if (mode === 'generate') {
@@ -16,6 +16,7 @@ export async function POST(req: Request) {
     } else {
       return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
     }
+    if (stylePrompt) prompt += '\n' + stylePrompt
     const suggestion = await getGeminiCompletion(prompt)
     return NextResponse.json({ suggestion })
   } catch (e: any) {

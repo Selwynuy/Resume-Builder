@@ -73,17 +73,35 @@ export const PersonalInfoStep = ({
     updatePersonalInfo(field, value)
   }
 
+  const saveEditPair = (ai: string, user: string) => {
+    if (!ai || !user || ai === user) return
+    const key = 'ai_summary_edits'
+    const prev = JSON.parse(localStorage.getItem(key) || '[]')
+    prev.push({ ai, user })
+    localStorage.setItem(key, JSON.stringify(prev.slice(-3)))
+  }
+
   const handleAISuggest = async (mode: 'generate' | 'improve') => {
     setAiLoading(true)
     setAiError('')
     setAiSuggestion('')
     try {
+      let editPairs = []
+      try {
+        editPairs = JSON.parse(localStorage.getItem('ai_summary_edits') || '[]')
+      } catch {}
+      let stylePrompt = ''
+      if (editPairs.length) {
+        stylePrompt = '\nHere are some examples of how the user edits AI suggestions. Please match their style.\n' +
+          editPairs.map((p: any, i: number) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
+      }
       const res = await fetch('/api/ai/summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: personalInfo.summary,
-          mode: personalInfo.summary ? 'improve' : 'generate'
+          mode: personalInfo.summary ? 'improve' : 'generate',
+          stylePrompt
         })
       })
       if (!res.ok) {
@@ -111,6 +129,7 @@ export const PersonalInfoStep = ({
 
   const applySuggestion = () => {
     if (aiSuggestion) {
+      saveEditPair(aiSuggestion, personalInfo.summary)
       updatePersonalInfo('summary', aiSuggestion)
       closeModal()
     }

@@ -19,15 +19,32 @@ export const ExperienceStep = ({
   const [aiError, setAiError] = useState('')
   const [aiSuggestion, setAiSuggestion] = useState('')
 
+  const saveEditPair = (ai: string, user: string) => {
+    if (!ai || !user || ai === user) return
+    const key = 'ai_bullet_edits'
+    const prev = JSON.parse(localStorage.getItem(key) || '[]')
+    prev.push({ ai, user })
+    localStorage.setItem(key, JSON.stringify(prev.slice(-3)))
+  }
+
   const handleAISuggest = async (index: number) => {
     setAiLoading(true)
     setAiError('')
     setAiSuggestion('')
     try {
+      let editPairs = []
+      try {
+        editPairs = JSON.parse(localStorage.getItem('ai_bullet_edits') || '[]')
+      } catch {}
+      let stylePrompt = ''
+      if (editPairs.length) {
+        stylePrompt = '\nHere are some examples of how the user edits AI suggestions. Please match their style.\n' +
+          editPairs.map((p: any, i: number) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
+      }
       const res = await fetch('/api/ai/bullet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: experiences[index].description, mode: 'rewrite' })
+        body: JSON.stringify({ text: experiences[index].description, mode: 'rewrite', stylePrompt })
       })
       const data = await res.json()
       if (data.suggestion) setAiSuggestion(data.suggestion)
@@ -48,6 +65,7 @@ export const ExperienceStep = ({
   const closeModal = () => setAiModal({ open: false, index: null })
   const applySuggestion = () => {
     if (aiModal.index !== null && aiSuggestion) {
+      saveEditPair(aiSuggestion, experiences[aiModal.index].description)
       updateExperience(aiModal.index, 'description', aiSuggestion)
       closeModal()
     }

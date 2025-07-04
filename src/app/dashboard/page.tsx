@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   FileText,
   Edit3,
@@ -15,121 +15,124 @@ import {
   FileCheck,
   FilePlus,
   Layout,
-} from "lucide-react"
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+} from 'lucide-react';
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Resume {
-  _id: string
-  title: string
+  _id: string;
+  title: string;
   personalInfo: {
-    name: string
-  }
-  createdAt: string
-  updatedAt: string
-  isDraft: boolean
+    name: string;
+    summary?: string;
+  };
+  experience?: { description: string }[];
+  skills?: string[];
+  createdAt: string;
+  updatedAt: string;
+  isDraft: boolean;
 }
 
 interface QuickStats {
-  totalResumes: number
-  draftResumes: number
-  publishedResumes: number
-  totalTemplates: number
+  totalResumes: number;
+  draftResumes: number;
+  publishedResumes: number;
+  totalTemplates: number;
 }
 
 export default function Dashboard() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [resumes, setResumes] = useState<Resume[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [resumeToDelete, setResumeToDelete] = useState<Resume | null>(null)
-  const [deleting, setDeleting] = useState(false)
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [resumeToDelete, setResumeToDelete] = useState<Resume | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [quickStats, setQuickStats] = useState<QuickStats>({
     totalResumes: 0,
     draftResumes: 0,
     publishedResumes: 0,
-    totalTemplates: 0
-  })
+    totalTemplates: 0,
+  });
 
   useEffect(() => {
-    if (status === 'loading') return
-    if (!session) router.push('/login')
+    if (status === 'loading') return;
+    if (!session) router.push('/login');
     else {
-      fetchResumes()
-      fetchQuickStats()
+      fetchResumes();
+      fetchQuickStats();
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   const fetchResumes = async () => {
     try {
-      const response = await fetch('/api/resumes')
+      const response = await fetch('/api/resumes');
       if (response.ok) {
-        const data = await response.json()
-        setResumes(data)
+        const data = await response.json();
+        setResumes(data);
         // Calculate stats from resumes
-        const draftCount = data.filter((r: Resume) => r.isDraft).length
-        const publishedCount = data.filter((r: Resume) => !r.isDraft).length
+        const draftCount = data.filter((r: Resume) => r.isDraft).length;
+        const publishedCount = data.filter((r: Resume) => !r.isDraft).length;
         setQuickStats(prev => ({
           ...prev,
           totalResumes: data.length,
           draftResumes: draftCount,
-          publishedResumes: publishedCount
-        }))
+          publishedResumes: publishedCount,
+        }));
       }
     } catch (error) {
-      console.error('Error fetching resumes:', error)
+      console.error('Error fetching resumes:', error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const fetchQuickStats = async () => {
     try {
-      const templatesResponse = await fetch('/api/templates/my')
+      const templatesResponse = await fetch('/api/templates/my');
       if (templatesResponse.ok) {
-        const templatesData = await templatesResponse.json()
+        const templatesData = await templatesResponse.json();
         setQuickStats(prev => ({
           ...prev,
-          totalTemplates: templatesData.templates?.length || 0
-        }))
+          totalTemplates: templatesData.templates?.length || 0,
+        }));
       }
     } catch (error) {
-      console.error('Error fetching template stats:', error)
+      console.error('Error fetching template stats:', error);
     }
-  }
+  };
 
   const handleDeleteClick = (resume: Resume) => {
-    setResumeToDelete(resume)
-    setShowDeleteModal(true)
-  }
+    setResumeToDelete(resume);
+    setShowDeleteModal(true);
+  };
 
   const confirmDelete = async () => {
-    if (!resumeToDelete) return
-    setDeleting(true)
+    if (!resumeToDelete) return;
+    setDeleting(true);
     try {
       const response = await fetch(`/api/resumes/${resumeToDelete._id}`, {
-        method: 'DELETE'
-      })
+        method: 'DELETE',
+      });
       if (response.ok) {
-        setResumes(resumes.filter(resume => resume._id !== resumeToDelete._id))
-        setShowDeleteModal(false)
-        setResumeToDelete(null)
+        setResumes(resumes.filter(resume => resume._id !== resumeToDelete._id));
+        setShowDeleteModal(false);
+        setResumeToDelete(null);
       } else {
-        alert('Error deleting resume')
+        alert('Error deleting resume');
       }
     } catch (error) {
-      alert('Error deleting resume')
+      alert('Error deleting resume');
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
-  }
+  };
 
   const cancelDelete = () => {
-    setShowDeleteModal(false)
-    setResumeToDelete(null)
-  }
+    setShowDeleteModal(false);
+    setResumeToDelete(null);
+  };
 
   if (status === 'loading' || loading) {
     return (
@@ -143,24 +146,23 @@ export default function Dashboard() {
           <p className="text-slate-500 text-sm mt-2">Preparing your dashboard experience</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return null
+    return null;
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-12">
         {/* Welcome Message */}
@@ -225,11 +227,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-        {/* Resume Scoring Card */}
-        {resumes.length > 0 && (
-          <ResumeScoreCard resume={resumes[0]} />
-        )}
-
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <Link href="/resume/new">
@@ -258,7 +255,7 @@ export default function Dashboard() {
 
           {resumes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resumes.map((resume) => (
+              {resumes.map(resume => (
                 <Card
                   key={resume._id}
                   className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
@@ -268,7 +265,9 @@ export default function Dashboard() {
                       {/* Header */}
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate text-lg">{resume.title}</h3>
+                          <h3 className="font-semibold text-gray-900 truncate text-lg">
+                            {resume.title}
+                          </h3>
                           <div className="flex items-center text-sm text-gray-600 mt-1">
                             <User className="h-3 w-3 mr-1" />
                             {resume.personalInfo.name}
@@ -277,11 +276,20 @@ export default function Dashboard() {
                         {/* Inline action buttons */}
                         <div className="flex gap-2">
                           <Link href={`/resume/new?edit=${resume._id}`}>
-                            <Button size="sm" variant="ghost" className="text-blue-600 hover:bg-blue-50">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-blue-600 hover:bg-blue-50"
+                            >
                               <Edit3 className="h-4 w-4" />
                             </Button>
                           </Link>
-                          <Button size="sm" variant="ghost" className="text-red-600 hover:bg-red-50" onClick={() => handleDeleteClick(resume)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-red-600 hover:bg-red-50"
+                            onClick={() => handleDeleteClick(resume)}
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -289,9 +297,11 @@ export default function Dashboard() {
                       {/* Status Badge */}
                       <div>
                         <Badge
-                          className={resume.isDraft
-                            ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0'
-                            : 'bg-green-100 text-green-800 hover:bg-green-100 border-0'}
+                          className={
+                            resume.isDraft
+                              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0'
+                              : 'bg-green-100 text-green-800 hover:bg-green-100 border-0'
+                          }
                         >
                           {resume.isDraft ? 'Draft' : 'Complete'}
                         </Badge>
@@ -310,7 +320,10 @@ export default function Dashboard() {
                       {/* Actions */}
                       <div className="flex gap-2 pt-2">
                         <Link href={`/resume/new?edit=${resume._id}`} className="flex-1">
-                          <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                          <Button
+                            size="sm"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                          >
                             <Edit3 className="h-3 w-3 mr-1" />
                             Edit
                           </Button>
@@ -332,8 +345,8 @@ export default function Dashboard() {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">No resumes yet</h3>
                   <p className="text-gray-600 mb-6">
-                    Get started by creating your first resume. Choose from our professional templates or start from
-                    scratch.
+                    Get started by creating your first resume. Choose from our professional
+                    templates or start from scratch.
                   </p>
                   <Link href="/resume/new">
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-[1.02]">
@@ -352,14 +365,28 @@ export default function Dashboard() {
             <div className="bg-white rounded-2xl shadow-2xl border border-white/20 p-8 max-w-md w-full mx-4 transform transition-all duration-300">
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-3">Delete Resume</h3>
                 <p className="text-slate-600 mb-2">Are you sure you want to delete</p>
-                <p className="text-lg font-semibold text-slate-800 mb-6">"{resumeToDelete?.title}"?</p>
-                <p className="text-sm text-slate-500 mb-8">This action cannot be undone. All resume data will be permanently removed.</p>
+                <p className="text-lg font-semibold text-slate-800 mb-6">
+                  "{resumeToDelete?.title}"?
+                </p>
+                <p className="text-sm text-slate-500 mb-8">
+                  This action cannot be undone. All resume data will be permanently removed.
+                </p>
                 <div className="flex gap-4">
                   <button
                     onClick={cancelDelete}
@@ -389,76 +416,5 @@ export default function Dashboard() {
         )}
       </main>
     </div>
-  )
-}
-
-function ResumeScoreCard({ resume }: { resume: Resume }) {
-  const [score, setScore] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-
-  useEffect(() => {
-    const fetchScore = async () => {
-      setLoading(true)
-      setError("")
-      try {
-        const res = await fetch("/api/ai/score", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ resume: resume.personalInfo.name + "\n" + resume.title })
-        })
-        if (!res.ok) throw new Error(await res.text())
-        setScore(await res.json())
-      } catch (e: any) {
-        setError(e.message || "Error scoring resume")
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchScore()
-  }, [resume])
-
-  return (
-    <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-md mb-8">
-      <CardContent className="p-6">
-        <h2 className="text-xl font-bold mb-2 text-primary-700 flex items-center gap-2">
-          <FileCheck className="h-5 w-5 text-green-600" /> Resume Score
-        </h2>
-        {loading ? (
-          <div className="text-slate-500">Scoring...</div>
-        ) : error ? (
-          <div className="text-red-500">{error}</div>
-        ) : score ? (
-          <div className="space-y-2">
-            <div className="flex gap-4 flex-wrap">
-              <ScoreBar label="Overall" value={score.overallScore} color="bg-blue-500" />
-              <ScoreBar label="ATS" value={score.atsScore} color="bg-green-500" />
-              <ScoreBar label="Keyword Match" value={score.keywordMatch} color="bg-yellow-500" />
-              <ScoreBar label="Readability" value={score.readability} color="bg-purple-500" />
-            </div>
-            <div className="mt-4">
-              <h3 className="font-semibold text-slate-700 mb-1">Suggestions</h3>
-              <ul className="list-disc pl-6 text-slate-700 text-sm">
-                {score.suggestions?.map((s: string, i: number) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
-  )
-}
-
-function ScoreBar({ label, value, color }: { label: string, value: number, color: string }) {
-  return (
-    <div className="flex flex-col items-start min-w-[120px]">
-      <span className="text-xs font-medium text-slate-600 mb-1">{label}</span>
-      <div className="w-full bg-slate-200 rounded-full h-3 mb-1">
-        <div className={`${color} h-3 rounded-full`} style={{ width: `${value || 0}%` }}></div>
-      </div>
-      <span className="text-xs font-semibold text-slate-700">{value != null ? value + "%" : "N/A"}</span>
-    </div>
-  )
+  );
 }
