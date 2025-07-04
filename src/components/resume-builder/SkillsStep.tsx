@@ -110,22 +110,26 @@ Education: ${resumeData.education.map(edu =>
     })
   }
   const addSelected = () => {
+    let currentIndex = skills.length
     Array.from(selected).forEach(skill => {
       // Only add if not already present
       if (!skills.some(s => s.name.toLowerCase() === skill.toLowerCase())) {
-        updateSkill(skills.length, 'name', skill)
-        updateSkill(skills.length, 'level', 'Intermediate')
         addSkill()
+        updateSkill(currentIndex, 'name', skill)
+        updateSkill(currentIndex, 'level', 'Intermediate')
+        currentIndex++
       }
     })
     closeModal()
   }
   const addAll = () => {
+    let currentIndex = skills.length
     aiSkills.forEach(skill => {
       if (!skills.some(s => s.name.toLowerCase() === skill.toLowerCase())) {
-        updateSkill(skills.length, 'name', skill)
-        updateSkill(skills.length, 'level', 'Intermediate')
         addSkill()
+        updateSkill(currentIndex, 'name', skill)
+        updateSkill(currentIndex, 'level', 'Intermediate')
+        currentIndex++
       }
     })
     closeModal()
