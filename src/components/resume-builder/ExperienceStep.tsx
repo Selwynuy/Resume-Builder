@@ -18,6 +18,14 @@ export const ExperienceStep = ({
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
   const [aiSuggestion, setAiSuggestion] = useState('')
+  const [multiSummaries, setMultiSummaries] = useState<null | {
+    resultsOriented: string;
+    teamPlayer: string;
+    innovative: string;
+    concise: string;
+  }>(null);
+  const [multiLoading, setMultiLoading] = useState(false);
+  const [multiError, setMultiError] = useState<string | null>(null);
 
   const saveEditPair = (ai: string, user: string) => {
     if (!ai || !user || ai === user) return
@@ -56,12 +64,50 @@ export const ExperienceStep = ({
     }
   }
 
+  const handleMultiSuggest = async (index: number) => {
+    setMultiLoading(true);
+    setMultiError(null);
+    setMultiSummaries(null);
+    try {
+      let editPairs = [];
+      try {
+        editPairs = JSON.parse(localStorage.getItem('ai_bullet_edits') || '[]');
+      } catch {}
+      let stylePrompt = '';
+      if (editPairs.length) {
+        stylePrompt = '\nHere are some examples of how the user edits AI suggestions. Please match their style.\n' +
+          editPairs.map((p: { ai: string; user: string }) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n');
+      }
+      const res = await fetch('/api/ai/bullet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: experiences[index].description, mode: 'multi', stylePrompt })
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`API error: ${res.status} - ${errorText}`);
+      }
+      const data = await res.json();
+      if (data.summaries) setMultiSummaries(data.summaries);
+      else setMultiError(data.error || 'AI error');
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setMultiError(e.message || 'AI error');
+      } else {
+        setMultiError('An unexpected error occurred');
+      }
+    } finally {
+      setMultiLoading(false);
+    }
+  };
+
   const openModal = (index: number) => {
-    setAiModal({ open: true, index })
-    setAiSuggestion('')
-    setAiError('')
-    handleAISuggest(index)
-  }
+    setAiModal({ open: true, index });
+    setMultiSummaries(null);
+    setMultiError(null);
+    setMultiLoading(true);
+    handleMultiSuggest(index);
+  };
   const closeModal = () => setAiModal({ open: false, index: null })
   const applySuggestion = () => {
     if (aiModal.index !== null && aiSuggestion) {
@@ -182,44 +228,81 @@ export const ExperienceStep = ({
 
       {/* AI Suggestion Modal */}
       {aiModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto relative">
-            <button className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 focus:outline-none focus:ring-2 focus:ring-primary-400 rounded-full p-1" onClick={closeModal} aria-label="Close">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <h4 className="font-semibold text-lg mb-2 text-primary-700">AI Suggestion</h4>
-            {aiLoading ? (
-              <div className="text-center py-8 text-slate-500">Generating suggestion...</div>
-            ) : aiError ? (
-              <div className="text-red-500 mb-4">{aiError}</div>
-            ) : aiSuggestion ? (
-              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50">{aiSuggestion}</div>
-            ) : null}
-            <div className="flex gap-2 justify-end mt-4">
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-30 dark:bg-opacity-60 transition-all z-40"></div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+            <div
+              className="bg-white rounded-xl shadow-2xl w-full max-w-lg sm:max-w-xl min-w-[280px] max-h-[80vh] p-3 sm:p-5 md:p-6 flex flex-col justify-center relative"
+              style={{ boxSizing: 'border-box' }}
+              tabIndex={-1}
+            >
               <button
-                className="px-4 py-2 h-10 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200"
-                onClick={regenerate}
-                disabled={aiLoading}
-              >Regenerate</button>
-              <button
-                className="px-4 py-2 h-10 rounded bg-green-600 text-white font-semibold hover:bg-green-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-400 transition-colors duration-200"
-                onClick={applySuggestion}
-                disabled={!aiSuggestion || aiLoading}
-              >Apply</button>
-              <button
-                className="px-4 py-2 h-10 rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200"
+                className="absolute -top-3 -right-3 p-2 bg-white rounded-full shadow focus:outline-none"
+                style={{ zIndex: 10 }}
                 onClick={closeModal}
-              >Dismiss</button>
-              <button
-                className="px-4 py-2 h-10 rounded bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200"
-                onClick={() => aiSuggestion && navigator.clipboard.writeText(aiSuggestion)}
-                disabled={!aiSuggestion}
-              >Copy</button>
+                aria-label="Close"
+                autoFocus
+              >
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" d="M6 6l12 12m0-12l-12 12"/></svg>
+              </button>
+              <div className="flex-1 overflow-y-auto h-[65vh]">
+                <h2 className="font-semibold mb-6 text-center text-lg sm:text-xl md:text-2xl">AI Job Description Suggestions</h2>
+                <button
+                  className="mb-6 self-center px-5 py-2 rounded bg-primary-100 text-primary-700 font-semibold hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200"
+                  onClick={() => aiModal.index !== null && handleMultiSuggest(aiModal.index)}
+                  disabled={multiLoading}
+                >Regenerate Suggestions</button>
+                {multiLoading && <div className="text-center py-12 text-lg">Loading...</div>}
+                {multiError && <div className="text-red-500 text-center py-6">{multiError}</div>}
+                {multiSummaries && (
+                  <div className="space-y-4 sm:space-y-6">
+                    {([
+                      { key: 'resultsOriented', label: 'Results-Oriented' },
+                      { key: 'teamPlayer', label: 'Team Player' },
+                      { key: 'innovative', label: 'Innovative' },
+                      { key: 'concise', label: 'Concise' },
+                    ] as const).map(({ key, label }) => (
+                      <div key={key} className={`border rounded-lg p-3 sm:p-5 md:p-8 bg-slate-50 ${experiences[aiModal.index!]?.description === multiSummaries[key] ? 'ring-2 ring-primary-500 bg-primary-50' : ''}`}
+                        aria-selected={experiences[aiModal.index!]?.description === multiSummaries[key]}
+                        tabIndex={0}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') {
+                            if (aiModal.index !== null) {
+                              updateExperience(aiModal.index, 'description', multiSummaries[key]);
+                              setAiModal({ open: false, index: null });
+                            }
+                          }
+                        }}
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-medium capitalize text-base">{label}</span>
+                          <div className="flex gap-2">
+                            <button
+                              className={`px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded bg-primary-600 text-white font-semibold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition-colors duration-200 ${experiences[aiModal.index!]?.description === multiSummaries[key] ? 'ring-2 ring-primary-400' : ''}`}
+                              onClick={() => {
+                                if (aiModal.index !== null) {
+                                  updateExperience(aiModal.index, 'description', multiSummaries[key]);
+                                  setAiModal({ open: false, index: null });
+                                }
+                              }}
+                              aria-label={`Use ${label} job description`}
+                            >Use</button>
+                            <button
+                              className="px-2 sm:px-4 py-1 sm:py-2 text-sm sm:text-base rounded bg-slate-200 text-slate-700 font-semibold hover:bg-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200"
+                              onClick={() => navigator.clipboard.writeText(multiSummaries[key])}
+                              aria-label={`Copy ${label} job description`}
+                            >Copy</button>
+                          </div>
+                        </div>
+                        <div className="text-base whitespace-pre-line leading-relaxed">{multiSummaries[key]}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
