@@ -1,18 +1,30 @@
-import { Skill } from './types'
+import { Skill, ResumeData } from './types'
 import { useState } from 'react'
+
+const SKILL_FORMATS = [
+  { key: 'name', label: 'Skill Only' },
+  { key: 'level', label: 'Proficiency' },
+  { key: 'years', label: 'Years of Experience' },
+  { key: 'certification', label: 'Certification' },
+  { key: 'context', label: 'Context/Example' },
+] as const;
+
+type SkillFormat = typeof SKILL_FORMATS[number]['key'];
 
 interface SkillsStepProps {
   skills: Skill[]
-  updateSkill: (index: number, field: keyof Skill, value: string) => void
+  updateSkill: (index: number, field: keyof Skill, value: string | number | undefined) => void
   addSkill: () => void
   removeSkill: (index: number) => void
+  resumeData?: ResumeData // Add optional resume data for AI context
 }
 
 export const SkillsStep = ({ 
   skills, 
   updateSkill,
   addSkill,
-  removeSkill
+  removeSkill,
+  resumeData
 }: SkillsStepProps) => {
   const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
   const [aiModal, setAiModal] = useState(false)
@@ -20,10 +32,8 @@ export const SkillsStep = ({
   const [aiError, setAiError] = useState('')
   const [aiSkills, setAiSkills] = useState<string[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
-
-  // Optionally, you could pass job title/industry from parent or context
-  const jobTitle = ''
-  const industry = ''
+  // Track format per skill
+  const [skillFormats, setSkillFormats] = useState<SkillFormat[]>(skills.map(() => 'name'));
 
   const handleAISuggest = async () => {
     setAiLoading(true)
@@ -31,10 +41,44 @@ export const SkillsStep = ({
     setAiSkills([])
     setSelected(new Set())
     try {
+      // Build context from available resume data
+      const context: Record<string, any> = {}
+      
+      if (resumeData) {
+        // Priority 1: Full resume content (most comprehensive)
+        context.resumeContent = `
+Personal Info: ${resumeData.personalInfo.name ? `${resumeData.personalInfo.name}, ` : ''}${resumeData.personalInfo.summary || ''}
+
+Experience: ${resumeData.experiences.map(exp => 
+  `${exp.position} at ${exp.company}: ${exp.description}`
+).filter(exp => exp.trim() !== ' at : ').join('\n')}
+
+Education: ${resumeData.education.map(edu => 
+  `${edu.degree} in ${edu.field} from ${edu.school}`
+).filter(edu => edu.trim() !== ' in  from ').join('\n')}
+        `.trim()
+
+        // Priority 2: Experience descriptions (good for role-specific skills)
+        const experienceDescriptions = resumeData.experiences
+          .map(exp => exp.description)
+          .filter(desc => desc.trim())
+          .join(' ')
+        if (experienceDescriptions) {
+          context.experienceDescriptions = experienceDescriptions
+        }
+
+        // Priority 3: Job title from most recent experience
+        const recentExp = resumeData.experiences.find(exp => exp.position && exp.company)
+        if (recentExp) {
+          context.jobTitle = recentExp.position
+          context.industry = recentExp.company
+        }
+      }
+
       const res = await fetch('/api/ai/skills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobTitle, industry })
+        body: JSON.stringify(context)
       })
       const data = await res.json()
       if (data.skills) setAiSkills(data.skills)
@@ -87,6 +131,21 @@ export const SkillsStep = ({
     closeModal()
   }
 
+  // Update skillFormats if skills array changes
+  // (e.g. when adding/removing skills)
+  if (skillFormats.length !== skills.length) {
+    setSkillFormats(Array(skills.length).fill('name'));
+  }
+
+  const handleFormatChange = (index: number, format: SkillFormat) => {
+    setSkillFormats(prev => prev.map((f, i) => (i === index ? format : f)));
+    // Clear other fields except name
+    if (format !== 'level') updateSkill(index, 'level', undefined);
+    if (format !== 'years') updateSkill(index, 'years', undefined);
+    if (format !== 'certification') updateSkill(index, 'certification', undefined);
+    if (format !== 'context') updateSkill(index, 'context', undefined);
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="text-center mb-8">
@@ -107,7 +166,7 @@ export const SkillsStep = ({
       <div className="space-y-4">
         {skills.map((skill, index) => (
           <div key={index} className="bg-white border border-slate-200 rounded-xl p-6">
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
               <div className="flex-1">
                 <input
                   type="text"
@@ -117,19 +176,17 @@ export const SkillsStep = ({
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
                 />
               </div>
-
-              <div className="w-40">
+              <div className="w-48">
                 <select
-                  value={skill.level}
-                  onChange={(e) => updateSkill(index, 'level', e.target.value)}
+                  value={skillFormats[index]}
+                  onChange={e => handleFormatChange(index, e.target.value as SkillFormat)}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
                 >
-                  {skillLevels.map((level) => (
-                    <option key={level} value={level}>{level}</option>
+                  {SKILL_FORMATS.map(f => (
+                    <option key={f.key} value={f.key}>{f.label}</option>
                   ))}
                 </select>
               </div>
-
               {skills.length > 1 && (
                 <button
                   onClick={() => removeSkill(index)}
@@ -141,23 +198,68 @@ export const SkillsStep = ({
                 </button>
               )}
             </div>
-
-            {/* Skill level visual indicator */}
-            <div className="mt-3 flex items-center space-x-3">
-              <span className="text-sm font-medium text-slate-700 w-24 flex-shrink-0">{skill.level}</span>
-              <div className="flex-1 bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${
-                      skill.level === 'Beginner' ? '25%' :
-                      skill.level === 'Intermediate' ? '50%' :
-                      skill.level === 'Advanced' ? '75%' : '100%'
-                    }` 
-                  }}
-                ></div>
+            {/* Dynamic fields based on format */}
+            {skillFormats[index] === 'level' && (
+              <div className="mt-3 flex items-center space-x-3">
+                <span className="text-sm font-medium text-slate-700 w-24 flex-shrink-0">{skill.level}</span>
+                <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: `${
+                        skill.level === 'Beginner' ? '25%' :
+                        skill.level === 'Intermediate' ? '50%' :
+                        skill.level === 'Advanced' ? '75%' : '100%'
+                      }` 
+                    }}
+                  ></div>
+                </div>
+                <select
+                  value={skill.level || ''}
+                  onChange={e => updateSkill(index, 'level', e.target.value)}
+                  className="ml-4 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
+                >
+                  <option value="">Select Level</option>
+                  {skillLevels.map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
+                </select>
               </div>
-            </div>
+            )}
+            {skillFormats[index] === 'years' && (
+              <div className="mt-3 flex items-center space-x-3">
+                <label className="text-sm font-medium text-slate-700 w-32">Years of Experience</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={skill.years || ''}
+                  onChange={e => updateSkill(index, 'years', e.target.value ? parseInt(e.target.value) : undefined)}
+                  className="w-24 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+            )}
+            {skillFormats[index] === 'certification' && (
+              <div className="mt-3 flex items-center space-x-3">
+                <label className="text-sm font-medium text-slate-700 w-32">Certification</label>
+                <input
+                  type="text"
+                  value={skill.certification || ''}
+                  onChange={e => updateSkill(index, 'certification', e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+            )}
+            {skillFormats[index] === 'context' && (
+              <div className="mt-3 flex items-center space-x-3">
+                <label className="text-sm font-medium text-slate-700 w-32">Context/Example</label>
+                <input
+                  type="text"
+                  value={skill.context || ''}
+                  onChange={e => updateSkill(index, 'context', e.target.value)}
+                  className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+            )}
           </div>
         ))}
 

@@ -3,6 +3,7 @@ import { ResumeData, PersonalInfo, Experience, Education, Skill } from './types'
 import { renderTemplate } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
 import type { Template } from '@/lib/templates'
+import { SkillDisplay } from './SkillDisplay'
 
 interface ReviewStepProps {
   resumeData: ResumeData
@@ -699,11 +700,10 @@ export const ReviewStep = ({
                 <div className="space-y-2">
                   {resumeData.skills.filter(skill => skill.name).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {resumeData.skills.filter(skill => skill.name).map((skill, index) => (
-                        <div key={index} className="bg-primary-50 text-primary-700 px-3 py-1 rounded-full text-sm flex items-center space-x-2">
-                          <span className="font-medium">{skill.name}</span>
-                          <span className="text-xs bg-primary-100 px-2 py-0.5 rounded-full">{skill.level}</span>
-                        </div>
+                      {resumeData.skills.map((skill, index) => (
+                        <span key={index} className="skill">
+                          <SkillDisplay skill={skill} />
+                        </span>
                       ))}
                     </div>
                   ) : (

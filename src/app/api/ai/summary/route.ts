@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     } catch (err1) {
       console.error('Failed to parse Gemini JSON:', raw, err1);
       // Fallback: strip Markdown code fences and HTML tags, then try again
-      let cleaned = raw
+      const cleaned = raw
         .replace(/```json|```/gi, '') // remove code fences
         .replace(/<[^>]+>/g, '')      // remove HTML tags
         .trim();

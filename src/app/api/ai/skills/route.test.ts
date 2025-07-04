@@ -31,4 +31,29 @@ describe('/api/ai/skills', () => {
     expect(res.status).toBe(500);
     expect(data.error).toMatch(/fail/);
   });
+
+  it('prioritizes resume content over job title', async () => {
+    mockGemini.mockResolvedValue('React, Node.js, TypeScript');
+    const req = { json: async () => ({ 
+      resumeContent: 'Frontend Developer with React and TypeScript experience',
+      jobTitle: 'Backend Developer',
+      industry: 'Finance'
+    }) } as any;
+    const res = await POST(req);
+    const data = await res.json();
+    expect(mockGemini).toHaveBeenCalledWith(expect.stringContaining('Frontend Developer with React and TypeScript'));
+    expect(data.skills).toEqual(['React', 'Node.js', 'TypeScript']);
+  });
+
+  it('falls back to experience descriptions when no full resume content', async () => {
+    mockGemini.mockResolvedValue('Python, Django, PostgreSQL');
+    const req = { json: async () => ({ 
+      experienceDescriptions: 'Built web apps using Python Django framework with PostgreSQL database',
+      jobTitle: 'Data Scientist'
+    }) } as any;
+    const res = await POST(req);
+    const data = await res.json();
+    expect(mockGemini).toHaveBeenCalledWith(expect.stringContaining('Built web apps using Python Django'));
+    expect(data.skills).toEqual(['Python', 'Django', 'PostgreSQL']);
+  });
 });

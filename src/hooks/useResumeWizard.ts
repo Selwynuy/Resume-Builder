@@ -83,7 +83,7 @@ export function useResumeWizard() {
     }))
   }
 
-  const updateSkill = (index: number, field: keyof Skill, value: string) => {
+  const updateSkill = (index: number, field: keyof Skill, value: string | number | undefined) => {
     setResumeData(prev => ({
       ...prev,
       skills: prev.skills.map((skill, i) => 

@@ -172,6 +172,16 @@ const CustomTemplatePDF = ({ data }: { data: ResumeData }) => {
     },
   })
 
+  function PDFSkillDisplay({ skill }: { skill: any }) {
+    if (!skill.name) return null;
+    let text = skill.name;
+    if (skill.years) text += ` (${skill.years} years)`;
+    if (skill.certification) text += ` (${skill.certification})`;
+    if (skill.level) text += ` (${skill.level})`;
+    if (skill.context) text += ` - ${skill.context}`;
+    return <Text>{text}</Text>;
+  }
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -355,6 +365,16 @@ export const ResumePDF = ({ data }: { data: ResumeData }) => {
   }
 
   // Return a basic PDF structure if no template is available
+  function PDFSkillDisplay({ skill }: { skill: any }) {
+    if (!skill.name) return null;
+    let text = skill.name;
+    if (skill.years) text += ` (${skill.years} years)`;
+    if (skill.certification) text += ` (${skill.certification})`;
+    if (skill.level) text += ` (${skill.level})`;
+    if (skill.context) text += ` - ${skill.context}`;
+    return <Text>{text}</Text>;
+  }
+
   return (
     <Document>
       <Page size="A4" style={defaultStyles.page}>

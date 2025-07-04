@@ -32,7 +32,7 @@ export interface ResumeData {
   }>
   skills: Array<{
     name: string
-    level: string
+    level?: string
   }>
 }
 

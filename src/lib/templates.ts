@@ -63,7 +63,13 @@ export const getDefaultTemplate = (): Template => {
         
         <h2>Skills</h2>
         {{#each skills}}
-        <span style="margin-right: 15px;">{{name}} ({{level}})</span>
+        <span style="margin-right: 15px;">
+          {{name}}
+          {{#if years}} ({{years}} years){{/if}}
+          {{#if certification}} ({{certification}}){{/if}}
+          {{#if level}} ({{level}}){{/if}}
+          {{#if context}} - {{context}}{{/if}}
+        </span>
         {{/each}}
       </div>
     `,

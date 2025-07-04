@@ -132,6 +132,7 @@ export default function NewResumePage() {
             updateSkill={updateSkill}
             addSkill={addSkill}
             removeSkill={removeSkill}
+            resumeData={resumeData}
           />
         )
       case 6:
