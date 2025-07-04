@@ -41,7 +41,7 @@ const ComingSoonSection = () => (
         </Badge>
         <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Exciting Features on the Horizon</h2>
         <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-          We're constantly innovating to make your job search even more effective. Here's what's coming next!
+          We&apos;re constantly innovating to make your job search even more effective. Here&apos;s what&apos;s coming next!
         </p>
       </div>
       <motion.div

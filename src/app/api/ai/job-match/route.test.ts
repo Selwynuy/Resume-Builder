@@ -1,34 +1,34 @@
-import { POST } from './route'
-import * as gemini from '@/lib/gemini'
+import { POST } from './route';
+import * as gemini from '@/lib/gemini';
 
-jest.mock('@/lib/gemini')
-const mockGemini = gemini.getGeminiCompletion as jest.Mock
+jest.mock('@/lib/gemini');
+const mockGemini = gemini.getGeminiCompletion as jest.Mock;
 
 describe('/api/ai/job-match', () => {
   beforeEach(() => {
-    jest.clearAllMocks()
-  })
+    jest.clearAllMocks();
+  });
 
   it('returns result for valid input', async () => {
-    mockGemini.mockResolvedValue('Match result')
-    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any
-    const res = await POST(req)
-    const data = await res.json()
-    expect(data.result).toBe('Match result')
-  })
+    mockGemini.mockResolvedValue('Match result');
+    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any;
+    const res = await POST(req);
+    const data = await res.json();
+    expect(data.result).toBe('Match result');
+  });
 
   it('returns error for missing input', async () => {
-    const req = { json: async () => ({}) } as any
-    const res = await POST(req)
-    expect(res.status).toBe(400)
-  })
+    const req = { json: async () => ({}) } as any;
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+  });
 
   it('handles Gemini error', async () => {
-    mockGemini.mockRejectedValue(new Error('fail'))
-    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any
-    const res = await POST(req)
-    const data = await res.json()
-    expect(res.status).toBe(500)
-    expect(data.error).toMatch(/fail/)
-  })
-}) 
+    mockGemini.mockRejectedValue(new Error('fail'));
+    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any;
+    const res = await POST(req);
+    const data = await res.json();
+    expect(res.status).toBe(500);
+    expect(data.error).toMatch(/fail/);
+  });
+});

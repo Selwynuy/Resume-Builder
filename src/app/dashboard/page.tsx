@@ -9,7 +9,6 @@ import {
   Edit3,
   Trash2,
   Plus,
-  MoreHorizontal,
   Calendar,
   User,
   FileCheck,
@@ -170,7 +169,7 @@ export default function Dashboard() {
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
             Welcome back{session?.user?.name ? `, ${session.user.name.split(' ')[0]}` : ''}!
           </h1>
-          <p className="text-gray-600 text-lg">Here's what's happening with your resumes today</p>
+          <p className="text-gray-600 text-lg">Here&apos;s what&apos;s happening with your resumes today</p>
         </div>
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -382,7 +381,7 @@ export default function Dashboard() {
                 <h3 className="text-2xl font-bold text-slate-800 mb-3">Delete Resume</h3>
                 <p className="text-slate-600 mb-2">Are you sure you want to delete</p>
                 <p className="text-lg font-semibold text-slate-800 mb-6">
-                  "{resumeToDelete?.title}"?
+                  &quot;{resumeToDelete?.title}&quot;?
                 </p>
                 <p className="text-sm text-slate-500 mb-8">
                   This action cannot be undone. All resume data will be permanently removed.
@@ -406,7 +405,7 @@ export default function Dashboard() {
                         Deleting...
                       </>
                     ) : (
-                      'Delete Resume'
+                      <span>Delete Resume</span>
                     )}
                   </button>
                 </div>

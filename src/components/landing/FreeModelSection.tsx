@@ -13,7 +13,7 @@ const FreeModelSection = () => (
       </Badge>
       <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Completely Free Resume Builder</h2>
       <p className="text-xl text-slate-600 max-w-3xl mx-auto mb-12">
-        We believe everyone deserves access to professional resume tools. That's why our platform is completely free
+        We believe everyone deserves access to professional resume tools. That&apos;s why our platform is completely free
         - just watch a short ad to unlock premium templates and PDF downloads.
       </p>
       <motion.div

@@ -39,8 +39,12 @@ export const SkillsStep = ({
       const data = await res.json()
       if (data.skills) setAiSkills(data.skills)
       else setAiError(data.error || 'No skills returned')
-    } catch (e: any) {
-      setAiError(e.message || 'AI error')
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setAiError(e.message || 'AI error')
+      } else {
+        setAiError('An unexpected error occurred')
+      }
     } finally {
       setAiLoading(false)
     }

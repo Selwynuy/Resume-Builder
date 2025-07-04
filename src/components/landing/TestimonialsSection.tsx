@@ -10,7 +10,7 @@ const testimonials = [
     role: "Software Engineer",
     company: "Tech Corp",
     content:
-      "This resume builder helped me land my dream job! The AI suggestions were spot-on and the ATS optimization really worked.",
+      "This &quot;Resume-Builder helped me&quot; land my dream job! The AI suggestions were spot-on and the ATS optimization really worked.",
     rating: 5,
     avatar: "/placeholder.svg?height=60&width=60",
   },
@@ -52,7 +52,7 @@ const TestimonialsSection = () => {
           </Badge>
           <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Loved by Job Seekers Worldwide</h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-            Join thousands of professionals who've landed their dream jobs using our platform.
+            Join thousands of professionals who&apos;ve landed their dream jobs using our platform.
           </p>
         </div>
         <div className="relative max-w-4xl mx-auto">
@@ -67,7 +67,7 @@ const TestimonialsSection = () => {
                 <div className="text-center">
                   <Quote className="w-12 h-12 text-blue-600 mx-auto mb-6" />
                   <p className="text-xl text-slate-700 leading-relaxed mb-8">
-                    "{testimonials[currentTestimonial].content}"
+                    &quot;{testimonials[currentTestimonial].content}&quot;
                   </p>
                   <div className="flex items-center justify-center space-x-4">
                     <img

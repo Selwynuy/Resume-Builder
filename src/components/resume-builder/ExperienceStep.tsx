@@ -39,7 +39,7 @@ export const ExperienceStep = ({
       let stylePrompt = ''
       if (editPairs.length) {
         stylePrompt = '\nHere are some examples of how the user edits AI suggestions. Please match their style.\n' +
-          editPairs.map((p: any, i: number) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
+          editPairs.map((p: { ai: string; user: string }) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
       }
       const res = await fetch('/api/ai/bullet', {
         method: 'POST',
@@ -49,8 +49,8 @@ export const ExperienceStep = ({
       const data = await res.json()
       if (data.suggestion) setAiSuggestion(data.suggestion)
       else setAiError(data.error || 'No suggestion returned')
-    } catch (e: any) {
-      setAiError(e.message || 'AI error')
+    } catch (e: unknown) {
+      setAiError((e as Error).message || 'AI error')
     } finally {
       setAiLoading(false)
     }

@@ -93,7 +93,7 @@ export const PersonalInfoStep = ({
       let stylePrompt = ''
       if (editPairs.length) {
         stylePrompt = '\nHere are some examples of how the user edits AI suggestions. Please match their style.\n' +
-          editPairs.map((p: any, i: number) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
+          editPairs.map((p: { ai: string; user: string }) => `AI: ${p.ai}\nUser: ${p.user}`).join('\n')
       }
       const res = await fetch('/api/ai/summary', {
         method: 'POST',
@@ -111,8 +111,12 @@ export const PersonalInfoStep = ({
       const data = await res.json()
       if (data.suggestion) setAiSuggestion(data.suggestion)
       else setAiError(data.error || 'No suggestion returned')
-    } catch (e: any) {
-      setAiError(e.message || 'AI error')
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        setAiError(e.message || 'AI error')
+      } else {
+        setAiError('An unexpected error occurred')
+      }
     } finally {
       setAiLoading(false)
     }
@@ -141,7 +145,7 @@ export const PersonalInfoStep = ({
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center mb-8">
         <h3 className="text-lg font-semibold text-slate-800 mb-2">Tell Us About Yourself</h3>
-        <p className="text-slate-600">Let's start with your basic information</p>
+        <p className="text-slate-600">Let&apos;s start with your basic information</p>
       </div>
 
       <div className="space-y-6">

@@ -31,7 +31,8 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 
 ### 5. Personalization
 
-- [ ] AI adapts to user's writing style
+- [ ] AI adapts to user's writing style  
+  - **REMOVED: All resumes use a consistent professional tone for clarity and ATS compatibility.**
 
 ### 6. Analytics & Insights
 
@@ -73,6 +74,7 @@ Implement comprehensive AI-powered features for the resume builder using Google 
 - [ ] Documentation updated
 - [ ] UI/UX matches current design system
 - [x] Dashboard resume score and industry benchmarking removed as redundant
+- [x] Personalization (writing style adaptation) removed in favor of professional tone
 
 ---
 

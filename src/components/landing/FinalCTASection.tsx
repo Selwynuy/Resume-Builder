@@ -13,7 +13,7 @@ const FinalCTASection = () => (
       >
         <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">Ready to Land Your Dream Job?</h2>
         <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-          Join thousands of professionals who've successfully created ATS-optimized resumes with our AI-powered
+          Join thousands of professionals who&apos;ve successfully created ATS-optimized resumes with our AI-powered
           platform. Start building your perfect resume today!
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

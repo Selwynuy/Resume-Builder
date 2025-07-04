@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
+import type { Template } from '@/lib/templates'
 
 interface TemplateStepProps {
   selectedTemplate: string
@@ -15,10 +16,10 @@ export const TemplateStep = ({
   onTemplateSelect,
   returnToStep 
 }: TemplateStepProps) => {
-  const [allTemplates, setAllTemplates] = useState<any[]>([])
+  const [allTemplates, setAllTemplates] = useState<Template[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const getTemplatePreviewHtml = (template: any) => {
+  const getTemplatePreviewHtml = (template: Template) => {
     try {
       const sampleData = getSampleResumeData()
       return renderTemplate(
@@ -43,15 +44,16 @@ export const TemplateStep = ({
         
         // Fetch only community templates (no more built-in templates)
         const response = await fetch('/api/templates')
-        let communityTemplates = []
+        let communityTemplates: Template[] = []
         
         if (response.ok) {
-          const data = await response.json()
-          communityTemplates = (data.templates || []).map((template: any) => ({
+          const data: { templates: Template[] } = await response.json()
+          communityTemplates = (data.templates || []).map((template: Template) => ({
             ...template,
-            id: template.id || template._id // Ensure we have an id field
+            // @ts-expect-error: _id is a legacy property for some templates
+            id: template.id || template._id
           }))
-          console.log('🌐 Community templates loaded:', communityTemplates.map((t: any) => ({ id: t.id, name: t.name })))
+          console.log('🌐 Community templates loaded:', communityTemplates.map((t: Template) => ({ id: t.id, name: t.name })))
         } else {
           console.error('Failed to fetch community templates')
         }
@@ -102,7 +104,7 @@ export const TemplateStep = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span className="text-sm font-medium">
-                Select a template and you'll return to step {returnToStep} automatically
+                Select a template and you&apos;ll return to step {returnToStep} automatically
               </span>
             </div>
           </div>

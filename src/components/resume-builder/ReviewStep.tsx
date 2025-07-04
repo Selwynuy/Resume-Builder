@@ -5,7 +5,7 @@ import { sanitizeTemplateContent } from '@/lib/security'
 
 interface ReviewStepProps {
   resumeData: ResumeData
-  selectedTemplate: any
+  selectedTemplate: Template | null
   onSave: () => Promise<void>
   onExport: () => Promise<void>
   onChangeTemplate: () => void
