@@ -16,7 +16,6 @@ export async function PATCH(
 
     // Simple admin check - enhance with proper role system
     const adminEmails = [
-      'admin@resumebuilder.com',
       'selwyn.cybersec@gmail.com',
       session?.user?.email || '' // Temporary: allow current user for testing
     ]

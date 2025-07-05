@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 
 interface AutoSaveData {
-  personalInfo: any
-  experiences: any[]
-  education: any[]
-  skills: any[]
+  personalInfo: Record<string, unknown>
+  experiences: Record<string, unknown>[]
+  education: Record<string, unknown>[]
+  skills: Record<string, unknown>[]
   template: string
   resumeId?: string
 }
