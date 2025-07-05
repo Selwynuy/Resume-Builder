@@ -143,6 +143,7 @@ Education: ${resumeData.education.map(edu =>
 
   const handleFormatChange = (index: number, format: SkillFormat) => {
     setSkillFormats(prev => prev.map((f, i) => (i === index ? format : f)));
+    updateSkill(index, 'format', format); // <-- persist format in skill
     // Clear other fields except name
     if (format !== 'level') updateSkill(index, 'level', undefined);
     if (format !== 'years') updateSkill(index, 'years', undefined);

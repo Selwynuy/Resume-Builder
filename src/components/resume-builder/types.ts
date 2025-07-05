@@ -25,10 +25,11 @@ export interface Education {
 
 export interface Skill {
   name: string
-  level?: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+  level?: string
   years?: number
   certification?: string
   context?: string
+  format?: string // display format: 'name', 'level', etc.
 }
 
 export interface ResumeData {

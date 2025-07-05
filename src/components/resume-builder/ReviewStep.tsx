@@ -606,11 +606,24 @@ export const ReviewStep = ({
                 <div className="space-y-2">
                   {resumeData.skills.filter(skill => skill.name).length > 0 ? (
                     <div className="flex flex-wrap gap-2">
-                      {resumeData.skills.map((skill, index) => (
-                        <span key={index} className="skill">
-                          <SkillDisplay skill={skill} />
-                        </span>
-                      ))}
+                      {resumeData.skills.map((skill, index) => {
+                        if (skill.format === 'name' || !skill.format) {
+                          return <span key={index}>{skill.name}</span>
+                        }
+                        if (skill.format === 'level') {
+                          return <span key={index}>{skill.name} ({skill.level})</span>
+                        }
+                        if (skill.format === 'years') {
+                          return <span key={index}>{skill.name} ({skill.years} yrs)</span>
+                        }
+                        if (skill.format === 'certification') {
+                          return <span key={index}>{skill.name} ({skill.certification})</span>
+                        }
+                        if (skill.format === 'context') {
+                          return <span key={index}>{skill.name} - {skill.context}</span>
+                        }
+                        return <span key={index}>{skill.name}</span>
+                      })}
                     </div>
                   ) : (
                     <div className="text-slate-500 text-center py-4">No skills added yet</div>
