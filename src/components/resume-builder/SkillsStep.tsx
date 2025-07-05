@@ -153,11 +153,6 @@ Education: ${resumeData.education.map(edu =>
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h3 className="text-lg font-semibold text-slate-800 mb-2">Your Skills</h3>
-        <p className="text-slate-600">Showcase your technical and soft skills</p>
-      </div>
-
       <div className="flex justify-end mb-4">
         <button
           type="button"

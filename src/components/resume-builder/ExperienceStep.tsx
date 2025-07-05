@@ -122,10 +122,6 @@ export const ExperienceStep = ({
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h3 className="text-lg font-semibold text-slate-800 mb-2">Your Work Experience</h3>
-        <p className="text-slate-600">Add your work history, starting with your most recent position</p>
-      </div>
       
       <div className="space-y-6">
         {experiences.map((experience, index) => (

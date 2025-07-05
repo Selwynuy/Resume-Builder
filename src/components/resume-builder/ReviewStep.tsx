@@ -111,18 +111,12 @@ export const ReviewStep = ({
     setAiResult('')
     let url = ''
     let body: any = {}
-    if (type === 'ats' || type === 'job-match') {
-      url = '/api/ai/job-match'
-      body = { resume: JSON.stringify(resumeData), jobDescription: '' } // Optionally allow user to paste job desc
-    } else if (type === 'feedback') {
+    if (type === 'feedback') {
       url = '/api/ai/feedback'
       body = { sectionText: JSON.stringify(resumeData) }
-    } else if (type === 'cover-letter') {
-      url = '/api/ai/cover-letter'
-      body = { resume: JSON.stringify(resumeData), jobDescription: '' }
-    } else if (type === 'interview-prep') {
-      url = '/api/ai/interview-prep'
-      body = { resume: JSON.stringify(resumeData), jobDescription: '' }
+    } else {
+      setAiLoading(false)
+      return
     }
     try {
       const res = await fetch(url, {
@@ -131,7 +125,7 @@ export const ReviewStep = ({
         body: JSON.stringify(body)
       })
       const data = await res.json()
-      setAiResult(data.result || data.coverLetter || data.feedback || data.suggestion || data.error || '')
+      setAiResult(data.result || data.feedback || data.suggestion || data.error || '')
       if (data.error) setAiError(data.error)
     } catch (e: any) {
       const errorMessage = e.message || e.toString() || 'AI error'
@@ -151,38 +145,13 @@ export const ReviewStep = ({
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-slate-800 mb-2 flex items-center justify-center">
-          <span className="text-2xl mr-2">✨</span>
-          Review
-        </h3>
-        <p className="text-slate-600">Finalize your resume</p>
-        <div className="flex flex-wrap gap-2 justify-center mb-4">
-          <button
-            className="px-4 py-2 rounded bg-primary-600 text-white font-semibold hover:bg-primary-700"
-            onClick={() => openModal('ats')}
-          >
-            ATS Scan
-          </button>
-          <button
-            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
-            onClick={() => openModal('feedback')}
-          >
-            AI Feedback
-          </button>
-          <button
-            className="px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700"
-            onClick={() => openModal('cover-letter')}
-          >
-            Cover Letter
-          </button>
-          <button
-            className="px-4 py-2 rounded bg-amber-600 text-white font-semibold hover:bg-amber-700"
-            onClick={() => openModal('interview-prep')}
-          >
-            Interview Prep
-          </button>
-        </div>
+      <div className="flex flex-wrap gap-2 justify-center mb-4">
+        <button
+          className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
+          onClick={() => openModal('feedback')}
+        >
+          AI Feedback
+        </button>
       </div>
 
       {/* Template Selector */}
@@ -737,10 +706,7 @@ export const ReviewStep = ({
               </svg>
             </button>
             <h4 className="font-semibold text-lg mb-2 text-primary-700">
-              {aiModal.type === 'ats' ? 'ATS Scan / Job Match' :
-                aiModal.type === 'feedback' ? 'AI Feedback' :
-                aiModal.type === 'cover-letter' ? 'AI Cover Letter' :
-                aiModal.type === 'interview-prep' ? 'Interview Prep' : ''}
+              AI Feedback
             </h4>
             {aiLoading ? (
               <div className="text-center py-8 text-slate-500">Generating...</div>

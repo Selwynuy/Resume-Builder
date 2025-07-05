@@ -205,11 +205,6 @@ export const PersonalInfoStep = ({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h3 className="text-lg font-semibold text-slate-800 mb-2">Tell Us About Yourself</h3>
-        <p className="text-slate-600">Let&apos;s start with your basic information</p>
-      </div>
-
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">Full Name *</label>
