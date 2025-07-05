@@ -15,9 +15,16 @@ export { AIFeedbackModal } from './AIFeedbackModal'
 export { SkillDisplay } from './SkillDisplay'
 export { ValidatedInput } from './ValidatedInput'
 export { MultiStyleSummaryModal } from './MultiStyleSummaryModal'
+export { SkillInputRow } from './SkillInputRow'
+export { SkillFormatSelector } from './SkillFormatSelector'
+export { ExperienceInputRow } from './ExperienceInputRow'
+export { EducationInputRow } from './EducationInputRow'
 
 // Export validation utilities
 export * from './validation'
+export { validateSkillField } from './validateSkillField'
+export { validateExperienceField } from './validateExperienceField'
+export { validateEducationField } from './validateEducationField'
 
 // Export types
 export * from './types' 
