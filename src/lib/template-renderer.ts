@@ -55,6 +55,16 @@ export function registerHandlebarsHelpers() {
   Handlebars.registerHelper('eq', (a: any, b: any) => a === b)
   
   Handlebars.registerHelper('gt', (a: number, b: number) => a > b)
+
+  // Skill formatting helper
+  Handlebars.registerHelper('formatSkill', function(skill: any) {
+    if (!skill) return '';
+    if (skill.format === 'level') return `${skill.name} (${skill.level})`;
+    if (skill.format === 'years') return `${skill.name} (${skill.years} yrs)`;
+    if (skill.format === 'certification') return `${skill.name} (${skill.certification})`;
+    if (skill.format === 'context') return `${skill.name} - ${skill.context}`;
+    return skill.name;
+  });
 }
 
 /**
