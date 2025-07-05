@@ -212,19 +212,21 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-gray-900">{quickStats.totalTemplates}</p>
-                  <p className="text-sm text-gray-600 mt-1">Templates</p>
+          <Link href="/templates/my">
+            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">{quickStats.totalTemplates}</p>
+                    <p className="text-sm text-gray-600 mt-1">Templates</p>
+                  </div>
+                  <div className="p-2 bg-purple-50 rounded-lg">
+                    <Layout className="h-5 w-5 text-purple-600" />
+                  </div>
                 </div>
-                <div className="p-2 bg-purple-50 rounded-lg">
-                  <Layout className="h-5 w-5 text-purple-600" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 mb-8">

@@ -91,103 +91,7 @@ export const ReviewStep = ({
         )
       }
       
-      // Fallback to basic template if no template is selected
-      const basicTemplate = `
-        <div class="resume-document">
-          <div class="header">
-            <h1>{{personalInfo.name}}</h1>
-            <div class="contact">
-              <p>{{personalInfo.email}} | {{personalInfo.phone}} | {{personalInfo.location}}</p>
-            </div>
-            {{#if personalInfo.summary}}
-            <div class="summary">
-              <p>{{personalInfo.summary}}</p>
-            </div>
-            {{/if}}
-          </div>
-          
-          {{#if experiences}}
-          <div class="section">
-            <h2>Experience</h2>
-            {{#each experiences}}
-            <div class="item">
-              <div class="item-header">
-                <h3>{{position}} at {{company}}</h3>
-                <span class="dates">{{startDate}} - {{endDate}}</span>
-              </div>
-              <p>{{description}}</p>
-            </div>
-            {{/each}}
-          </div>
-          {{/if}}
-          
-          {{#if education}}
-          <div class="section">
-            <h2>Education</h2>
-            {{#each education}}
-            <div class="item">
-              <h3>{{degree}}{{#if field}} in {{field}}{{/if}}</h3>
-              <p>{{school}} | {{graduationDate}}{{#if gpa}} | GPA: {{gpa}}{{/if}}</p>
-            </div>
-            {{/each}}
-          </div>
-          {{/if}}
-          
-          {{#if skills}}
-          <div class="section">
-            <h2>Skills</h2>
-            <div class="skills">
-              {{#each skills}}
-              <span class="skill">{{name}} ({{level}})</span>
-              {{/each}}
-            </div>
-          </div>
-          {{/if}}
-        </div>
-      `
-      
-      const basicCSS = `
-        .resume-document {
-          font-family: 'Times New Roman', serif;
-          width: 210mm;  /* A4 width */
-          height: 297mm; /* A4 height */
-          margin: 0;
-          padding: 20mm; /* Standard A4 margins */
-          background: white;
-          box-sizing: border-box;
-          line-height: 1.4;
-          overflow: hidden;
-        }
-        .header { text-align: center; margin-bottom: 1.5em; }
-        .header h1 { margin: 0; font-size: 24px; }
-        .contact { margin: 0.5em 0; }
-        .summary { margin: 1em 0; font-style: italic; }
-        .section { margin: 1.5em 0; }
-        .section h2 { 
-          font-size: 18px; 
-          border-bottom: 2px solid #333; 
-          padding-bottom: 0.25em;
-          margin-bottom: 0.75em;
-        }
-        .item { margin: 1em 0; }
-        .item-header { 
-          display: flex; 
-          justify-content: space-between; 
-          align-items: baseline;
-          margin-bottom: 0.25em;
-        }
-        .item h3 { margin: 0; font-size: 16px; }
-        .dates { font-style: italic; color: #666; }
-        .skills { display: flex; flex-wrap: wrap; gap: 0.5em; }
-        .skill { 
-          background: #f0f0f0; 
-          padding: 0.25em 0.5em; 
-          border-radius: 4px;
-          font-size: 14px;
-        }
-      `
-      
-      return renderTemplate(basicTemplate, basicCSS, resumeData, true)
+      return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>No Template Selected</h3><p>Please select a template to view preview</p></div>'
     } catch (error) {
       console.error('Template preview error:', error)
       return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>Preview Unavailable</h3><p>Unable to render resume preview</p></div>'
@@ -757,9 +661,9 @@ export const ReviewStep = ({
                 <div 
                   className="resume-preview bg-white border rounded-lg overflow-hidden shadow-lg w-full h-full"
                   style={{ 
-                    width: '210mm',  // A4 width
-                    height: '297mm', // A4 height
-                    transform: 'scale(0.55)', // 65% scaling
+                    width: '816px', 
+                    height: '1056px', 
+                    transform: 'scale(0.5)', 
                     transformOrigin: 'center top',
                   }}
                 >
