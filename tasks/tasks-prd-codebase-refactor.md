@@ -1,5 +1,21 @@
 ## Relevant Files
 
+- `src/components/resume-builder/` - All resume builder components, modularized into atomic components
+  - `PersonalInfoStep.tsx` - Personal information input step (refactored)
+  - `SkillsStep.tsx` - Skills input step (refactored) 
+  - `ExperienceStep.tsx` - Experience input step (refactored)
+  - `EducationStep.tsx` - Education input step (refactored)
+  - `ReviewStep.tsx` - Review and preview step (refactored)
+  - `ValidatedInput.tsx` - Reusable input component with validation
+  - `MultiStyleSummaryModal.tsx` - AI suggestion modal component
+  - `SkillInputRow.tsx` - Atomic skill input row component
+  - `SkillFormatSelector.tsx` - Skill format selection component
+  - `ExperienceInputRow.tsx` - Atomic experience input row component
+  - `EducationInputRow.tsx` - Atomic education input row component
+  - `validateSkillField.ts` - Skill field validation utility
+  - `validateExperienceField.ts` - Experience field validation utility
+  - `validateEducationField.ts` - Education field validation utility
+  - `index.ts` - Export file for all components and utilities
 - `src/components/` - All UI components, to be modularized and refactored into atomic components.
 - `src/hooks/` - Custom hooks, to be cleaned up and organized.
 - `src/lib/` - Utility functions and shared logic.
@@ -21,16 +37,16 @@
 
 - [ ] 1.0 Audit and Remove Unused Code, Dead Files, and Linter Errors
   - [x] 1.1 Run linter and formatter (ESLint + Prettier) across the codebase
-  - [ ] 1.2 Identify and remove unused imports, variables, and functions
+  - [x] 1.2 Identify and remove unused imports, variables, and functions
   - [ ] 1.3 Delete dead files and obsolete modules
   - [ ] 1.4 Fix all linter and TypeScript errors/warnings
   - [ ] 1.5 Commit and test after each cleanup step
 
-- [ ] 2.0 Modularize and Refactor Code into Atomic Components, Hooks, and Utilities
-  - [ ] 2.1 Identify large or repetitive UI blocks and split into atomic components (Button, Card, etc.)
-  - [ ] 2.2 Move reusable logic into custom hooks in `src/hooks/`
-  - [ ] 2.3 Move shared functions/utilities to `src/lib/`
-  - [ ] 2.4 Refactor existing components to use new atomic components/hooks/utilities
+- [x] 2.0 Modularize and Refactor Code into Atomic Components, Hooks, and Utilities
+  - [x] 2.1 Identify large or repetitive UI blocks and split into atomic components (Button, Card, etc.)
+  - [x] 2.2 Move reusable logic into custom hooks in `src/hooks/`
+  - [x] 2.3 Move shared functions/utilities to `src/lib/`
+  - [x] 2.4 Refactor existing components to use new atomic components/hooks/utilities
   - [ ] 2.5 Add/Update tests for all new and refactored components/hooks/utilities
 
 - [ ] 3.0 Adopt and Enforce Modern File Structure and Best Practices
