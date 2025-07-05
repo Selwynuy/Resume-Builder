@@ -36,7 +36,6 @@ function getRateLimitKey(request: NextRequest): string {
 function isRateLimited(request: NextRequest, maxRequests: number, windowMs: number): boolean {
   const key = getRateLimitKey(request)
   const now = Date.now()
-  const windowStart = now - windowMs
 
   // Get current rate limit data
   const current = rateLimit.get(key)
