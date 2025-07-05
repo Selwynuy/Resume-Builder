@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ResumeData, PersonalInfo, Experience, Education, Skill, STEPS } from '@/components/resume-builder'
+import { ResumeData, PersonalInfo, Experience, Education, Skill, STEPS } from '@/components/resume-builder/types'
 import { fetchTemplateData, loadResumeData, saveResume, exportPDF } from '@/lib/resume-api'
-import { useResumeStepNavigation } from './useResumeStepNavigation'
+import { useResumeStepNavigation } from '@/hooks/useResumeStepNavigation'
 
 export function useResumeWizard() {
   const { data: session, status } = useSession()

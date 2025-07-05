@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { renderTemplate } from '@/lib/template-renderer'
 import { getTemplate } from '@/lib/templates'
 import connectDB from '@/lib/db'

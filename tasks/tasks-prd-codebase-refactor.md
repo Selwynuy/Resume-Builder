@@ -1,5 +1,11 @@
 ## Relevant Files
 
+- `src/auth/` - Centralized authentication logic and utilities (new directory)
+- `src/middleware/` - Custom middleware functions (new directory)
+  - `index.ts` - Main middleware with rate limiting and security
+- `src/documentation/` - Comprehensive documentation (new directory)
+  - `README.md` - Project structure and organization guide
+  - `ARCHITECTURE.md` - System architecture and design patterns
 - `src/components/resume-builder/` - All resume builder components, modularized into atomic components
   - `PersonalInfoStep.tsx` - Personal information input step (refactored)
   - `SkillsStep.tsx` - Skills input step (refactored) 
@@ -16,16 +22,13 @@
   - `validateExperienceField.ts` - Experience field validation utility
   - `validateEducationField.ts` - Education field validation utility
   - `index.ts` - Export file for all components and utilities
-- `src/components/` - All UI components, to be modularized and refactored into atomic components.
-- `src/hooks/` - Custom hooks, to be cleaned up and organized.
-- `src/lib/` - Utility functions and shared logic.
-- `src/auth/` or `src/authenticate/` - Centralized authentication logic.
-- `src/middleware/` - Middleware for auth, logging, rate limiting, etc.
-- `src/documentation/` - All documentation (code, onboarding, architecture, deployment, API docs).
-- `src/pages/` or `src/app/` - Main Next.js pages, to be optimized for SSR/CSR/SSG as appropriate.
-- `jest.config.js` and all `*.test.ts(x)` files - For 100% test coverage.
-- `.gitignore` - To be updated for sensitive/build files.
-- `.env` - To be reviewed for secrets and best practices.
+- `src/components/` - All UI components, organized by feature
+- `src/hooks/` - Custom hooks, cleaned up and organized
+- `src/lib/` - Utility functions and shared logic
+- `src/app/` - Main Next.js pages, to be optimized for SSR/CSR/SSG as appropriate
+- `jest.config.js` and all `*.test.ts(x)` files - For 100% test coverage
+- `.gitignore` - To be updated for sensitive/build files
+- `.env` - To be reviewed for secrets and best practices
 
 ### Notes
 
@@ -47,11 +50,11 @@
   - [x] 2.2 Move reusable logic into custom hooks in `src/hooks/`
   - [x] 2.3 Move shared functions/utilities to `src/lib/`
   - [x] 2.4 Refactor existing components to use new atomic components/hooks/utilities
-  - [ ] 2.5 Add/Update tests for all new and refactored components/hooks/utilities
+  - [x] 2.5 Add/Update tests for all new and refactored components/hooks/utilities
 
 - [ ] 3.0 Adopt and Enforce Modern File Structure and Best Practices
-  - [ ] 3.1 Organize files into `components/`, `hooks/`, `lib/`, `auth/`, `middleware/`, `documentation/`, etc.
-  - [ ] 3.2 Use absolute imports throughout the codebase
+  - [x] 3.1 Organize files into `components/`, `hooks/`, `lib/`, `auth/`, `middleware/`, `documentation/`, etc.
+  - [x] 3.2 Use absolute imports throughout the codebase
   - [ ] 3.3 Enforce strict TypeScript mode in `tsconfig.json`
   - [ ] 3.4 Add/Update index files for clean imports
   - [ ] 3.5 Document the new file structure in `/documentation`

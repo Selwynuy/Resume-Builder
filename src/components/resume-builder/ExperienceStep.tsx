@@ -1,7 +1,7 @@
-import { Experience } from './types'
-import { useState } from 'react'
-import { ExperienceInputRow } from './ExperienceInputRow'
-import { validateExperienceField } from './validateExperienceField'
+import { Experience } from '@/components/resume-builder/types'
+import { useState, useEffect } from 'react'
+import { ExperienceInputRow } from '@/components/resume-builder/ExperienceInputRow'
+import { validateExperienceField } from '@/components/resume-builder/validateExperienceField'
 
 interface ExperienceStepProps {
   experiences: Experience[]

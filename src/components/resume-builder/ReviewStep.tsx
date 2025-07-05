@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ResumeData, PersonalInfo, Experience, Education, Skill } from './types'
+import { useState, useEffect } from 'react'
+import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/resume-builder/types'
 import type { Template } from '@/lib/templates'
 import { useRouter } from 'next/navigation'
 import { 

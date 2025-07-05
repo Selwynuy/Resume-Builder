@@ -1,4 +1,4 @@
-import { STEPS } from './types'
+import { STEPS } from '@/components/resume-builder/types'
 
 interface ProgressBarProps {
   currentStep: number

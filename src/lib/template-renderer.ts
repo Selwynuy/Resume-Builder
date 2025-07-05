@@ -1,5 +1,5 @@
 import Handlebars from 'handlebars'
-import { sanitizeHtml, sanitizeTemplateContent, sanitizeCss } from './security'
+import { sanitizeHtml, sanitizeTemplateContent, sanitizeCss } from '@/lib/security'
 
 export interface TemplateData {
   htmlTemplate: string

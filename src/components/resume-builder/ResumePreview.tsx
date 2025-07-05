@@ -1,6 +1,6 @@
 import { renderTemplate } from '@/lib/template-renderer';
 import { sanitizeTemplateContent } from '@/lib/security';
-import { ResumeData } from './types';
+import { ResumeData } from '@/components/resume-builder/types';
 import type { Template } from '@/lib/templates';
 
 interface ResumePreviewProps {
