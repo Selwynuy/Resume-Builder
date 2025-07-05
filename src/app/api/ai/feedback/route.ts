@@ -7,7 +7,10 @@ export async function POST(req: Request) {
     console.log('AI feedback POST body:', body);
     const { sectionText } = body;
     if (!sectionText) return NextResponse.json({ error: 'Missing sectionText' }, { status: 400 });
-    const prompt = `Give actionable feedback to improve this resume section:\n${sectionText}`;
+    // Update the prompt for user-friendly feedback
+    const FEEDBACK_PROMPT = `
+You are a resume coach. Give feedback grouped by section (Personal Info, Experience, Education, Skills). Use simple, short bullet points. Use plain language. Mark strengths with ✅, issues with ⚠️, and suggestions with 💡. Limit to 3 points per section. No markdown, no bold, no long explanations. Make it easy for anyone to understand.`;
+    const prompt = `${FEEDBACK_PROMPT}\n\nResume Data:\n${sectionText}`;
     const feedback = await getGeminiCompletion(prompt);
     return NextResponse.json({ feedback });
   } catch (e: unknown) {

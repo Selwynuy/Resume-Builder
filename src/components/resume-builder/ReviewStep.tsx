@@ -27,6 +27,44 @@ interface ReviewStepProps {
   removeSkill: (index: number) => void
 }
 
+// Utility to parse feedback into sections
+function parseFeedback(feedbackText: string) {
+  const sections: Record<string, string[]> = {};
+  let currentSection: string | null = null;
+  feedbackText.split('\n').forEach(line => {
+    const sectionMatch = line.match(/^([A-Za-z ]+):$/);
+    if (sectionMatch) {
+      currentSection = sectionMatch[1].trim();
+      sections[currentSection] = [];
+    } else if (currentSection && line.trim()) {
+      sections[currentSection].push(line.trim());
+    }
+  });
+  return sections;
+}
+
+// FeedbackDisplay component
+function FeedbackDisplay({ feedback }: { feedback: string }) {
+  const sections = parseFeedback(feedback);
+  return (
+    <div className="space-y-4">
+      {Object.entries(sections).map(([section, points]) => (
+        <div key={section} className="bg-white rounded-lg shadow p-4">
+          <h4 className="font-semibold text-primary-700 mb-2">{section}</h4>
+          <ul className="space-y-1">
+            {points.map((point, idx) => (
+              <li key={idx} className="flex items-start">
+                <span className="mr-2">{point.slice(0, 2)}</span>
+                <span>{point.slice(2).trim()}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export const ReviewStep = ({ 
   resumeData,
   selectedTemplate,
@@ -52,6 +90,7 @@ export const ReviewStep = ({
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
   const [aiResult, setAiResult] = useState('')
+  const FEEDBACK_STORAGE_KEY = 'resumeAI_feedback';
 
   const getCompletionPercentage = () => {
     let totalFields = 0
@@ -107,7 +146,7 @@ export const ReviewStep = ({
   const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview, true) : sanitizeTemplateContent(preview.html, true)
   const previewCss = typeof preview === 'string' ? '' : preview.css || ''
 
-  const handleAI = async (type: string) => {
+  const handleAI = async (type: string, forceRegenerate = false) => {
     setAiLoading(true)
     setAiError('')
     setAiResult('')
@@ -121,13 +160,25 @@ export const ReviewStep = ({
       return
     }
     try {
+      // Use cached feedback unless forceRegenerate is true
+      if (!forceRegenerate) {
+        const cached = localStorage.getItem(FEEDBACK_STORAGE_KEY)
+        if (cached) {
+          setAiResult(cached)
+          setAiLoading(false)
+          return
+        }
+      }
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       })
       const data = await res.json()
-      setAiResult(data.result || data.feedback || data.suggestion || data.error || '')
+      setAiResult(data.feedback || data.result || data.suggestion || data.error || '')
+      if (data.feedback) {
+        localStorage.setItem(FEEDBACK_STORAGE_KEY, data.feedback)
+      }
       if (data.error) setAiError(data.error)
     } catch (e: any) {
       const errorMessage = e.message || e.toString() || 'AI error'
@@ -143,7 +194,7 @@ export const ReviewStep = ({
     handleAI(type)
   }
   const closeModal = () => setAiModal({ open: false, type: '' })
-  const regenerate = () => handleAI(aiModal.type)
+  const regenerate = () => handleAI(aiModal.type, true)
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -718,10 +769,9 @@ export const ReviewStep = ({
                 return aiError
               })()}</div>
             ) : aiResult ? (
-              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50 max-h-96 overflow-y-auto">{(() => {
-                console.log('🔍 Displaying AI Result:', aiResult, typeof aiResult)
-                return aiResult
-              })()}</div>
+              <div className="mb-4 max-h-96 overflow-y-auto">
+                <FeedbackDisplay feedback={aiResult} />
+              </div>
             ) : null}
             <div className="flex gap-2 justify-end mt-4">
               <button
