@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { renderTemplate, validateTemplate, extractPlaceholders, getSampleResumeData } from '@/lib/template-renderer'
+import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+
 import { sanitizeTemplateContent } from '@/lib/security'
+import { renderTemplate, validateTemplate, extractPlaceholders, getSampleResumeData } from '@/lib/template-renderer'
 
 // Sample data for previews
 const sampleData = {

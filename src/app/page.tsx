@@ -1,17 +1,17 @@
 "use client"
 
-import Header from "@/components/layout/Header"
-import HeroSection from "@/components/landing/HeroSection"
-import StatsSection from "@/components/landing/StatsSection"
-import FeaturesSection from "@/components/landing/FeaturesSection"
-import HowItWorksSection from "@/components/landing/HowItWorksSection"
 import AIATSSection from "@/components/landing/AIATSSection"
-import FreeModelSection from "@/components/landing/FreeModelSection"
 import ComingSoonSection from "@/components/landing/ComingSoonSection"
-import TestimonialsSection from "@/components/landing/TestimonialsSection"
 import FAQSection from "@/components/landing/FAQSection"
+import FeaturesSection from "@/components/landing/FeaturesSection"
 import FinalCTASection from "@/components/landing/FinalCTASection"
 import FooterSection from "@/components/landing/FooterSection"
+import FreeModelSection from "@/components/landing/FreeModelSection"
+import HeroSection from "@/components/landing/HeroSection"
+import HowItWorksSection from "@/components/landing/HowItWorksSection"
+import StatsSection from "@/components/landing/StatsSection"
+import TestimonialsSection from "@/components/landing/TestimonialsSection"
+import Header from "@/components/layout/Header"
 
 export default function LandingPage() {
   return (

@@ -1,7 +1,8 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Brain, Target, FileText, Zap, Shield, Download } from "lucide-react"
 import { motion } from "framer-motion"
+import { Brain, Target, FileText, Zap, Shield, Download } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 
 const features = [
   {

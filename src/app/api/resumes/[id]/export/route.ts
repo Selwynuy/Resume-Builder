@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
-import connectDB from '@/lib/db'
-import Resume from '@/models/Resume'
-import Template from '@/models/Template'
-import { renderTemplate } from '@/lib/template-renderer'
 import mongoose from 'mongoose'
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
 import puppeteer from 'puppeteer'
 
+import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import connectDB from '@/lib/db'
+import { renderTemplate } from '@/lib/template-renderer'
+import Resume from '@/models/Resume'
+import Template from '@/models/Template'
+
 async function generatePDF(params: { id: string }) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions) as any
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }

@@ -1,5 +1,6 @@
-import { POST } from './route';
 import * as gemini from '@/lib/gemini';
+
+import { POST } from './route';
 
 jest.mock('@/lib/gemini');
 const mockGemini = gemini.getGeminiCompletion as jest.Mock;

@@ -1,6 +1,7 @@
-import { Badge } from "@/components/ui/badge"
-import { Brain, Sparkles, Target, TrendingUp } from "lucide-react"
 import { motion } from "framer-motion"
+import { Brain, Sparkles, Target, TrendingUp } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
 
 const AIATSSection = () => (
   <section className="py-20 px-4 sm:px-6 lg:px-8">

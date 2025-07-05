@@ -1,6 +1,7 @@
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight } from "lucide-react"
 import { motion } from "framer-motion"
+import { ArrowRight } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
 
 const steps = [
   {

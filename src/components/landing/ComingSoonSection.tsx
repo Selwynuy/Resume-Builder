@@ -1,8 +1,10 @@
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Clock, Briefcase, Globe, Users, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { Clock, Briefcase, Globe, Users, ChevronRight } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+
 
 const features = [
   {

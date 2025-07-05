@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+
 import dbConnect from '@/lib/db'
+import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss, sanitizeError } from '@/lib/security'
 import Template from '@/models/Template'
 import User from '@/models/User'
-import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss, sanitizeError } from '@/lib/security'
 
 // GET /api/templates - Fetch all public templates
 export async function GET(request: NextRequest) {

@@ -259,7 +259,9 @@ export async function exportPDF({
       }
     }
   } catch (error: any) {
+    console.warn('🔍 Export PDF Final Error:', error)
     const errorMessage = error.message || error.toString() || 'Unknown error occurred'
+    console.warn('🔍 Final Error Message:', errorMessage)
     setSaveMessage(`❌ Error: ${errorMessage}`)
   } finally {
     setIsLoading(false)

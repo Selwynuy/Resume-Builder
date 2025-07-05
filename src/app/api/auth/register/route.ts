@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server';
+
 import connectDB from '@/lib/db';
+import { UserRegistrationSchema, sanitizeError } from '@/lib/security';
 import User from '@/models/User';
-import { RegistrationSchema, sanitizeError } from '@/lib/security';
 
 export async function POST(req: Request) {
   try {
     const { email, password, name } = await req.json();
 
     // Validate input using the new registration schema
-    const validation = RegistrationSchema.safeParse({ name, email, password });
+    const validation = UserRegistrationSchema.safeParse({ name, email, password });
     if (!validation.success) {
       return NextResponse.json(
         { error: 'Invalid input: ' + validation.error.errors[0].message },

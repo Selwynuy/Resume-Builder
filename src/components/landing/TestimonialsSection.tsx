@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Star, Quote } from "lucide-react"
 import { motion } from "framer-motion"
+import { Star, Quote } from "lucide-react"
+import { useState, useEffect } from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 
 const testimonials = [
   {

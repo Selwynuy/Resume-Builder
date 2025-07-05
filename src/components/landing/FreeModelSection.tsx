@@ -1,8 +1,9 @@
+import { motion } from "framer-motion"
+import { FileText, Eye, Shield, ArrowRight, CheckCircle } from "lucide-react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { FileText, Eye, Shield, ArrowRight, CheckCircle } from "lucide-react"
-import { motion } from "framer-motion"
 
 const FreeModelSection = () => (
   <section className="py-20 bg-gradient-to-br from-green-50 to-emerald-50 px-4 sm:px-6 lg:px-8">

@@ -1,5 +1,5 @@
-import { FileText } from "lucide-react"
 import { motion } from "framer-motion"
+import { FileText } from "lucide-react"
 
 const FooterSection = () => (
   <footer className="bg-slate-900 text-white py-16 px-4 sm:px-6 lg:px-8">

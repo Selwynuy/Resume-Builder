@@ -1,6 +1,7 @@
-import { Skill, ResumeData } from '@/components/resume-builder/types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+
 import { SkillInputRow } from '@/components/resume-builder/SkillInputRow'
+import { Skill, ResumeData } from '@/components/resume-builder/types'
 import { validateSkillField } from '@/components/resume-builder/validateSkillField'
 
 const SKILL_FORMATS = [

@@ -1,11 +1,11 @@
-import NextAuth, { type NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
+import NextAuth from 'next-auth/next'
 import type { JWT } from 'next-auth/jwt'
-import type { Session } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+
 import connectDB from '@/lib/db'
 import User from '@/models/User'
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: any = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
+    async session({ session, token }: { session: any; token: JWT }) {
       if (token && session.user) {
         session.user.id = token.id as string
       }
@@ -64,6 +64,6 @@ export const authOptions: NextAuthOptions = {
   }
 }
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(authOptions) as any
 
 export { handler as GET, handler as POST } 

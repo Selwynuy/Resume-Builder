@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
+
 import {
   ProgressBar,
   PersonalInfoStep,

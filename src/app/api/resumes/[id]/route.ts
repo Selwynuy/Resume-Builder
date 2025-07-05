@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import mongoose from 'mongoose'
+import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
-import mongoose from 'mongoose'
 
 // GET - Fetch specific resume
 export async function GET(

@@ -1,6 +1,7 @@
-import { Education } from '@/components/resume-builder/types'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+
 import { EducationInputRow } from '@/components/resume-builder/EducationInputRow'
+import { Education } from '@/components/resume-builder/types'
 import { validateEducationField } from '@/components/resume-builder/validateEducationField'
 
 interface EducationStepProps {

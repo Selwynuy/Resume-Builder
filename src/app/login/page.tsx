@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { signIn, getSession } from 'next-auth/react'
+import { useState } from 'react'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({

@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+
+import { ValidatedInput, MultiStyleSummaryModal, validatePersonalInfoField } from '@/components/resume-builder'
 import { PersonalInfo } from '@/components/resume-builder/types'
 import { INPUT_LIMITS } from '@/lib/security'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { ValidatedInput, MultiStyleSummaryModal, validatePersonalInfoField } from '@/components/resume-builder'
 
 interface PersonalInfoStepProps {
   personalInfo: PersonalInfo

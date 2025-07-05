@@ -1,10 +1,9 @@
-import DOMPurify from 'dompurify'
 import { z } from 'zod'
 
-// Input validation schemas
-export const phoneRegex = /^[\+]?[\d\s\-\(\)]{10,}$/
-export const nameRegex = /^[a-zA-Z\s\-\.\']{1,100}$/
-export const locationRegex = /^[a-zA-Z0-9\s\,\-\.\']{1,200}$/
+// Validation patterns
+export const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/
+export const nameRegex = /^[a-zA-Z\s\-\.']{2,50}$/
+export const locationRegex = /^[a-zA-Z\s\-\.',]{2,100}$/
 
 export const PersonalInfoSchema = z.object({
   name: z.string()
@@ -97,68 +96,48 @@ export const TemplateMetadataSchema = z.object({
 })
 
 // HTML Sanitization
-export const sanitizeHtml = (html: string): string => {
-  if (typeof window === 'undefined') {
-    // Server-side: basic sanitization
-    return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      .replace(/on\w+="[^"]*"/g, '')
-      .replace(/javascript:/gi, '')
-  }
-
-  // Client-side: use DOMPurify
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'div', 'span', 'p', 'br', 'strong', 'em', 'b', 'i', 'u',
-      'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'table', 'tr', 'td', 'th', 'thead', 'tbody',
-      'section', 'article', 'header', 'footer'
-    ],
-    ALLOWED_ATTR: [
-      'class', 'id', 'style'
-    ],
-    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i
-  })
+export function sanitizeHtml(html: string): string {
+  return html
+    .replace(/[<>&'"]/g, (match) => {
+      switch (match) {
+        case '<': return '&lt;'
+        case '>': return '&gt;'
+        case '&': return '&amp;'
+        case "'": return '&#39;'
+        case '"': return '&quot;'
+        default: return match
+      }
+    })
 }
 
 // Template content sanitization (more restrictive)
-export const sanitizeTemplateContent = (html: string, forPreview: boolean = false): string => {
-  if (typeof window === 'undefined') {
-    // Server-side basic sanitization
-    return html
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
-      .replace(/on\w+="[^"]*"/g, '')
-      .replace(/javascript:/gi, '')
-      .replace(/<link\b[^<]*(?:(?!<\/link>)<[^<]*)*<\/link>/gi, '')
-      .replace(/<meta\b[^<]*(?:(?!<\/meta>)<[^<]*)*<\/meta>/gi, '')
-  }
-
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'div', 'span', 'p', 'br', 'strong', 'em', 'b', 'i', 'u',
-      'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'table', 'tr', 'td', 'th', 'thead', 'tbody',
-      'section', 'article', 'header', 'footer',
-      ...(forPreview ? ['style'] : [])
-    ],
-    ALLOWED_ATTR: ['class', ...(forPreview ? ['style'] : [])],
-    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'meta'],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
-  })
+export function sanitizeTemplateContent(content: string, forPreview: boolean = false): string {
+  return content
+    .replace(/[<>&'"]/g, (match) => {
+      switch (match) {
+        case '<': return '&lt;'
+        case '>': return '&gt;'
+        case '&': return '&amp;'
+        case "'": return '&#39;'
+        case '"': return '&quot;'
+        default: return match
+      }
+    })
 }
 
 // CSS Sanitization
-export const sanitizeCss = (css: string): string => {
-  // Remove potentially dangerous CSS
+export function sanitizeCss(css: string): string {
   return css
-    .replace(/expression\s*\(/gi, '')
-    .replace(/javascript\s*:/gi, '')
-    .replace(/@import\s+/gi, '')
-    .replace(/url\s*\(\s*['"]*javascript:/gi, '')
-    .replace(/behavior\s*:/gi, '')
-    .replace(/-moz-binding\s*:/gi, '')
+    .replace(/[<>&'"]/g, (match) => {
+      switch (match) {
+        case '<': return '&lt;'
+        case '>': return '&gt;'
+        case '&': return '&amp;'
+        case "'": return '&#39;'
+        case '"': return '&quot;'
+        default: return match
+      }
+    })
 }
 
 // Rate limiting configuration
@@ -197,24 +176,24 @@ export const sanitizeError = (error: any, isDevelopment: boolean = false): strin
   return genericErrors[errorType] || 'An unexpected error occurred'
 }
 
-// Input length limits
+// Input limits
 export const INPUT_LIMITS = {
-  NAME: 100,
-  EMAIL: 254,
+  NAME: 50,
+  EMAIL: 100,
   PHONE: 20,
-  LOCATION: 200,
-  SUMMARY: 1000,
-  COMPANY: 200,
-  POSITION: 200,
-  DESCRIPTION: 2000,
-  SCHOOL: 200,
-  DEGREE: 200,
-  FIELD: 200,
-  SKILL_NAME: 100,
+  LOCATION: 100,
+  SUMMARY: 500,
+  COMPANY: 100,
+  POSITION: 100,
+  DESCRIPTION: 1000,
+  SCHOOL: 100,
+  DEGREE: 100,
+  FIELD: 100,
+  SKILL_NAME: 50,
   TEMPLATE_NAME: 100,
   TEMPLATE_DESCRIPTION: 500,
   REVIEW_COMMENT: 1000
-}
+} as const
 
 // Security headers configuration
 export const securityHeaders = {
@@ -248,15 +227,36 @@ export const securityHeaders = {
 }
 
 // Password validation schema
-export const PasswordSchema = z.string()
-  .min(8, 'Password must be at least 8 characters long')
-  .max(128, 'Password too long')
-  .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number')
-  .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/, 'Password contains invalid characters')
+const PasswordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number')
+  .regex(/[^a-zA-Z0-9]/, 'Password must contain at least one special character')
 
-// Registration schema
-export const RegistrationSchema = z.object({
-  name: PersonalInfoSchema.shape.name,
-  email: PersonalInfoSchema.shape.email,
+// User registration schema
+export const UserRegistrationSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(INPUT_LIMITS.NAME),
+  email: z.string().email('Invalid email address').max(INPUT_LIMITS.EMAIL),
   password: PasswordSchema
-}) 
+})
+
+// Input validation
+export function validateInput(value: string, type: 'name' | 'email' | 'phone' | 'location' | 'text'): boolean {
+  if (!value || typeof value !== 'string') return false
+  
+  switch (type) {
+    case 'name':
+      return nameRegex.test(value.trim())
+    case 'email':
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
+    case 'phone':
+      return phoneRegex.test(value.trim())
+    case 'location':
+      return locationRegex.test(value.trim())
+    case 'text':
+      return value.trim().length > 0 && value.trim().length <= INPUT_LIMITS.DESCRIPTION
+    default:
+      return false
+  }
+} 

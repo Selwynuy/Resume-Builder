@@ -1,5 +1,5 @@
-import { phoneRegex, nameRegex, locationRegex, INPUT_LIMITS } from '@/lib/security';
 import { PersonalInfo } from '@/components/resume-builder/types';
+import { phoneRegex, nameRegex, locationRegex, INPUT_LIMITS } from '@/lib/security';
 
 export interface ValidationErrors {
   [key: string]: string;

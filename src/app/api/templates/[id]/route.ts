@@ -1,9 +1,10 @@
+import mongoose from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
+
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import dbConnect from '@/lib/db'
 import Template from '@/models/Template'
-import mongoose from 'mongoose'
 
 // DELETE /api/templates/[id] - Delete user's template
 export async function DELETE(

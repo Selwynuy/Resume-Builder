@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
+
 import { renderTemplate } from '@/lib/template-renderer'
-import { renderToStaticMarkup } from 'react-dom/server'
 
 interface ResumeData {
   personalInfo: {

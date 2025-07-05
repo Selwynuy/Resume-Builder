@@ -80,20 +80,47 @@ reviewSchema.statics.calculateTemplateRating = async function(templateId: string
 
 // Post save middleware to update template rating
 reviewSchema.post('save', function() {
-  // @ts-ignore
+  // @ts-expect-error - Mongoose schema definition
   this.constructor.calculateTemplateRating(this.templateId)
 })
 
 // Post remove middleware to update template rating
 reviewSchema.post('deleteOne', function() {
-  // @ts-ignore
+  // @ts-expect-error - Mongoose schema definition
   this.constructor.calculateTemplateRating(this.templateId)
 })
 
 reviewSchema.post('findOneAndDelete', function() {
-  // @ts-ignore
+  // @ts-expect-error - Mongoose schema definition
   this.constructor.calculateTemplateRating(this.templateId)
 })
+
+// @ts-expect-error - Mongoose schema definition
+reviewSchema.virtual('id').get(function() {
+  return this._id.toHexString();
+});
+
+// @ts-expect-error - Mongoose schema definition
+reviewSchema.set('toJSON', {
+  virtuals: true,
+  transform: function(doc: any, ret: any) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  }
+});
+
+// @ts-expect-error - Mongoose schema definition
+reviewSchema.set('toObject', {
+  virtuals: true,
+  transform: function(doc: any, ret: any) {
+    ret.id = ret._id;
+    delete ret._id;
+    delete ret.__v;
+    return ret;
+  }
+});
 
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema)
 

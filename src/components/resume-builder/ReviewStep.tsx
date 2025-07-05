@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
 import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/resume-builder/types'
 import type { Template } from '@/lib/templates'
-import { useRouter } from 'next/navigation'
+
 import { 
   CompletionStatus, 
   TemplateSelector, 

@@ -1,19 +1,17 @@
-import { ReactNode } from 'react';
-
 interface EditableSectionProps {
-  title: string;
-  icon: string;
-  count?: number;
-  isEditing: boolean;
-  onToggleEdit: () => void;
-  children: ReactNode;
+  title: string
+  icon: string
+  count?: number
+  isEditing: boolean
+  onToggleEdit: () => void
+  children: React.ReactNode
 }
 
 export const EditableSection = ({ 
   title, 
   icon, 
   count, 
-  isEditing, 
+  isEditing: _isEditing, 
   onToggleEdit, 
   children 
 }: EditableSectionProps) => {

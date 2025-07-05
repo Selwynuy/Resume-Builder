@@ -1,7 +1,8 @@
+import { motion } from "framer-motion"
+import { FileText, Play, CheckCircle, Sparkles } from "lucide-react"
+
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Play, CheckCircle, Sparkles } from "lucide-react"
-import { motion } from "framer-motion"
 
 const HeroSection = () => (
   <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">

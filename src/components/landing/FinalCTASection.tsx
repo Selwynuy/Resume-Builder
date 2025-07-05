@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button"
-import { FileText, Play, CheckCircle } from "lucide-react"
 import { motion } from "framer-motion"
+import { FileText, Play, CheckCircle } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 
 const FinalCTASection = () => (
   <section className="py-20 bg-gradient-to-br from-blue-600 to-indigo-600 px-4 sm:px-6 lg:px-8">

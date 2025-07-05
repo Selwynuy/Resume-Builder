@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { getGeminiCompletion } from '@/lib/gemini';
 
 export async function POST(req: Request) {

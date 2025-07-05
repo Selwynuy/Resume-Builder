@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+
 import { sanitizeTemplateContent } from '@/lib/security'
+import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 
 interface CustomTemplate {
   _id: string

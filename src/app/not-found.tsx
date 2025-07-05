@@ -1,10 +1,11 @@
 "use client"
 
+import { motion } from "framer-motion"
+import { FileText, ArrowLeft } from "lucide-react"
+import Link from "next/link"
+
 import Header from "@/components/layout/Header"
 import { Button } from "@/components/ui/button"
-import { FileText, ArrowLeft } from "lucide-react"
-import { motion } from "framer-motion"
-import Link from "next/link"
 
 export default function NotFoundPage() {
   return (
@@ -26,9 +27,8 @@ export default function NotFoundPage() {
             404
           </h1>
           <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Page Not Found</h2>
-          <p className="text-lg sm:text-xl text-slate-600 mb-8 max-w-xl text-center">
-            Sorry, the page you're looking for doesn't exist or has been moved.<br />
-            Let's get you back to the homepage.
+          <p className="text-lg text-gray-600 mb-8">
+            We&apos;re sorry, but the page you&apos;re looking for doesn&apos;t exist.
           </p>
           <Link href="/">
             <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold rounded-xl">
