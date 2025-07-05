@@ -51,7 +51,7 @@ const ComingSoonSection = () => (
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
       >
-        {features.map((feature, idx) => (
+        {features.map((feature) => (
           <Card
             key={feature.title}
             className={`group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 ${feature.card}`}

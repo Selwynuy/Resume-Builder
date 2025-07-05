@@ -77,7 +77,7 @@ export default function TemplateDetailPage() {
       )
     } catch (error) {
       previewResult = {
-        html: `<div style=\"color: red; padding: 1rem;\">Template Error: ${error}</div>`,
+        html: `<div style="color: red; padding: 1rem;">Template Error: ${error}</div>`,
         css: ''
       }
     }

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ProgressBar,
@@ -11,11 +11,6 @@ import {
   EducationStep,
   SkillsStep,
   ReviewStep,
-  ResumeData,
-  PersonalInfo,
-  Experience,
-  Education,
-  Skill,
   STEPS
 } from '@/components/resume-builder'
 import { useResumeWizard } from '@/hooks/useResumeWizard'
@@ -23,14 +18,11 @@ import { useResumeWizard } from '@/hooks/useResumeWizard'
 // Main Component
 export default function NewResumePage() {
   const {
-    status,
     isLoadingResume,
-    isEditMode,
     resumeData,
     selectedTemplateData,
     saveMessage,
     isLoading,
-    returnToStep,
     updatePersonalInfo,
     updateExperience,
     addExperience,
@@ -44,16 +36,13 @@ export default function NewResumePage() {
     handleSaveResume,
     handleExportPDF,
     handleStepClick,
-    handleTemplateChange,
     handleChangeTemplate,
     currentStep,
     nextStep,
     prevStep,
-    canProceed,
-    saveStateToLocalStorage
+    canProceed
   } = useResumeWizard()
-  const { data: session, status: authStatus } = useSession()
-  const router = useRouter()
+  const { status: authStatus } = useSession()
   const searchParams = useSearchParams()
 
   // Helper Functions
@@ -81,7 +70,7 @@ export default function NewResumePage() {
     if (initialTemplate) {
       fetchTemplateData(initialTemplate)
     }
-  }, [])
+  }, [searchParams, resumeData.template])
 
   // Load template data when template changes
   useEffect(() => {

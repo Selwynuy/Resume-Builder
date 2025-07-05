@@ -35,8 +35,9 @@ export default function SignupPage() {
       }
 
       router.push('/login');
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) setError(error.message);
+      else setError('Something went wrong');
     } finally {
       setLoading(false);
     }

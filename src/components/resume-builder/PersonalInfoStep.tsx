@@ -167,7 +167,7 @@ export const PersonalInfoStep = ({
 
   // 2. Update AI Suggest button to open multi-style modal
   const handleMultiSuggest = async (force = false) => {
-    let cached = !force && getMultiSummariesFromStorage();
+    const cached = !force && getMultiSummariesFromStorage();
     setShowMultiModal(true);
     setMultiError(null);
     if (cached) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -77,7 +77,7 @@ export default function TemplatesPage() {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [newReview, setNewReview] = useState({ rating: 5, comment: '' })
   const [submittingReview, setSubmittingReview] = useState(false)
-  const [showSuccessMessage, setShowSuccessMessage] = useState('')
+
 
   useEffect(() => {
     fetchCustomTemplates()
@@ -230,12 +230,7 @@ export default function TemplatesPage() {
     <div className="min-h-screen pt-12 pb-12 bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Success Message */}
-          {showSuccessMessage && (
-            <div className="fixed top-24 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse">
-              {showSuccessMessage}
-            </div>
-          )}
+
 
           {/* Small heading and Build Resume button above filters */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
@@ -314,7 +309,7 @@ export default function TemplatesPage() {
             ) : (
                   <div className="px-4 py-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
-                      {sortedCustomTemplates.map((template, idx) => (
+                      {sortedCustomTemplates.map((template) => (
                         <div key={template._id} className="flex flex-col items-center w-full h-full">
                           <TemplatePreview html={template.htmlTemplate} css={template.cssStyles} />
                           <div className="w-full mt-2 bg-white shadow rounded-md p-4 flex flex-col gap-2">
