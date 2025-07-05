@@ -119,8 +119,9 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
       html: renderedHtml,
       css: `${previewDefaults}\n${processedCss}`
     }
-  } catch (error) {
-    throw new Error(`Failed to render template: ${error}`)
+  } catch (error: any) {
+    const errorMessage = error.message || error.toString() || 'Unknown template rendering error'
+    throw new Error(`Failed to render template: ${errorMessage}`)
   }
 }
 

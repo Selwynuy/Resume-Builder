@@ -8,7 +8,17 @@ export async function fetchTemplateData(templateId: string): Promise<any> {
     const response = await fetch(`/api/templates/${templateId}`)
     if (response.ok) {
       const data = await response.json()
-      return data.template
+      const template = data.template
+      
+      // Normalize the template data structure to ensure both _id and id fields exist
+      if (template) {
+        return {
+          ...template,
+          id: template._id || template.id, // Ensure id field exists
+          _id: template._id || template.id // Ensure _id field exists
+        }
+      }
+      return template
     } else {
       return null
     }
@@ -138,7 +148,8 @@ export async function saveResume({
       throw new Error(errorData.error || 'Failed to save resume')
     }
   } catch (error: any) {
-    setSaveMessage(`❌ Error: ${error.message}`)
+    const errorMessage = error.message || error.toString() || 'Unknown error occurred'
+    setSaveMessage(`❌ Error: ${errorMessage}`)
   } finally {
     setIsLoading(false)
   }
@@ -256,13 +267,15 @@ export async function exportPDF({
     } else {
       try {
         const errorData = await pdfResponse.json()
-        throw new Error(errorData.error || 'Failed to export PDF')
-      } catch {
+        const errorMessage = typeof errorData.error === 'string' ? errorData.error : 'Failed to export PDF'
+        throw new Error(errorMessage)
+      } catch (parseError) {
         throw new Error(`Failed to export PDF: ${pdfResponse.statusText}`)
       }
     }
   } catch (error: any) {
-    setSaveMessage(`❌ Error: ${error.message}`)
+    const errorMessage = error.message || error.toString() || 'Unknown error occurred'
+    setSaveMessage(`❌ Error: ${errorMessage}`)
   } finally {
     setIsLoading(false)
   }

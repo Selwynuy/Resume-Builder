@@ -92,8 +92,9 @@ export const ReviewStep = ({
       }
       
       return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>No Template Selected</h3><p>Please select a template to view preview</p></div>'
-    } catch (error) {
-      console.error('Template preview error:', error)
+    } catch (error: any) {
+      const errorMessage = error.message || error.toString() || 'Unknown preview error'
+      console.error('Template preview error:', errorMessage)
       return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>Preview Unavailable</h3><p>Unable to render resume preview</p></div>'
     }
   }
@@ -133,7 +134,8 @@ export const ReviewStep = ({
       setAiResult(data.result || data.coverLetter || data.feedback || data.suggestion || data.error || '')
       if (data.error) setAiError(data.error)
     } catch (e: any) {
-      setAiError(e.message || 'AI error')
+      const errorMessage = e.message || e.toString() || 'AI error'
+      setAiError(errorMessage)
     } finally {
       setAiLoading(false)
     }
@@ -190,7 +192,7 @@ export const ReviewStep = ({
             <span className="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center mr-3 text-sm">🎨</span>
             <div>
               <h4 className="font-semibold text-slate-800">Current Template</h4>
-              <p className="text-slate-600 text-sm">{selectedTemplate?.name || 'Modern Professional'}</p>
+              <p className="text-slate-600 text-sm">{selectedTemplate?.name || 'No Template Selected'}</p>
             </div>
           </div>
           
@@ -208,7 +210,7 @@ export const ReviewStep = ({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column - Resume Data with Inline Editing */}
-        <div className="order-2 lg:order-1 space-y-6 max-h-[800px] overflow-y-auto pr-2">
+        <div className="order-2 lg:order-1 space-y-6 overflow-y-auto pr-2">
           {/* Completion Status */}
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6">
             <div className="flex items-center justify-between mb-3">
@@ -655,7 +657,17 @@ export const ReviewStep = ({
       {/* Action Buttons - Fixed outside scrolling area */}
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
         <button
-          onClick={onSave}
+          onClick={() => {
+            console.log('🔍 DEBUG SAVE - Template Data:', {
+              resumeDataTemplate: resumeData.template,
+              selectedTemplate: selectedTemplate,
+              selectedTemplateId: selectedTemplate?.id,
+              selectedTemplateName: selectedTemplate?.name,
+              hasHtmlTemplate: !!selectedTemplate?.htmlTemplate,
+              hasCssStyles: !!selectedTemplate?.cssStyles
+            })
+            onSave()
+          }}
           disabled={isLoading}
           className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >
@@ -666,7 +678,17 @@ export const ReviewStep = ({
         </button>
 
         <button
-          onClick={onExport}
+          onClick={() => {
+            console.log('🔍 DEBUG EXPORT - Template Data:', {
+              resumeDataTemplate: resumeData.template,
+              selectedTemplate: selectedTemplate,
+              selectedTemplateId: selectedTemplate?.id,
+              selectedTemplateName: selectedTemplate?.name,
+              hasHtmlTemplate: !!selectedTemplate?.htmlTemplate,
+              hasCssStyles: !!selectedTemplate?.cssStyles
+            })
+            onExport()
+          }}
           disabled={isLoading || completionPercentage < 50}
           className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
         >

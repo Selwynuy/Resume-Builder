@@ -90,10 +90,18 @@ async function generatePDF(params: { id: string }) {
 
   // All templates are now community templates - generate HTML for PDF printing
   try {
+    // Check if we have a valid template
+    if (!customTemplate || !customTemplate.htmlTemplate) {
+      return NextResponse.json(
+        { error: 'Template not found or invalid' },
+        { status: 400 }
+      )
+    }
+
     // Use the same renderTemplate function used everywhere else
     const htmlContent = renderTemplate(
-      customTemplate?.htmlTemplate || '', 
-      customTemplate?.cssStyles || '', 
+      customTemplate.htmlTemplate, 
+      customTemplate.cssStyles || '', 
       resumeData, 
       false
     )

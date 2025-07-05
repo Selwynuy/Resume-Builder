@@ -1,5 +1,6 @@
 export interface Template {
   id: string
+  _id?: string // MongoDB document ID (optional for compatibility)
   name: string
   description: string
   preview?: string

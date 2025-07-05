@@ -73,7 +73,7 @@ export async function PUT(
     }
 
     const data = await req.json()
-    const { personalInfo, experiences, education, skills, title } = data
+    const { personalInfo, experiences, education, skills, title, template } = data
 
     if (!personalInfo?.name) {
       return NextResponse.json(
@@ -92,6 +92,7 @@ export async function PUT(
         experiences: experiences || [],
         education: education || [],
         skills: skills || [],
+        template: template || '',
         updatedAt: new Date()
       },
       { new: true }
