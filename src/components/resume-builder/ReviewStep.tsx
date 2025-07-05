@@ -706,7 +706,10 @@ export const ReviewStep = ({
               ? 'bg-red-50 border border-red-200 text-red-700'
               : 'bg-green-50 border border-green-200 text-green-700'
           }`}>
-            {saveMessage}
+            {(() => {
+              console.log('🔍 Displaying Save Message:', saveMessage, typeof saveMessage)
+              return saveMessage
+            })()}
           </div>
         </div>
       )}
@@ -729,9 +732,15 @@ export const ReviewStep = ({
             {aiLoading ? (
               <div className="text-center py-8 text-slate-500">Generating...</div>
             ) : aiError ? (
-              <div className="text-red-500 mb-4">{aiError}</div>
+              <div className="text-red-500 mb-4">{(() => {
+                console.log('🔍 Displaying AI Error:', aiError, typeof aiError)
+                return aiError
+              })()}</div>
             ) : aiResult ? (
-              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50 max-h-96 overflow-y-auto">{aiResult}</div>
+              <div className="mb-4 whitespace-pre-line text-slate-800 border border-slate-100 rounded p-3 bg-slate-50 max-h-96 overflow-y-auto">{(() => {
+                console.log('🔍 Displaying AI Result:', aiResult, typeof aiResult)
+                return aiResult
+              })()}</div>
             ) : null}
             <div className="flex gap-2 justify-end mt-4">
               <button

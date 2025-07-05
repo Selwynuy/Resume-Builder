@@ -148,7 +148,9 @@ export async function saveResume({
       throw new Error(errorData.error || 'Failed to save resume')
     }
   } catch (error: any) {
+    console.log('🔍 Export PDF Final Error:', error)
     const errorMessage = error.message || error.toString() || 'Unknown error occurred'
+    console.log('🔍 Final Error Message:', errorMessage)
     setSaveMessage(`❌ Error: ${errorMessage}`)
   } finally {
     setIsLoading(false)
@@ -216,7 +218,10 @@ export async function exportPDF({
     })
     if (!saveResponse.ok) {
       const errorData = await saveResponse.json()
-      throw new Error(errorData.error || 'Failed to save resume before export')
+      const errorMessage = typeof errorData.error === 'string' ? errorData.error : 
+                          typeof errorData.error === 'object' ? JSON.stringify(errorData.error) :
+                          'Failed to save resume before export'
+      throw new Error(errorMessage)
     }
     const savedResume = await saveResponse.json()
     const resumeIdForPdf = isEditMode && editingResumeId ? editingResumeId : savedResume._id
@@ -228,31 +233,7 @@ export async function exportPDF({
     })
     if (pdfResponse.ok) {
       const contentType = pdfResponse.headers.get('Content-Type')
-      if (contentType?.includes('text/html')) {
-        const htmlContent = await pdfResponse.text()
-        const resumeTitle = pdfResponse.headers.get('X-Resume-Title') || 'Resume'
-        const printWindow = window.open('', '_blank')
-        if (printWindow) {
-          const enhancedHtml = htmlContent.replace(
-            '</head>',
-            `\n              <script>\n                window.onload = function() {\n                  setTimeout(() => {\n                    if (window.print) {\n                      window.print();\n                    }\n                    setTimeout(() => {\n                      window.close();\n                    }, 1000);\n                  }, 500);\n                };\n              </script>\n              </head>`
-          )
-          printWindow.document.write(enhancedHtml)
-          printWindow.document.close()
-          setSaveMessage('✅ PDF print dialog opened!')
-        } else {
-          const blob = new Blob([htmlContent], { type: 'text/html' })
-          const url = window.URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-          link.download = `${resumeTitle}.html`
-          document.body.appendChild(link)
-          link.click()
-          window.URL.revokeObjectURL(url)
-          document.body.removeChild(link)
-          setSaveMessage('✅ HTML file downloaded!')
-        }
-      } else {
+      if (contentType?.includes('application/pdf')) {
         const blob = await pdfResponse.blob()
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -263,11 +244,15 @@ export async function exportPDF({
         window.URL.revokeObjectURL(url)
         document.body.removeChild(link)
         setSaveMessage('✅ PDF downloaded successfully!')
+      } else {
+        throw new Error('Unexpected response type from server (expected PDF)')
       }
     } else {
       try {
         const errorData = await pdfResponse.json()
-        const errorMessage = typeof errorData.error === 'string' ? errorData.error : 'Failed to export PDF'
+        const errorMessage = typeof errorData.error === 'string' ? errorData.error : 
+                            typeof errorData.error === 'object' ? JSON.stringify(errorData.error) :
+                            'Failed to export PDF'
         throw new Error(errorMessage)
       } catch (parseError) {
         throw new Error(`Failed to export PDF: ${pdfResponse.statusText}`)

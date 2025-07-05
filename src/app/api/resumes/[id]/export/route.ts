@@ -1,63 +1,41 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '../../../auth/[...nextauth]/route'
-import { renderToBuffer } from '@react-pdf/renderer'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
 import Template from '@/models/Template'
-import { ResumePDF } from '@/lib/pdf-generator'
 import { renderTemplate } from '@/lib/template-renderer'
 import mongoose from 'mongoose'
+import puppeteer from 'puppeteer'
 
 async function generatePDF(params: { id: string }) {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(params.id)) {
-      return NextResponse.json(
-        { error: 'Invalid resume ID' },
-        { status: 400 }
-      )
-    }
-
-    await connectDB()
-
-    const resume = await Resume.findOne({
-      _id: params.id,
-      userId: session.user.id
-    })
-
-    if (!resume) {
-      return NextResponse.json(
-        { error: 'Resume not found' },
-        { status: 404 }
-      )
-    }
-
-  // Fetch community template data
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    return NextResponse.json({ error: 'Invalid resume ID' }, { status: 400 })
+  }
+  await connectDB()
+  const resume = await Resume.findOne({ _id: params.id, userId: session.user.id })
+  if (!resume) {
+    return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
+  }
   let customTemplate = null
-  if (resume.template) {
-    // Check if the template ID is a valid ObjectId
-    if (mongoose.Types.ObjectId.isValid(resume.template)) {
-      try {
-        customTemplate = await Template.findById(resume.template)
-        if (customTemplate) {
-          // Increment downloads count for the custom template
-          await Template.findByIdAndUpdate(resume.template, { $inc: { downloads: 1 } })
-        }
-      } catch (error) {
-        console.error('Error fetching custom template:', error)
+  if (resume.template && mongoose.Types.ObjectId.isValid(resume.template)) {
+    try {
+      customTemplate = await Template.findById(resume.template)
+      if (customTemplate) {
+        await Template.findByIdAndUpdate(resume.template, { $inc: { downloads: 1 } })
       }
+    } catch (error) {
+      console.error('Error fetching custom template:', error)
     }
   }
-
-  // Transform resume data to match expected format
+  if (!customTemplate || !customTemplate.htmlTemplate) {
+    return NextResponse.json({ error: 'Template not found or invalid' }, { status: 400 })
+  }
+  // Prepare resume data
   const resumeData = {
     personalInfo: {
       name: resume.personalInfo.name || '',
@@ -87,168 +65,84 @@ async function generatePDF(params: { id: string }) {
     template: resume.template || '',
     customTemplate: customTemplate
   }
+  // Render HTML
+  const renderResult = renderTemplate(
+    customTemplate.htmlTemplate,
+    customTemplate.cssStyles || '',
+    resumeData,
+    false
+  )
+  const renderedHtml = typeof renderResult === 'string' ? renderResult : renderResult.html
 
-  // All templates are now community templates - generate HTML for PDF printing
+  // Compose full HTML document with CSS in <style>
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${resume.title || 'Resume'}</title>
+        <style>
+          /* Reset all margins and padding */
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+          }
+          
+          /* Ensure the resume takes full page */
+          .resume-template, .resume-document {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+          }
+          
+          ${customTemplate.cssStyles || ''}
+        </style>
+      </head>
+      <body>
+        ${renderedHtml}
+      </body>
+    </html>
+  `
+
+  // Generate PDF with Puppeteer
   try {
-    // Check if we have a valid template
-    if (!customTemplate || !customTemplate.htmlTemplate) {
-      return NextResponse.json(
-        { error: 'Template not found or invalid' },
-        { status: 400 }
-      )
-    }
-
-    // Use the same renderTemplate function used everywhere else
-    const htmlContent = renderTemplate(
-      customTemplate.htmlTemplate, 
-      customTemplate.cssStyles || '', 
-      resumeData, 
-      false
-    )
-
-    // Return a complete HTML document optimized for PDF printing
-    const fullHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>${resume.title || 'Resume'}</title>
-          <style>
-            @page {
-              size: A4 portrait;
-              margin: 0;
-              /* Force A4 dimensions */
-              width: 210mm;
-              height: 297mm;
-            }
-            
-            @media print {
-              @page {
-                size: A4 portrait !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                /* Remove browser headers and footers */
-                -webkit-print-color-adjust: exact;
-                color-adjust: exact;
-              }
-              
-              /* Hide browser chrome elements */
-              body {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-              }
-              
-              /* Remove any default browser margins */
-              html, body {
-                width: 210mm;
-                height: 297mm;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden;
-              }
-              
-              /* Hide any scrollbars or browser UI */
-              ::-webkit-scrollbar {
-                display: none;
-              }
-            }
-            
-            * {
-              box-sizing: border-box;
-            }
-            
-            body {
-              margin: 0;
-              padding: 0;
-              font-family: Arial, Helvetica, sans-serif;
-              line-height: 1.4;
-              color: #333;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-            
-            /* Template-specific CSS */
-            ${customTemplate?.cssStyles || ''}
-            
-            /* PDF-specific overrides */
-            .resume-template {
-              width: 100%;
-              max-width: none;
-              margin: 0;
-              padding: 0;
-              background: white !important;
-            }
-            
-            /* Ensure colors are preserved in PDF */
-            * {
-              -webkit-print-color-adjust: exact !important;
-              color-adjust: exact !important;
-            }
-            
-            /* Page break controls */
-            .page-break {
-              page-break-before: always;
-            }
-            
-            .no-break {
-              page-break-inside: avoid;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="resume-template">
-            ${htmlContent}
-          </div>
-        </body>
-      </html>
-    `
-
-    return new NextResponse(fullHtml, {
+    const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] })
+    const page = await browser.newPage()
+    await page.setContent(htmlContent, { waitUntil: 'networkidle0' })
+    const pdfBuffer = await page.pdf({
+      width: '8.5in',
+      height: '11in',
+      printBackground: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 }
+    })
+    await browser.close()
+    return new NextResponse(pdfBuffer, {
       headers: {
-        'Content-Type': 'text/html',
-        'X-PDF-Template': 'community',
-        'X-Resume-Title': resume.title || 'resume'
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${resume.title || 'resume'}.pdf"`,
+        'Content-Length': pdfBuffer.length.toString(),
       },
     })
-  } catch (error) {
-    console.error('Error generating community template HTML:', error)
-    
-    // Return error response
-    return NextResponse.json(
-      { error: 'Failed to generate PDF - no template available' },
-      { status: 400 }
-    )
+  } catch (error: any) {
+    console.error('PDF generation error:', error)
+    const errorMessage = error.message || error.toString() || 'Unknown PDF generation error'
+    return NextResponse.json({ error: `Failed to generate PDF: ${errorMessage}` }, { status: 500 })
   }
 }
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    return await generatePDF(params)
-  } catch (error: any) {
-    console.error('PDF generation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate PDF' },
-      { status: 500 }
-    )
-  }
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  return await generatePDF(params)
 }
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    return await generatePDF(params)
-  } catch (error: any) {
-    console.error('PDF generation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to generate PDF' },
-      { status: 500 }
-    )
-  }
+export async function POST(req: Request, { params }: { params: { id: string } }) {
+  return await generatePDF(params)
 } 
