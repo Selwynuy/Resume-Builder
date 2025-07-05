@@ -4,6 +4,7 @@ import { renderTemplate } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
 import type { Template } from '@/lib/templates'
 import { SkillDisplay } from './SkillDisplay'
+import { useRouter } from 'next/navigation'
 
 interface ReviewStepProps {
   resumeData: ResumeData
@@ -31,7 +32,6 @@ export const ReviewStep = ({
   selectedTemplate,
   onSave,
   onExport,
-  onChangeTemplate,
   isLoading = false,
   saveMessage = '',
   updatePersonalInfo,
@@ -43,8 +43,10 @@ export const ReviewStep = ({
   removeEducation,
   updateSkill,
   addSkill,
-  removeSkill
+  removeSkill,
+  onChangeTemplate
 }: ReviewStepProps) => {
+  const router = useRouter();
   const [editingSection, setEditingSection] = useState<string | null>(null)
   const [aiModal, setAiModal] = useState<{ open: boolean; type: string }>({ open: false, type: '' })
   const [aiLoading, setAiLoading] = useState(false)

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 import { sanitizeTemplateContent } from '@/lib/security'
@@ -65,6 +65,7 @@ function TemplatePreview({ html, css }: { html: string; css: string }) {
 export default function TemplatesPage() {
   const { data: session } = useSession()
   const router = useRouter()
+  const searchParams = useSearchParams()
   
   const [customTemplates, setCustomTemplates] = useState<CustomTemplate[]>([])
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -102,8 +103,16 @@ export default function TemplatesPage() {
       return
     }
 
-    // No more download tracking here
-    router.push(`/resume/new?customTemplate=${template._id}`)
+    // Redirect back if redirect param is present
+    const redirect = searchParams.get('redirect')
+    if (redirect) {
+      // Append template as query param
+      const url = new URL(redirect, window.location.origin)
+      url.searchParams.set('customTemplate', template._id)
+      router.push(url.pathname + url.search)
+    } else {
+      router.push(`/resume/new?customTemplate=${template._id}`)
+    }
   }
 
   const handleSubmitReview = async () => {

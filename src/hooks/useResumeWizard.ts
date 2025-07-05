@@ -207,9 +207,33 @@ export function useResumeWizard() {
   }
 
   const handleChangeTemplate = () => {
-    setReturnToStep(currentStep)
-    setCurrentStep(1)
+    saveStateToLocalStorage();
+    setReturnToStep(currentStep);
+    // If editing, use /resume/edit/[id], else /resume/new
+    const isEdit = !!editingResumeId;
+    const redirectPath = isEdit ? `/resume/edit/${editingResumeId}` : '/resume/new';
+    router.push(`/templates?redirect=${encodeURIComponent(redirectPath)}`);
   }
+
+  // Save resume data and step to localStorage before redirecting to templates
+  const saveStateToLocalStorage = () => {
+    try {
+      localStorage.setItem('resumeBuilderData', JSON.stringify({ resumeData, currentStep }))
+    } catch (e) { /* ignore */ }
+  }
+
+  // Restore resume data and step from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('resumeBuilderData')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (parsed.resumeData) setResumeData(parsed.resumeData)
+        if (parsed.currentStep) setCurrentStep(parsed.currentStep)
+        localStorage.removeItem('resumeBuilderData') // clear after restore
+      }
+    } catch (e) { /* ignore */ }
+  }, [])
 
   return {
     status,
@@ -238,6 +262,7 @@ export function useResumeWizard() {
     currentStep,
     nextStep,
     prevStep,
-    canProceed
+    canProceed,
+    saveStateToLocalStorage
   }
 } 

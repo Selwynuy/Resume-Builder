@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   ProgressBar,
-  TemplateStep,
   PersonalInfoStep,
   ExperienceStep,
   EducationStep,
@@ -50,7 +49,8 @@ export default function NewResumePage() {
     currentStep,
     nextStep,
     prevStep,
-    canProceed
+    canProceed,
+    saveStateToLocalStorage
   } = useResumeWizard()
   const { data: session, status: authStatus } = useSession()
   const router = useRouter()
@@ -94,20 +94,12 @@ export default function NewResumePage() {
     switch (currentStep) {
       case 1:
         return (
-          <TemplateStep 
-            selectedTemplate={resumeData.template}
-            onTemplateSelect={handleTemplateChange}
-            returnToStep={returnToStep}
-          />
-        )
-      case 2:
-        return (
           <PersonalInfoStep 
             personalInfo={resumeData.personalInfo}
             updatePersonalInfo={updatePersonalInfo}
           />
         )
-      case 3:
+      case 2:
         return (
           <ExperienceStep 
             experiences={resumeData.experiences}
@@ -116,7 +108,7 @@ export default function NewResumePage() {
             removeExperience={removeExperience}
           />
         )
-      case 4:
+      case 3:
         return (
           <EducationStep 
             education={resumeData.education}
@@ -125,7 +117,7 @@ export default function NewResumePage() {
             removeEducation={removeEducation}
           />
         )
-      case 5:
+      case 4:
         return (
           <SkillsStep 
             skills={resumeData.skills}
@@ -135,7 +127,7 @@ export default function NewResumePage() {
             resumeData={resumeData}
           />
         )
-      case 6:
+      case 5:
         return (
           <ReviewStep 
             resumeData={resumeData}

@@ -42,10 +42,9 @@ export interface ResumeData {
 
 // Step Configuration
 export const STEPS = [
-  { id: 1, title: 'Choose Template', icon: '🎨', description: 'Pick your perfect design' },
-  { id: 2, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself' },
-  { id: 3, title: 'Work Experience', icon: '💼', description: 'Add your work history' },
-  { id: 4, title: 'Education', icon: '🎓', description: 'Add your education' },
-  { id: 5, title: 'Skills', icon: '⚡', description: 'Showcase your abilities' },
-  { id: 6, title: 'Review', icon: '✨', description: 'Finalize your resume' }
+  { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself' },
+  { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history' },
+  { id: 3, title: 'Education', icon: '🎓', description: 'Add your education' },
+  { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities' },
+  { id: 5, title: 'Review', icon: '✨', description: 'Finalize your resume' }
 ] 
