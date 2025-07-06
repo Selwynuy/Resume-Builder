@@ -47,12 +47,12 @@
 
 ## Tasks
 
-- [ ] 1.0 Audit and Remove Unused Code, Dead Files, and Linter Errors
+- [x] 1.0 Audit and Remove Unused Code, Dead Files, and Linter Errors
   - [x] 1.1 Run linter and formatter (ESLint + Prettier) across the codebase
   - [x] 1.2 Identify and remove unused imports, variables, and functions
   - [x] 1.3 Delete dead files and obsolete modules
   - [x] 1.4 Fix all linter and TypeScript errors/warnings
-  - [ ] 1.5 Commit and test after each cleanup step
+  - [x] 1.5 Commit and test after each cleanup step
 
 - [x] 2.0 Modularize and Refactor Code into Atomic Components, Hooks, and Utilities
   - [x] 2.1 Identify large or repetitive UI blocks and split into atomic components (Button, Card, etc.)

@@ -62,7 +62,7 @@ export const authOptions = {
       return token
     },
     async session(params: unknown) {
-      const { session, token } = params as { session: { user: { id?: string } }; token: { id?: string } }
+      const { session, token } = params as { session: { user: { id?: string; email?: string; name?: string }; expires: string }; token: { id?: string } }
       if (token && session.user) {
         session.user.id = token.id as string
       }
