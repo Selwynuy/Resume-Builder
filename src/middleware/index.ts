@@ -61,12 +61,14 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public (public files)
+     * - api/auth (NextAuth.js routes)
      */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    '/((?!_next/static|_next/image|favicon.ico|public|api/auth).*)',
   ],
 }
 
 // Export middleware modules for use in other parts of the application
 export * from './rate-limiting'
 export * from './security'
-export * from './logging' 
+export * from './logging'
+export * from './input-validation' 

@@ -44,6 +44,18 @@ export const RATE_LIMIT_CONFIGS = {
     maxRequests: 50,
     windowMs: 15 * 60 * 1000, // 15 minutes
     errorMessage: 'Too many resume operations'
+  },
+  // AI endpoints - strict limiting due to cost and resources
+  ai: {
+    maxRequests: 20,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    errorMessage: 'Too many AI requests. Please wait before making more requests.'
+  },
+  // Template operations - moderate limiting
+  template: {
+    maxRequests: 30,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    errorMessage: 'Too many template operations'
   }
 }
 
@@ -56,6 +68,10 @@ function getRateLimitKey(request: NextRequest): string {
     return `session:${ip}`
   } else if (path.startsWith('/api/auth/')) {
     return `auth:${ip}:${path}`
+  } else if (path.startsWith('/api/ai/')) {
+    return `ai:${ip}:${path}`
+  } else if (path.startsWith('/api/templates/')) {
+    return `template:${ip}:${path}`
   } else if (path.startsWith('/api/resumes/')) {
     return `resume:${ip}:${path}`
   } else if (path.startsWith('/api/')) {
@@ -115,6 +131,18 @@ export function checkRateLimit(request: NextRequest): NextResponse | null {
   else if (path.startsWith('/api/auth/')) {
     if (isRateLimited(request, RATE_LIMIT_CONFIGS.auth)) {
       return createRateLimitResponse(RATE_LIMIT_CONFIGS.auth)
+    }
+  }
+  // AI endpoints - strict limiting due to cost and resources
+  else if (path.startsWith('/api/ai/')) {
+    if (isRateLimited(request, RATE_LIMIT_CONFIGS.ai)) {
+      return createRateLimitResponse(RATE_LIMIT_CONFIGS.ai)
+    }
+  }
+  // Template operations - moderate
+  else if (path.startsWith('/api/templates/')) {
+    if (isRateLimited(request, RATE_LIMIT_CONFIGS.template)) {
+      return createRateLimitResponse(RATE_LIMIT_CONFIGS.template)
     }
   }
   // Resume operations - moderate

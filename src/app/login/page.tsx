@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { getCurrentSession } from '@/auth'
+import { CSRFTokenInput } from '@/components/ui/csrf-token'
 
 export const metadata: Metadata = {
   title: 'Login - Resume Builder',
@@ -30,6 +31,7 @@ export default async function LoginPage() {
         </div>
         <form className="mt-8 space-y-6" action="/api/auth/signin" method="POST">
           <input type="hidden" name="callbackUrl" value="/dashboard" />
+          <CSRFTokenInput />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input

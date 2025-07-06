@@ -82,5 +82,17 @@ describe('Rate Limiting Middleware', () => {
       expect(RATE_LIMIT_CONFIGS.resume.windowMs).toBe(15 * 60 * 1000)
       expect(RATE_LIMIT_CONFIGS.resume.errorMessage).toBe('Too many resume operations')
     })
+
+    it('should have correct ai configuration', () => {
+      expect(RATE_LIMIT_CONFIGS.ai.maxRequests).toBe(20)
+      expect(RATE_LIMIT_CONFIGS.ai.windowMs).toBe(15 * 60 * 1000)
+      expect(RATE_LIMIT_CONFIGS.ai.errorMessage).toBe('Too many AI requests. Please wait before making more requests.')
+    })
+
+    it('should have correct template configuration', () => {
+      expect(RATE_LIMIT_CONFIGS.template.maxRequests).toBe(30)
+      expect(RATE_LIMIT_CONFIGS.template.windowMs).toBe(15 * 60 * 1000)
+      expect(RATE_LIMIT_CONFIGS.template.errorMessage).toBe('Too many template operations')
+    })
   })
 }) 

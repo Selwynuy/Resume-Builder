@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { addSecurityHeaders, checkCSRF, validateContentType, sanitizeHeaders, securityHeaders } from './security'
+import { addSecurityHeaders, checkCSRF, validateContentType, sanitizeHeaders, securityHeaders, generateCSRFToken, validateCSRFToken } from './security'
 
 describe('Security Headers Middleware', () => {
   const createMockRequest = (path: string = '/api/test', method: string = 'GET') => {
@@ -16,8 +16,8 @@ describe('Security Headers Middleware', () => {
       expect(result.headers.get('X-Content-Type-Options')).toBe('nosniff')
       expect(result.headers.get('X-XSS-Protection')).toBe('1; mode=block')
       expect(result.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin')
-      expect(result.headers.get('Permissions-Policy')).toBe('camera=(), microphone=(), geolocation=()')
-      expect(result.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains')
+      expect(result.headers.get('Permissions-Policy')).toBe('camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()')
+      expect(result.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains; preload')
     })
 
     it('should add CSP header', () => {
@@ -27,7 +27,7 @@ describe('Security Headers Middleware', () => {
 
       const cspHeader = result.headers.get('Content-Security-Policy')
       expect(cspHeader).toContain("default-src 'self'")
-      expect(cspHeader).toContain("script-src 'self' 'unsafe-eval' 'unsafe-inline'")
+      expect(cspHeader).toContain("script-src 'self' 'unsafe-inline'")
       expect(cspHeader).toContain("style-src 'self' 'unsafe-inline'")
       expect(cspHeader).toContain("img-src 'self' data: https:")
       expect(cspHeader).toContain("font-src 'self' data:")
@@ -57,6 +57,45 @@ describe('Security Headers Middleware', () => {
     })
   })
 
+  describe('CSRF Token Management', () => {
+    it('should generate valid CSRF tokens', () => {
+      const sessionId = 'test-session-123'
+      const token1 = generateCSRFToken(sessionId)
+      const token2 = generateCSRFToken(sessionId)
+
+      expect(token1).toBeDefined()
+      expect(token1).toHaveLength(64) // 32 bytes = 64 hex chars
+      expect(token2).toBeDefined()
+      expect(token2).toHaveLength(64)
+      expect(token1).not.toBe(token2) // Should be different each time
+    })
+
+    it('should validate CSRF tokens correctly', () => {
+      const sessionId = 'test-session-456'
+      const token = generateCSRFToken(sessionId)
+
+      // Valid token should pass
+      expect(validateCSRFToken(sessionId, token)).toBe(true)
+
+      // Invalid token should fail
+      expect(validateCSRFToken(sessionId, 'invalid-token')).toBe(false)
+
+      // Non-existent session should fail
+      expect(validateCSRFToken('non-existent', token)).toBe(false)
+    })
+
+    it('should allow one-time use of CSRF tokens', () => {
+      const sessionId = 'test-session-789'
+      const token = generateCSRFToken(sessionId)
+
+      // First use should succeed
+      expect(validateCSRFToken(sessionId, token)).toBe(true)
+
+      // Second use should fail (token consumed)
+      expect(validateCSRFToken(sessionId, token)).toBe(false)
+    })
+  })
+
   describe('checkCSRF', () => {
     it('should allow same-origin requests', () => {
       const request = createMockRequest('/api/resumes')
@@ -78,7 +117,7 @@ describe('Security Headers Middleware', () => {
       expect(result?.status).toBe(403)
       if (result) {
         const data = await result.json()
-        expect(data.error).toBe('CSRF validation failed')
+        expect(data.error).toBe('CSRF validation failed: Invalid origin')
       }
     })
 
@@ -109,31 +148,35 @@ describe('Security Headers Middleware', () => {
         expect(result).toBeNull()
       })
     })
-  })
 
-  describe('validateContentType', () => {
-    it('should allow requests with proper JSON content type', () => {
+    it('should validate referer header', async () => {
       const request = createMockRequest('/api/resumes', 'POST')
-      request.headers.set('content-type', 'application/json')
+      request.headers.set('origin', 'http://localhost:3000')
+      request.headers.set('host', 'localhost:3000')
+      request.headers.set('referer', 'https://malicious-site.com/attack')
 
-      const result = validateContentType(request)
+      const result = checkCSRF(request)
 
-      expect(result).toBeNull()
-    })
-
-    it('should reject POST requests without JSON content type', async () => {
-      const request = createMockRequest('/api/resumes', 'POST')
-      request.headers.set('content-type', 'text/plain')
-
-      const result = validateContentType(request)
-
-      expect(result?.status).toBe(400)
+      expect(result?.status).toBe(403)
       if (result) {
         const data = await result.json()
-        expect(data.error).toBe('Content-Type must be application/json')
+        expect(data.error).toBe('CSRF validation failed: Invalid referer')
       }
     })
 
+    it('should allow valid referer headers', () => {
+      const request = createMockRequest('/api/resumes', 'POST')
+      request.headers.set('origin', 'http://localhost:3000')
+      request.headers.set('host', 'localhost:3000')
+      request.headers.set('referer', 'http://localhost:3000/dashboard')
+
+      const result = checkCSRF(request)
+
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('validateContentType', () => {
     it('should allow GET requests without content type', () => {
       const request = createMockRequest('/api/resumes', 'GET')
 
@@ -142,8 +185,31 @@ describe('Security Headers Middleware', () => {
       expect(result).toBeNull()
     })
 
-    it('should not validate non-API routes', () => {
+    it('should require JSON content type for POST requests to API', () => {
+      const request = createMockRequest('/api/resumes', 'POST')
+      request.headers.set('content-type', 'text/plain')
+
+      const result = validateContentType(request)
+
+      expect(result?.status).toBe(400)
+      if (result) {
+        const data = result.json()
+        expect(data).resolves.toEqual({ error: 'Content-Type must be application/json' })
+      }
+    })
+
+    it('should allow JSON content type for POST requests', () => {
+      const request = createMockRequest('/api/resumes', 'POST')
+      request.headers.set('content-type', 'application/json')
+
+      const result = validateContentType(request)
+
+      expect(result).toBeNull()
+    })
+
+    it('should not validate content type for non-API routes', () => {
       const request = createMockRequest('/dashboard', 'POST')
+      request.headers.set('content-type', 'text/plain')
 
       const result = validateContentType(request)
 
@@ -185,9 +251,9 @@ describe('Security Headers Middleware', () => {
       expect(securityHeaders['X-Content-Type-Options']).toBe('nosniff')
       expect(securityHeaders['X-XSS-Protection']).toBe('1; mode=block')
       expect(securityHeaders['Referrer-Policy']).toBe('strict-origin-when-cross-origin')
-      expect(securityHeaders['Strict-Transport-Security']).toBe('max-age=31536000; includeSubDomains')
+      expect(securityHeaders['Strict-Transport-Security']).toBe('max-age=31536000; includeSubDomains; preload')
       expect(securityHeaders['Content-Security-Policy']).toBeDefined()
-      expect(securityHeaders['Permissions-Policy']).toBe('camera=(), microphone=(), geolocation=()')
+      expect(securityHeaders['Permissions-Policy']).toBe('camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()')
     })
   })
 }) 

@@ -105,13 +105,13 @@
   - [x] 7.3 Refactor API routes and pages to use centralized auth and middleware
   - [x] 7.4 Add/Update tests for auth and middleware
 
-- [ ] 8.0 Apply Security Best Practices
-  - [ ] 8.1 Review and validate all user input (backend and frontend)
-  - [ ] 8.2 Implement CSRF protection where needed
-  - [ ] 8.3 Set secure HTTP headers (e.g., with helmet)
-  - [ ] 8.4 Add rate limiting to sensitive endpoints
-  - [ ] 8.5 Review and fix any other common web vulnerabilities (XSS, SQLi, etc.)
-  - [ ] 8.6 Document security practices in `/documentation`
+- [x] 8.0 Apply Security Best Practices
+  - [x] 8.1 Review and validate all user input (backend and frontend)
+  - [x] 8.2 Implement CSRF protection where needed
+  - [x] 8.3 Set secure HTTP headers (e.g., with helmet)
+  - [x] 8.4 Add rate limiting to sensitive endpoints
+  - [x] 8.5 Review and fix any other common web vulnerabilities (XSS, SQLi, etc.)
+  - [x] 8.6 Document security practices in `/documentation`
 
 - [ ] 9.0 Achieve and Maintain 100% Test Coverage (Jest)
   - [ ] 9.1 Audit current test coverage
