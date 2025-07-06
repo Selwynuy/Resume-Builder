@@ -29,7 +29,9 @@ interface ResumeData {
   }>
   template?: string
   sectionOrder?: string[]
-  customTemplate?: any
+  customTemplate?: {
+    cssStyles?: string
+  }
 }
 
 // Custom template renderer for PDF - Unified styling for all community templates
@@ -171,7 +173,7 @@ const CustomTemplatePDF = ({ data }: { data: ResumeData }) => {
     },
   })
 
-  function PDFSkillDisplay({ skill }: { skill: any }) {
+  function _PDFSkillDisplay({ skill }: { skill: { name: string; years?: string; certification?: string; level?: string; context?: string } }) {
     if (!skill.name) return null;
     let text = skill.name;
     if (skill.years) text += ` (${skill.years} years)`;
@@ -364,7 +366,7 @@ export const ResumePDF = ({ data }: { data: ResumeData }) => {
   }
 
   // Return a basic PDF structure if no template is available
-  function PDFSkillDisplay({ skill }: { skill: any }) {
+  function _PDFSkillDisplay({ skill }: { skill: { name: string; years?: string; certification?: string; level?: string; context?: string } }) {
     if (!skill.name) return null;
     let text = skill.name;
     if (skill.years) text += ` (${skill.years} years)`;

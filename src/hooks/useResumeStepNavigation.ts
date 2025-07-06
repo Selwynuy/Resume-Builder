@@ -2,11 +2,13 @@ import { useState } from 'react'
 
 import { ResumeData } from '@/components/resume-builder'
 
-export function useResumeStepNavigation(resumeData: ResumeData, STEPS: any[]) {
-  const [currentStep, setCurrentStep] = useState(1)
+const TOTAL_STEPS = 6
+
+export const useResumeStepNavigation = (resumeData: ResumeData, initialStep: number, onStepChange: (step: number) => void) => {
+  const [currentStep, setCurrentStep] = useState(initialStep)
 
   const nextStep = () => {
-    if (currentStep < STEPS.length) {
+    if (currentStep < TOTAL_STEPS) {
       setCurrentStep(currentStep + 1)
     }
   }

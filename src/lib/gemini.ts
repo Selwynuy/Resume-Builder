@@ -18,7 +18,7 @@ const MIN_INTERVAL = 1500 // ms between calls
  * @param prompt The prompt string to send
  * @param options Optional: { systemPrompt, temperature, maxTokens }
  */
-export async function getGeminiCompletion(prompt: string, options: any = {}): Promise<string> {
+export async function getGeminiCompletion(prompt: string, options?: { temperature?: number; maxTokens?: number }): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set in environment')
   const now = Date.now()
   if (now - lastCall < MIN_INTERVAL) {
@@ -45,8 +45,8 @@ export async function getGeminiCompletion(prompt: string, options: any = {}): Pr
     const data: any = await res.json() // TODO: Type Gemini API response
     // Gemini returns candidates[0].content.parts[0].text
     return data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
-  } catch (e) {
-    console.error('Gemini API fetch failed:', e)
-    throw e
+  } catch (error: unknown) {
+    console.error('Gemini API error:', error)
+    throw new Error('Failed to get AI completion')
   }
 } 

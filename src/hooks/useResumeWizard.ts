@@ -29,6 +29,8 @@ export function useResumeWizard() {
   const [isLoadingResume, setIsLoadingResume] = useState(false)
   const [selectedTemplateData, setSelectedTemplateData] = useState<any>(null)
   const [returnToStep, setReturnToStep] = useState<number | null>(null)
+  const [_canAccessStep] = useState(true)
+  const [currentStep, setCurrentStep] = useState(1)
 
   // Helper Functions
   const updatePersonalInfo = (field: keyof PersonalInfo, value: string) => {
@@ -189,14 +191,12 @@ export function useResumeWizard() {
 
   // Step navigation
   const {
-    currentStep,
-    setCurrentStep,
     nextStep,
     prevStep,
     canProceed,
     canAccessStep,
     handleStepClick
-  } = useResumeStepNavigation(resumeData, STEPS)
+  } = useResumeStepNavigation(resumeData, currentStep, setCurrentStep)
 
   const handleTemplateChange = (templateId: string) => {
     setResumeData(prev => ({ ...prev, template: templateId }))
