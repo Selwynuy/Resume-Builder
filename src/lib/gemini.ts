@@ -42,7 +42,7 @@ export async function getGeminiCompletion(prompt: string, options?: { temperatur
       console.error('Gemini API error:', err)
       throw new Error('Gemini API error: ' + err)
     }
-    const data: any = await res.json() // TODO: Type Gemini API response
+    const data: { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> } = await res.json()
     // Gemini returns candidates[0].content.parts[0].text
     return data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
   } catch (error: unknown) {

@@ -61,7 +61,7 @@ export const authOptions = {
       }
       return token
     },
-    async session({ session, token }: { session: any; token: JWT }) {
+    async session({ session, token }: { session: { user?: { id?: string } }; token: JWT }) {
       if (token && session.user) {
         session.user.id = token.id as string
       }

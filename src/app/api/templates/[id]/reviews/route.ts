@@ -74,9 +74,9 @@ export async function GET(
       ratingBreakdown: breakdown
     })
     
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error fetching reviews:', error)
-    return NextResponse.json({ error: 'Error fetching reviews' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch reviews' }, { status: 500 })
   }
 }
 
@@ -128,13 +128,8 @@ export async function POST(
     
     return NextResponse.json({ message: 'Review added successfully', review })
     
-  } catch (error: any) {
-    console.error('Error adding review:', error)
-    
-    if (error.code === 11000) {
-      return NextResponse.json({ error: 'You have already reviewed this template' }, { status: 400 })
-    }
-    
-    return NextResponse.json({ error: 'Error adding review' }, { status: 500 })
+  } catch (error: unknown) {
+    console.error('Error creating review:', error)
+    return NextResponse.json({ error: 'Failed to create review' }, { status: 500 })
   }
 } 

@@ -27,7 +27,7 @@ export async function fetchTemplateData(templateId: string): Promise<any> {
   }
 }
 
-export async function loadResumeData(resumeId: string, searchParams: URLSearchParams): Promise<any> {
+export async function loadResumeData(resumeId: string, searchParams: unknown): Promise<ResumeData> {
   try {
     const response = await fetch(`/api/resumes/${resumeId}`)
     if (response.ok) {
@@ -81,7 +81,17 @@ export async function saveResume({
   setEditingResumeId,
   setSaveMessage,
   setIsLoading
-}: any): Promise<void> {
+}: {
+  session: unknown
+  resumeData: ResumeData
+  isEditMode: boolean
+  editingResumeId: string | null
+  router: unknown
+  setIsEditMode: (value: boolean) => void
+  setEditingResumeId: (value: string | null) => void
+  setSaveMessage: (message: string) => void
+  setIsLoading: (loading: boolean) => void
+}): Promise<void> {
   if (!session?.user?.email) {
     alert('Please sign in to save your resume')
     return
@@ -165,15 +175,15 @@ export async function exportPDF({
   setIsLoading,
   _router
 }: {
-  session: any
-  resumeData: any
+  session: unknown
+  resumeData: ResumeData
   isEditMode: boolean
   editingResumeId: string | null
   _setIsEditMode: (value: boolean) => void
   _setEditingResumeId: (value: string | null) => void
   setSaveMessage: (message: string) => void
   setIsLoading: (loading: boolean) => void
-  _router: any
+  _router: unknown
 }) {
   if (!session?.user?.email) {
     alert('Please sign in to export your resume')

@@ -53,12 +53,12 @@ export function registerHandlebarsHelpers() {
     return text ? text.charAt(0).toUpperCase() + text.slice(1) : ''
   })
 
-  Handlebars.registerHelper('eq', (a: any, b: any) => a === b)
+  Handlebars.registerHelper('eq', (a: unknown, b: unknown) => a === b)
   
   Handlebars.registerHelper('gt', (a: number, b: number) => a > b)
 
   // Skill formatting helper
-  Handlebars.registerHelper('formatSkill', function(skill: any) {
+  Handlebars.registerHelper('formatSkill', function(skill: { name?: string; format?: string; level?: string; years?: string; certification?: string; context?: string }) {
     if (!skill) return '';
     if (skill.format === 'level') return `${skill.name} (${skill.level})`;
     if (skill.format === 'years') return `${skill.name} (${skill.years} yrs)`;
@@ -130,8 +130,8 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
       html: renderedHtml,
       css: `${previewDefaults}\n${processedCss}`
     }
-  } catch (error: any) {
-    const errorMessage = error.message || error.toString() || 'Unknown template rendering error'
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown template rendering error'
     throw new Error(`Failed to render template: ${errorMessage}`)
   }
 }

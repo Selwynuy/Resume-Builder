@@ -9,8 +9,41 @@ import { renderTemplate } from '@/lib/template-renderer'
 import Resume from '@/models/Resume'
 import Template from '@/models/Template'
 
+interface ExportData {
+  personalInfo: {
+    name: string
+    email: string
+    phone: string
+    location: string
+    summary: string
+  }
+  experiences: Array<{
+    company: string
+    position: string
+    startDate: string
+    endDate: string
+    description: string
+  }>
+  education: Array<{
+    school: string
+    degree: string
+    field: string
+    graduationDate: string
+    gpa?: string
+  }>
+  skills: Array<{
+    name: string
+    level: string
+  }>
+  template?: string
+  customTemplate?: {
+    htmlTemplate: string
+    cssStyles: string
+  }
+}
+
 async function generatePDF(params: { id: string }) {
-  const session = await getServerSession(authOptions) as any
+  const session = await getServerSession(authOptions) as { user?: { id?: string } } | null
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
@@ -18,14 +51,14 @@ async function generatePDF(params: { id: string }) {
     return NextResponse.json({ error: 'Invalid resume ID' }, { status: 400 })
   }
   await connectDB()
-  const resume = await Resume.findOne({ _id: params.id, userId: session.user.id })
+  const resume = await Resume.findById(params.id).lean() as ExportData | null
   if (!resume) {
     return NextResponse.json({ error: 'Resume not found' }, { status: 404 })
   }
   let customTemplate = null
   if (resume.template && mongoose.Types.ObjectId.isValid(resume.template)) {
     try {
-      customTemplate = await Template.findById(resume.template)
+      customTemplate = await Template.findById(resume.template).lean() as { htmlTemplate: string; cssStyles: string } | null
       if (customTemplate) {
         await Template.findByIdAndUpdate(resume.template, { $inc: { downloads: 1 } })
       }
@@ -45,21 +78,21 @@ async function generatePDF(params: { id: string }) {
       location: resume.personalInfo.location || '',
       summary: resume.personalInfo.summary || ''
     },
-    experiences: resume.experiences.map((exp: any) => ({
+    experiences: resume.experiences.map((exp: { company?: string; position?: string; startDate?: string; endDate?: string; description?: string }) => ({
       company: exp.company || '',
       position: exp.position || '',
       startDate: exp.startDate || '',
       endDate: exp.endDate || '',
       description: exp.description || ''
     })),
-    education: resume.education.map((edu: any) => ({
+    education: resume.education.map((edu: { school?: string; degree?: string; field?: string; graduationDate?: string; gpa?: string }) => ({
       school: edu.school || '',
       degree: edu.degree || '',
       field: edu.field || '',
       graduationDate: edu.graduationDate || '',
       gpa: edu.gpa || ''
     })),
-    skills: resume.skills.map((skill: any) => ({
+    skills: resume.skills.map((skill: { name?: string; level?: string }) => ({
       name: skill.name || '',
       level: skill.level || 'Intermediate'
     })),
@@ -67,13 +100,13 @@ async function generatePDF(params: { id: string }) {
     customTemplate: customTemplate
   }
   // Render HTML
-  const renderResult = renderTemplate(
+  const { html, css } = renderTemplate(
     customTemplate.htmlTemplate,
-    customTemplate.cssStyles || '',
+    customTemplate.cssStyles,
     resumeData,
     false
   )
-  const renderedHtml = typeof renderResult === 'string' ? renderResult : renderResult.html
+  const renderedHtml = html
 
   // Compose full HTML document with CSS in <style>
   const htmlContent = `
@@ -105,7 +138,7 @@ async function generatePDF(params: { id: string }) {
             padding: 0;
           }
           
-          ${customTemplate.cssStyles || ''}
+          ${css || ''}
         </style>
       </head>
       <body>
@@ -133,9 +166,9 @@ async function generatePDF(params: { id: string }) {
         'Content-Length': pdfBuffer.length.toString(),
       },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('PDF generation error:', error)
-    const errorMessage = error.message || error.toString() || 'Unknown PDF generation error'
+    const errorMessage = error instanceof Error ? error.message : 'Unknown PDF generation error'
     return NextResponse.json({ error: `Failed to generate PDF: ${errorMessage}` }, { status: 500 })
   }
 }

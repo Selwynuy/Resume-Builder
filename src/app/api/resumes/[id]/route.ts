@@ -43,11 +43,9 @@ export async function GET(
     }
 
     return NextResponse.json(resume)
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch resume' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Get resume error:', error)
+    return NextResponse.json({ error: 'Failed to fetch resume' }, { status: 500 })
   }
 }
 
@@ -107,11 +105,9 @@ export async function PUT(
     }
 
     return NextResponse.json(resume)
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to update resume' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Update resume error:', error)
+    return NextResponse.json({ error: 'Failed to update resume' }, { status: 500 })
   }
 }
 
@@ -159,10 +155,8 @@ export async function DELETE(
     )
 
     return NextResponse.json({ message: 'Resume deleted successfully' })
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete resume' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Delete resume error:', error)
+    return NextResponse.json({ error: 'Failed to delete resume' }, { status: 500 })
   }
 } 

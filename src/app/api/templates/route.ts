@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
 
     // Build query
-    const query: any = {
+    const query: { isPublic: boolean; isApproved: boolean; category?: string; $text?: { $search: string } } = {
       isPublic: true,
       isApproved: true
     }
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build sort
-    let sortOption: any = {}
+    let sortOption: { downloads?: number; rating?: number; createdAt?: number; price?: number } = {}
     switch (sort) {
       case 'popular':
         sortOption = { downloads: -1 }
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
     // Transform data to include creator name and always include htmlTemplate/cssStyles
     const transformedTemplates = templates.map(template => ({
       ...template,
-      creatorName: (template.createdBy as any)?.name || 'Unknown',
+      creatorName: (template.createdBy as { name?: string })?.name || 'Unknown',
       htmlTemplate: template.htmlTemplate,
       cssStyles: template.cssStyles,
     }))

@@ -158,9 +158,9 @@ export const authRateLimitConfig = {
 }
 
 // Error sanitization
-export const sanitizeError = (error: any, isDevelopment: boolean = false): string => {
+export const sanitizeError = (error: unknown, isDevelopment: boolean = false): string => {
   if (isDevelopment) {
-    return error?.message || 'An error occurred'
+    return error instanceof Error ? error.message : 'An error occurred'
   }
 
   // Production: Generic error messages
@@ -172,7 +172,7 @@ export const sanitizeError = (error: any, isDevelopment: boolean = false): strin
     'TokenExpiredError': 'Session expired'
   }
 
-  const errorType = error?.constructor?.name || 'Error'
+  const errorType = error instanceof Error ? error.constructor.name : 'Error'
   return genericErrors[errorType] || 'An unexpected error occurred'
 }
 

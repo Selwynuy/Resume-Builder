@@ -12,21 +12,21 @@ describe('/api/ai/job-match', () => {
 
   it('returns result for valid input', async () => {
     mockGemini.mockResolvedValue('Match result');
-    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any;
+    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as Partial<Request> as Request;
     const res = await POST(req);
     const data = await res.json();
     expect(data.result).toBe('Match result');
   });
 
   it('returns error for missing input', async () => {
-    const req = { json: async () => ({}) } as any;
+    const req = { json: async () => ({}) } as Partial<Request> as Request;
     const res = await POST(req);
     expect(res.status).toBe(400);
   });
 
   it('handles Gemini error', async () => {
     mockGemini.mockRejectedValue(new Error('fail'));
-    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as any;
+    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as Partial<Request> as Request;
     const res = await POST(req);
     const data = await res.json();
     expect(res.status).toBe(500);

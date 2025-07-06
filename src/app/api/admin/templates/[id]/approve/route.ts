@@ -10,7 +10,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions) as any
+    const session = await getServerSession(authOptions) as unknown as { user: { email: string } }
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -45,7 +45,7 @@ export async function PATCH(
       template 
     })
   } catch (error: unknown) {
-    console.error('Template approval error:', error)
-    return NextResponse.json({ error: 'Error approving template' }, { status: 500 })
+    console.error('Error approving template:', error)
+    return NextResponse.json({ error: 'Failed to approve template' }, { status: 500 })
   }
 } 
