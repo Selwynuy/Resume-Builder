@@ -1,9 +1,8 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentSession } from '@/auth'
 
 export const metadata: Metadata = {
   title: 'Login - Resume Builder',
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function LoginPage() {
-  const session = await getServerSession(authOptions)
+  const session = await getCurrentSession()
   
   if (session) {
     redirect('/dashboard')

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentUserId } from '@/auth'
 import connectDB from '@/lib/db'
 import { PersonalInfoSchema, ExperienceSchema, EducationSchema, SkillSchema } from '@/lib/security'
 import Resume from '@/models/Resume'
@@ -9,9 +8,9 @@ import Resume from '@/models/Resume'
 // GET - Fetch user's resumes
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions) as { user?: { id?: string } } | null
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -20,7 +19,7 @@ export async function GET() {
 
     await connectDB()
 
-    const resumes = await Resume.find({ userId: session.user.id })
+    const resumes = await Resume.find({ userId })
       .sort({ updatedAt: -1 })
       .select('title personalInfo.name createdAt updatedAt isDraft')
 
@@ -34,9 +33,9 @@ export async function GET() {
 // POST - Create new resume (publish)
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions) as { user?: { id?: string } } | null
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -125,7 +124,7 @@ export async function POST(req: Request) {
     await connectDB()
 
     const resume = await Resume.create({
-      userId: session.user.id,
+      userId,
       title: title || `${personalInfo.name}'s Resume`,
       personalInfo,
       experiences: experiences || [],

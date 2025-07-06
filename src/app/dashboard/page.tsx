@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth/next'
 import {
   FileText,
   Plus,
@@ -13,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { authOptions } from '@/app/api/auth/options'
+import { requireAuth } from '@/auth'
 
 interface Resume {
   _id: string;
@@ -78,11 +77,7 @@ async function getTemplates(): Promise<Template[]> {
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session) {
-    redirect('/login')
-  }
+  const session = await requireAuth()
 
   const [resumes, templates] = await Promise.all([
     getResumes(),

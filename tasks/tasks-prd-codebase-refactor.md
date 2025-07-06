@@ -1,8 +1,15 @@
 ## Relevant Files
 
 - `src/auth/` - Centralized authentication logic and utilities (new directory)
+  - `config.ts` - NextAuth configuration and options
+  - `utils.ts` - Authentication utility functions (getCurrentSession, requireAuth, etc.)
+  - `register.ts` - User registration logic and API handlers
+  - `index.ts` - Export file for all auth utilities
 - `src/middleware/` - Custom middleware functions (new directory)
-  - `index.ts` - Main middleware with rate limiting and security
+  - `index.ts` - Main middleware orchestrator
+  - `rate-limiting.ts` - Rate limiting logic with configurable limits
+  - `security.ts` - Security headers, CSRF protection, and content validation
+  - `logging.ts` - Request/response logging with configurable levels
 - `src/documentation/` - Comprehensive documentation (new directory)
   - `README.md` - Project structure and organization guide
   - `ARCHITECTURE.md` - System architecture and design patterns
@@ -92,11 +99,11 @@
   - [x] 6.3 Test all pages for correct rendering and data loading
   - [x] 6.4 Document rendering choices in `/documentation`
 
-- [ ] 7.0 Centralize Authentication Logic and Add Middleware
-  - [ ] 7.1 Move all authentication logic to `src/auth/` or `src/authenticate/`
-  - [ ] 7.2 Create a `src/middleware/` folder for custom middleware (auth, logging, rate limiting)
-  - [ ] 7.3 Refactor API routes and pages to use centralized auth and middleware
-  - [ ] 7.4 Add/Update tests for auth and middleware
+- [x] 7.0 Centralize Authentication Logic and Add Middleware
+  - [x] 7.1 Move all authentication logic to `src/auth/` or `src/authenticate/`
+  - [x] 7.2 Create a `src/middleware/` folder for custom middleware (auth, logging, rate limiting)
+  - [x] 7.3 Refactor API routes and pages to use centralized auth and middleware
+  - [x] 7.4 Add/Update tests for auth and middleware
 
 - [ ] 8.0 Apply Security Best Practices
   - [ ] 8.1 Review and validate all user input (backend and frontend)

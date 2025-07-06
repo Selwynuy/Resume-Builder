@@ -1,9 +1,8 @@
 import mongoose from 'mongoose'
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 import puppeteer from 'puppeteer'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentUserId } from '@/auth'
 import connectDB from '@/lib/db'
 import { renderTemplate } from '@/lib/template-renderer'
 import Resume from '@/models/Resume'
@@ -44,8 +43,8 @@ interface ExportData {
 }
 
 async function generatePDF(params: { id: string }) {
-  const session = await getServerSession(authOptions) as { user?: { id?: string } } | null
-  if (!session?.user?.id) {
+  const userId = await getCurrentUserId()
+  if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   if (!mongoose.Types.ObjectId.isValid(params.id)) {

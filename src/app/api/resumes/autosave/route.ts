@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentUserId } from '@/auth'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -27,7 +26,7 @@ export async function POST(req: Request) {
     if (resumeId) {
       // Update existing resume (when editing)
       resume = await Resume.findOneAndUpdate(
-        { _id: resumeId, userId: session.user.id },
+        { _id: resumeId, userId },
         {
           personalInfo,
           experiences: experiences || [],
@@ -44,7 +43,7 @@ export async function POST(req: Request) {
     } else {
       // Check for existing draft, or create new one
       resume = await Resume.findOne({
-        userId: session.user.id,
+        userId,
         isDraft: true,
         title: { $regex: /^Draft Resume/ }
       })
@@ -59,8 +58,8 @@ export async function POST(req: Request) {
         await resume.save()
       } else {
         // Create new draft only if none exists
-        resume = await Resume.create({
-          userId: session.user.id,
+              resume = await Resume.create({
+        userId,
           title: 'Draft Resume',
           personalInfo,
           experiences: experiences || [],

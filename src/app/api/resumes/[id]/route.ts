@@ -1,8 +1,7 @@
 import mongoose from 'mongoose'
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentUserId } from '@/auth'
 import connectDB from '@/lib/db'
 import Resume from '@/models/Resume'
 
@@ -12,9 +11,9 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -32,7 +31,7 @@ export async function GET(
 
     const resume = await Resume.findOne({
       _id: params.id,
-      userId: session.user.id
+      userId
     })
 
     if (!resume) {
@@ -55,9 +54,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -84,7 +83,7 @@ export async function PUT(
     await connectDB()
 
     const resume = await Resume.findOneAndUpdate(
-      { _id: params.id, userId: session.user.id },
+      { _id: params.id, userId },
       {
         title: title || `${personalInfo.name}'s Resume`,
         personalInfo,
@@ -117,9 +116,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -137,7 +136,7 @@ export async function DELETE(
 
     const resume = await Resume.findOneAndDelete({
       _id: params.id,
-      userId: session.user.id
+      userId
     })
 
     if (!resume) {
@@ -150,7 +149,7 @@ export async function DELETE(
     // Remove resume from user's resumes array
     const User = mongoose.models.User || mongoose.model('User')
     await User.findByIdAndUpdate(
-      session.user.id,
+      userId,
       { $pull: { resumes: params.id } }
     )
 

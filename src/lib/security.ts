@@ -192,36 +192,7 @@ export const INPUT_LIMITS = {
   REVIEW_COMMENT: 1000
 } as const
 
-// Security headers configuration
-export const securityHeaders = {
-  'X-DNS-Prefetch-Control': 'off',
-  'X-Frame-Options': 'DENY',
-  'X-Content-Type-Options': 'nosniff',
-  'Referrer-Policy': 'origin-when-cross-origin',
-  'X-XSS-Protection': '1; mode=block',
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'Content-Security-Policy': process.env.NODE_ENV === 'development'
-    ? [
-        "default-src 'self';",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval';",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-        "font-src 'self' https://fonts.gstatic.com;",
-        "img-src 'self' data: https:;",
-        "object-src 'none';",
-        "base-uri 'self';",
-        "frame-ancestors 'none';"
-      ].join(' ')
-    : [
-        "default-src 'self';",
-        "script-src 'self' 'unsafe-inline';",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-        "font-src 'self' https://fonts.gstatic.com;",
-        "img-src 'self' data: https:;",
-        "object-src 'none';",
-        "base-uri 'self';",
-        "frame-ancestors 'none';"
-      ].join(' ')
-}
+// Security headers configuration moved to middleware/security.ts
 
 // Password validation schema
 const PasswordSchema = z.string()

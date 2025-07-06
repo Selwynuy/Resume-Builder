@@ -1,8 +1,7 @@
 import mongoose from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { getCurrentUserId, getCurrentUserEmail, isAdmin } from '@/auth'
 import dbConnect from '@/lib/db'
 import Template from '@/models/Template'
 
@@ -12,9 +11,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -32,7 +31,7 @@ export async function DELETE(
 
     const template = await Template.findOneAndDelete({
       _id: params.id,
-      createdBy: session.user.id
+      createdBy: userId
     })
 
     if (!template) {
@@ -58,9 +57,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
+    const userEmail = await getCurrentUserEmail()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -77,15 +77,10 @@ export async function GET(
     await dbConnect()
 
     // Check if user is admin
-    const adminEmails = [
-      'admin@resumebuilder.com',
-      'selwyn.cybersec@gmail.com',
-      session?.user?.email || ''
-    ]
-    const isAdmin = adminEmails.includes(session.user.email || '')
+    const userIsAdmin = userEmail ? isAdmin(userEmail) : false
 
     let template
-    if (isAdmin) {
+    if (userIsAdmin) {
       // Admin can access any template
       template = await Template.findById(params.id)
     } else {
@@ -93,7 +88,7 @@ export async function GET(
       template = await Template.findOne({
         _id: params.id,
         $or: [
-          { createdBy: session.user.id },
+          { createdBy: userId },
           { isApproved: true, isPublic: true }
         ]
       })
@@ -122,9 +117,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const userId = await getCurrentUserId()
     
-    if (!session?.user?.id) {
+    if (!userId) {
       return NextResponse.json(
         { error: 'Authentication required' },
         { status: 401 }
@@ -144,7 +139,7 @@ export async function PUT(
     await dbConnect()
 
     const template = await Template.findOneAndUpdate(
-      { _id: params.id, createdBy: session.user.id },
+      { _id: params.id, createdBy: userId },
       {
         name,
         description,

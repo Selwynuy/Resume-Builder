@@ -1,160 +1,54 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { securityHeaders } from '@/lib/security'
-
-// Rate limiting store (in production, use Redis)
-const rateLimit = new Map<string, { count: number; resetTime: number }>()
-
-// Clean up old entries every hour
-setInterval(() => {
-  const now = Date.now()
-  rateLimit.forEach((value, key) => {
-    if (now > value.resetTime) {
-      rateLimit.delete(key)
-    }
-  })
-}, 60 * 60 * 1000)
-
-function getRateLimitKey(request: NextRequest): string {
-  // Use IP address and path for rate limiting key
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'anonymous'
-  const path = request.nextUrl.pathname
-  
-  // Create more specific keys for different types of requests
-  if (path.startsWith('/api/auth/session') || path.startsWith('/api/auth/_log')) {
-    // Session management requests - use IP only to allow normal session activity
-    return `session:${ip}`
-  } else if (path.startsWith('/api/auth/')) {
-    // Authentication requests - use IP and path for stricter limiting
-    return `auth:${ip}:${path}`
-  } else {
-    // General API requests - use IP and path
-    return `api:${ip}:${path}`
-  }
-}
-
-function isRateLimited(request: NextRequest, maxRequests: number, windowMs: number): boolean {
-  const key = getRateLimitKey(request)
-  const now = Date.now()
-
-  // Get current rate limit data
-  const current = rateLimit.get(key)
-
-  if (!current) {
-    // First request
-    rateLimit.set(key, { count: 1, resetTime: now + windowMs })
-    return false
-  }
-
-  if (now > current.resetTime) {
-    // Reset window
-    rateLimit.set(key, { count: 1, resetTime: now + windowMs })
-    return false
-  }
-
-  if (current.count >= maxRequests) {
-    return true
-  }
-
-  // Increment count
-  current.count++
-  return false
-}
+import { checkRateLimit } from './rate-limiting'
+import { addSecurityHeaders, checkCSRF, validateContentType, sanitizeHeaders } from './security'
+import { createRequestLog, logRequest, logResponse, shouldLogRequest } from './logging'
 
 // Export the middleware function for Next.js
 export function middleware(request: NextRequest) {
+  const startTime = Date.now()
+  
+  // Create request log for tracking
+  const requestLog = createRequestLog(request)
+  
+  // Log incoming request
+  if (shouldLogRequest(request)) {
+    logRequest(requestLog)
+  }
+
+  // Sanitize headers
+  sanitizeHeaders(request)
+
+  // Check rate limiting first
+  const rateLimitResponse = checkRateLimit(request)
+  if (rateLimitResponse) {
+    logResponse(requestLog, 429, Date.now() - startTime)
+    return addSecurityHeaders(rateLimitResponse)
+  }
+
+  // Check CSRF protection
+  const csrfResponse = checkCSRF(request)
+  if (csrfResponse) {
+    logResponse(requestLog, 403, Date.now() - startTime)
+    return addSecurityHeaders(csrfResponse)
+  }
+
+  // Validate content type for API requests
+  const contentTypeResponse = validateContentType(request)
+  if (contentTypeResponse) {
+    logResponse(requestLog, 400, Date.now() - startTime)
+    return addSecurityHeaders(contentTypeResponse)
+  }
+
+  // Continue with the request
   const response = NextResponse.next()
-
-  // Add security headers to all responses
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value)
-  })
-
-  // Rate limiting for authentication endpoints (excluding NextAuth session management)
-  if (request.nextUrl.pathname.startsWith('/api/auth/')) {
-    // Exclude NextAuth session management endpoints from strict rate limiting
-    const nextAuthEndpoints = ['/api/auth/session', '/api/auth/_log', '/api/auth/csrf']
-    const isNextAuthEndpoint = nextAuthEndpoints.some(endpoint => 
-      request.nextUrl.pathname === endpoint
-    )
-    
-    if (isNextAuthEndpoint) {
-      // More lenient rate limiting for NextAuth session management
-      if (isRateLimited(request, 100, 15 * 60 * 1000)) { // 100 requests per 15 minutes
-        return new NextResponse(
-          JSON.stringify({ error: 'Too many session requests' }),
-          {
-            status: 429,
-            headers: {
-              'Content-Type': 'application/json',
-              'Retry-After': '900', // 15 minutes
-              ...Object.fromEntries(Object.entries(securityHeaders))
-            }
-          }
-        )
-      }
-    } else {
-      // Strict rate limiting for authentication attempts (login, register, etc.)
-      if (isRateLimited(request, 5, 15 * 60 * 1000)) { // 5 requests per 15 minutes
-        return new NextResponse(
-          JSON.stringify({ error: 'Too many authentication attempts' }),
-          {
-            status: 429,
-            headers: {
-              'Content-Type': 'application/json',
-              'Retry-After': '900', // 15 minutes
-              ...Object.fromEntries(Object.entries(securityHeaders))
-            }
-          }
-        )
-      }
-    }
-  }
-
-  // Rate limiting for API endpoints (excluding NextAuth)
-  if (request.nextUrl.pathname.startsWith('/api/') && !request.nextUrl.pathname.startsWith('/api/auth/')) {
-    if (isRateLimited(request, 100, 15 * 60 * 1000)) { // 100 requests per 15 minutes
-      return new NextResponse(
-        JSON.stringify({ error: 'Too many requests' }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': '900',
-            ...Object.fromEntries(Object.entries(securityHeaders))
-          }
-        }
-      )
-    }
-  }
-
-  // CSRF protection for state-changing requests
-  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(request.method)) {
-    const origin = request.headers.get('origin')
-    const host = request.headers.get('host')
-    
-    // Allow same-origin requests and localhost for development
-    const allowedOrigins = [
-      `https://${host}`,
-      `http://${host}`,
-      'http://localhost:3000',
-      'http://127.0.0.1:3000'
-    ]
-
-    if (origin && !allowedOrigins.includes(origin)) {
-      return new NextResponse(
-        JSON.stringify({ error: 'CSRF validation failed' }),
-        {
-          status: 403,
-          headers: {
-            'Content-Type': 'application/json',
-            ...Object.fromEntries(Object.entries(securityHeaders))
-          }
-        }
-      )
-    }
-  }
+  
+  // Add security headers
+  addSecurityHeaders(response)
+  
+  // Log response
+  logResponse(requestLog, 200, Date.now() - startTime)
 
   return response
 }
@@ -170,4 +64,9 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],
-} 
+}
+
+// Export middleware modules for use in other parts of the application
+export * from './rate-limiting'
+export * from './security'
+export * from './logging' 

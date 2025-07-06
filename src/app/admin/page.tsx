@@ -1,8 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/options'
+import { requireAdmin } from '@/auth'
 
 interface Template {
   _id: string
@@ -53,11 +52,7 @@ async function getTemplates(): Promise<Template[]> {
 }
 
 export default async function AdminPage() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session?.user?.email || !isAdmin(session.user.email, session?.user?.email)) {
-    redirect('/dashboard')
-  }
+  const session = await requireAdmin()
 
   const templates = await getTemplates()
 
