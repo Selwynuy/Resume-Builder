@@ -5,7 +5,6 @@ import { getGeminiCompletion } from '@/lib/gemini';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('AI skills POST body:', body);
     const { resumeContent, experienceDescriptions, jobDescription, jobTitle, industry } = body;
     let context = '';
     let prompt = '';
@@ -39,7 +38,6 @@ export async function POST(req: Request) {
       .filter(Boolean);
     return NextResponse.json({ skills });
   } catch (e: unknown) {
-    console.error('AI skills error:', e);
     if (e instanceof Error) {
       return NextResponse.json({ error: e.message || 'AI error' }, { status: 500 });
     }

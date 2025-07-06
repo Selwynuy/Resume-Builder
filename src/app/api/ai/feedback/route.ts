@@ -5,7 +5,6 @@ import { getGeminiCompletion } from '@/lib/gemini';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('AI feedback POST body:', body);
     const { sectionText } = body;
     if (!sectionText) return NextResponse.json({ error: 'Missing sectionText' }, { status: 400 });
     // Update the prompt for user-friendly feedback

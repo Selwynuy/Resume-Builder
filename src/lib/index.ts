@@ -1,5 +1,5 @@
 // Database utilities
-export * from './db'
+export { default as connectDB } from './db'
 
 // Security utilities
 export * from './security'

@@ -5,7 +5,6 @@ import { getGeminiCompletion } from '@/lib/gemini';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('AI summary POST body:', body);
     const { text, mode, stylePrompt } = body;
     if (!mode) return NextResponse.json({ error: 'Missing mode' }, { status: 400 });
     let prompt = '';

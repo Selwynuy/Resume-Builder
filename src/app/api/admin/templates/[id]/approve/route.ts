@@ -44,7 +44,7 @@ export async function PATCH(
       message: 'Template approved successfully',
       template 
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Template approval error:', error)
     return NextResponse.json({ error: 'Error approving template' }, { status: 500 })
   }

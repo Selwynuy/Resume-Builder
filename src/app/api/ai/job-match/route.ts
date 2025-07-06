@@ -5,7 +5,6 @@ import { getGeminiCompletion } from '@/lib/gemini';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('AI job-match POST body:', body);
     const { resume, jobDescription } = body;
     if (!resume || !jobDescription)
       return NextResponse.json({ error: 'Missing resume or jobDescription' }, { status: 400 });
@@ -13,7 +12,6 @@ export async function POST(req: Request) {
     const result = await getGeminiCompletion(prompt);
     return NextResponse.json({ result });
   } catch (e: unknown) {
-    console.error('AI job-match error:', e);
     if (e instanceof Error) {
       return NextResponse.json({ error: e.message || 'AI error' }, { status: 500 });
     }

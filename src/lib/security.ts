@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 // Validation patterns
-export const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/
-export const nameRegex = /^[a-zA-Z\s\-\.']{2,50}$/
-export const locationRegex = /^[a-zA-Z\s\-\.',]{2,100}$/
+export const phoneRegex = /^\+?[\d\s\-()]{10,}$/
+export const nameRegex = /^[a-zA-Z\s\-.'']{2,50}$/
+export const locationRegex = /^[a-zA-Z\s\-.,]{2,100}$/
 
 export const PersonalInfoSchema = z.object({
   name: z.string()
@@ -32,11 +32,11 @@ export const ExperienceSchema = z.object({
   company: z.string()
     .min(1, 'Company name is required')
     .max(200, 'Company name too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\']{1,200}$/, 'Company name contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.,&'']{1,200}$/, 'Company name contains invalid characters'),
   position: z.string()
     .min(1, 'Position is required')
     .max(200, 'Position too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\']{1,200}$/, 'Position contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.,&'']{1,200}$/, 'Position contains invalid characters'),
   startDate: z.string()
     .min(1, 'Start date is required')
     .regex(/^\d{4}-\d{2}$/, 'Invalid date format (YYYY-MM)'),
@@ -52,14 +52,14 @@ export const EducationSchema = z.object({
   school: z.string()
     .min(1, 'School name is required')
     .max(200, 'School name too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\']{1,200}$/, 'School name contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.,&'']{1,200}$/, 'School name contains invalid characters'),
   degree: z.string()
     .min(1, 'Degree is required')
     .max(200, 'Degree too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\']{1,200}$/, 'Degree contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.,&'']{1,200}$/, 'Degree contains invalid characters'),
   field: z.string()
     .max(200, 'Field too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\']{0,200}$/, 'Field contains invalid characters')
+    .regex(/^[a-zA-Z0-9\s\-.,&'']{0,200}$/, 'Field contains invalid characters')
     .optional()
     .or(z.literal('')),
   graduationDate: z.string()
@@ -75,7 +75,7 @@ export const SkillSchema = z.object({
   name: z.string()
     .min(1, 'Skill name is required')
     .max(100, 'Skill name too long')
-    .regex(/^[a-zA-Z0-9\s\-\.\,\&\+\#]{1,100}$/, 'Skill name contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.,&+#]{1,100}$/, 'Skill name contains invalid characters'),
   level: z.enum(['Beginner', 'Intermediate', 'Advanced', 'Expert'], {
     errorMap: () => ({ message: 'Invalid skill level' })
   })
@@ -85,7 +85,7 @@ export const TemplateMetadataSchema = z.object({
   name: z.string()
     .min(1, 'Template name is required')
     .max(100, 'Template name too long')
-    .regex(/^[a-zA-Z0-9\s\-\.]{1,100}$/, 'Template name contains invalid characters'),
+    .regex(/^[a-zA-Z0-9\s\-.]{1,100}$/, 'Template name contains invalid characters'),
   description: z.string()
     .min(1, 'Description is required')
     .max(500, 'Description too long'),

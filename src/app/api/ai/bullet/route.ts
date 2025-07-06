@@ -5,7 +5,6 @@ import { getGeminiCompletion } from '@/lib/gemini';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log('AI bullet POST body:', body);
     const { text, mode, stylePrompt } = body;
     if (!text || !mode)
       return NextResponse.json({ error: 'Missing text or mode' }, { status: 400 });
@@ -47,7 +46,6 @@ export async function POST(req: Request) {
     const suggestion = await getGeminiCompletion(prompt);
     return NextResponse.json({ suggestion });
   } catch (e: unknown) {
-    console.error('AI bullet error:', e);
     if (e instanceof Error) {
       return NextResponse.json({ error: e.message || 'AI error' }, { status: 500 });
     }

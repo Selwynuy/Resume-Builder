@@ -1,2 +1,2 @@
 // Provider components
-export * from './SessionProvider' 
+export { default as SessionProvider } from './SessionProvider' 

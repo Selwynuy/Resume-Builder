@@ -5,10 +5,10 @@ export * from './resume-builder'
 export * from './ui'
 
 // Layout components
-export * from './layout'
+export { Header } from './layout'
 
 // Provider components
-export * from './providers'
+export { SessionProvider } from './providers'
 
 // Landing page components
 export * from './landing' 

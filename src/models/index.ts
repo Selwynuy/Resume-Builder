@@ -1,5 +1,5 @@
 // Data models
-export * from './User'
-export * from './Resume'
-export * from './Template'
-export * from './Review' 
+export { default as User } from './User'
+export { default as Resume } from './Resume'
+export { default as Template } from './Template'
+export { default as Review } from './Review' 

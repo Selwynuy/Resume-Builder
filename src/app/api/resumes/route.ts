@@ -116,16 +116,6 @@ export async function POST(req: Request) {
         exp.company?.trim() && exp.position?.trim() && exp.startDate?.trim() && exp.endDate?.trim() && exp.description?.trim()
       )
 
-      // Filter and validate education
-      const validEducation = (education || []).filter((edu: any) => 
-        edu.school?.trim() && edu.degree?.trim() && edu.graduationDate?.trim()
-      )
-
-      // Filter and validate skills
-      const validSkills = (skills || []).filter((skill: any) => 
-        skill.name?.trim() && skill.level?.trim()
-      )
-
       if (validExperiences.length === 0) {
         return NextResponse.json(
           { error: 'At least one complete work experience is required' },

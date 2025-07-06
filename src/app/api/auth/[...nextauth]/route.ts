@@ -1,5 +1,5 @@
-import NextAuth from 'next-auth/next'
 import type { JWT } from 'next-auth/jwt'
+import NextAuth from 'next-auth/next'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 import connectDB from '@/lib/db'
