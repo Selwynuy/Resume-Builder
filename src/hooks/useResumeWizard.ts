@@ -27,9 +27,8 @@ export function useResumeWizard() {
   const [isLoading, setIsLoading] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [isLoadingResume, setIsLoadingResume] = useState(false)
-  const [selectedTemplateData, setSelectedTemplateData] = useState<any>(null)
+  const [selectedTemplateData, setSelectedTemplateData] = useState<unknown>(null)
   const [returnToStep, setReturnToStep] = useState<number | null>(null)
-  const [_canAccessStep] = useState(true)
   const [currentStep, setCurrentStep] = useState(1)
 
   // Helper Functions
@@ -122,8 +121,8 @@ export function useResumeWizard() {
     try {
       const data = await loadResumeData(resumeId, searchParams)
       setResumeData(data)
-    } catch (error: any) {
-      setSaveMessage(`❌ Error: ${error.message || 'Failed to load resume data'}`)
+    } catch (error: unknown) {
+      setSaveMessage(`❌ Error: ${error instanceof Error ? error.message : 'Failed to load resume data'}`)
     } finally {
       setIsLoadingResume(false)
     }
@@ -132,7 +131,7 @@ export function useResumeWizard() {
   // Save resume
   const handleSaveResume = async () => {
     await saveResume({
-      session,
+      session: session as any,
       resumeData,
       isEditMode,
       editingResumeId,
@@ -147,15 +146,15 @@ export function useResumeWizard() {
   // Export PDF
   const handleExportPDF = async () => {
     await exportPDF({
-      session,
+      session: session as any,
       resumeData,
       isEditMode,
       editingResumeId,
-      setIsEditMode,
-      setEditingResumeId,
+      _setIsEditMode: setIsEditMode,
+      _setEditingResumeId: setEditingResumeId,
       setSaveMessage,
       setIsLoading,
-      router
+      _router: router
     })
   }
 
@@ -194,7 +193,6 @@ export function useResumeWizard() {
     nextStep,
     prevStep,
     canProceed,
-    _canAccessStep,
     handleStepClick
   } = useResumeStepNavigation(resumeData, currentStep, setCurrentStep)
 

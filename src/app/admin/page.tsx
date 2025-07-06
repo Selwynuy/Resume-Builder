@@ -1,5 +1,5 @@
 'use client'
-
+import { Metadata } from 'next'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
@@ -28,6 +28,15 @@ const isAdmin = (email: string, sessionEmail: string) => {
   return adminEmails.includes(email)
 }
 
+export const metadata: Metadata = {
+  title: 'Admin Dashboard - Resume Builder',
+  description: 'Admin dashboard for managing templates and user content.',
+  robots: 'noindex, nofollow', // Admin pages should not be indexed
+}
+
+// Server-side rendering for admin - dynamic data and real-time updates
+export const dynamic = 'force-dynamic'
+
 export default function AdminPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -44,7 +53,7 @@ export default function AdminPage() {
     }
 
     fetchTemplates()
-  }, [session, status, router, isAdmin])
+  }, [session, status, router])
 
   const fetchTemplates = async () => {
     try {

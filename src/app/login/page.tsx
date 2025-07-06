@@ -1,9 +1,18 @@
+import { Metadata } from 'next'
 'use client'
-
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signIn, getSession } from 'next-auth/react'
 import { useState } from 'react'
+
+export const metadata: Metadata = {
+  title: 'Login - Resume Builder',
+  description: 'Sign in to your Resume Builder account to create and manage your resumes.',
+  robots: 'noindex, nofollow', // Login page should not be indexed
+}
+
+// Server-side rendering for login - form validation and error handling
+export const dynamic = 'force-dynamic'
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({

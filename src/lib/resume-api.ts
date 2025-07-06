@@ -1,6 +1,9 @@
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
+
+import { ResumeData, Experience, Education, Skill } from '@/components/resume-builder/types'
 // Resume API utility functions
 
-export async function fetchTemplateData(templateId: string): Promise<any> {
+export async function fetchTemplateData(templateId: string): Promise<unknown> {
   if (!templateId || templateId === 'undefined') {
     return null
   }
@@ -27,13 +30,13 @@ export async function fetchTemplateData(templateId: string): Promise<any> {
   }
 }
 
-export async function loadResumeData(resumeId: string, searchParams: unknown): Promise<ResumeData> {
+export async function loadResumeData(resumeId: string, searchParams: URLSearchParams): Promise<ResumeData> {
   try {
     const response = await fetch(`/api/resumes/${resumeId}`)
     if (response.ok) {
       const text = await response.text()
       if (!text) throw new Error('Empty response from server')
-      let resume
+      let resume: ResumeData
       try {
         resume = JSON.parse(text)
       } catch {
@@ -66,8 +69,8 @@ export async function loadResumeData(resumeId: string, searchParams: unknown): P
       }
       throw new Error(errorMessage)
     }
-  } catch (error: any) {
-    throw new Error(error.message || 'Failed to load resume data')
+  } catch (error: unknown) {
+    throw new Error((error as Error).message || 'Failed to load resume data')
   }
 }
 
@@ -82,11 +85,11 @@ export async function saveResume({
   setSaveMessage,
   setIsLoading
 }: {
-  session: unknown
+  session: { user: { email: string } } | null
   resumeData: ResumeData
   isEditMode: boolean
   editingResumeId: string | null
-  router: unknown
+  router: AppRouterInstance
   setIsEditMode: (value: boolean) => void
   setEditingResumeId: (value: string | null) => void
   setSaveMessage: (message: string) => void
@@ -103,23 +106,23 @@ export async function saveResume({
                           resumeData.personalInfo.email && 
                           resumeData.personalInfo.phone && 
                           resumeData.personalInfo.location &&
-                          resumeData.experiences.some((exp: any) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
+                          resumeData.experiences.some((exp: Experience) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
     const payload = {
       title: `${resumeData.personalInfo.name || 'Untitled'} - Resume`,
       personalInfo: resumeData.personalInfo,
-      experiences: resumeData.experiences.filter((exp: any) => 
+      experiences: resumeData.experiences.filter((exp: Experience) => 
         exp.position?.trim() && 
         exp.company?.trim() && 
         exp.startDate?.trim() && 
         exp.endDate?.trim() && 
         exp.description?.trim()
       ),
-      education: resumeData.education.filter((edu: any) => 
+      education: resumeData.education.filter((edu: Education) => 
         edu.school?.trim() && 
         edu.degree?.trim() && 
         edu.graduationDate?.trim()
       ),
-      skills: resumeData.skills.filter((skill: any) => 
+      skills: resumeData.skills.filter((skill: Skill) => 
         skill.name?.trim() && 
         skill.level?.trim()
       ),
@@ -157,8 +160,8 @@ export async function saveResume({
       const errorData = await response.json()
       throw new Error(errorData.error || 'Failed to save resume')
     }
-  } catch (error: any) {
-    setSaveMessage(`❌ Error: ${error.message || error.toString() || 'Unknown error occurred'}`)
+  } catch (error: unknown) {
+    setSaveMessage(`❌ Error: ${(error as Error).message || (error as Error).toString() || 'Unknown error occurred'}`)
   } finally {
     setIsLoading(false)
   }
@@ -175,7 +178,7 @@ export async function exportPDF({
   setIsLoading,
   _router
 }: {
-  session: unknown
+  session: { user: { email: string } } | null
   resumeData: ResumeData
   isEditMode: boolean
   editingResumeId: string | null
@@ -183,7 +186,7 @@ export async function exportPDF({
   _setEditingResumeId: (value: string | null) => void
   setSaveMessage: (message: string) => void
   setIsLoading: (loading: boolean) => void
-  _router: unknown
+  _router: AppRouterInstance
 }) {
   if (!session?.user?.email) {
     alert('Please sign in to export your resume')
@@ -196,26 +199,26 @@ export async function exportPDF({
                            resumeData.personalInfo.email && 
                            resumeData.personalInfo.phone && 
                            resumeData.personalInfo.location &&
-                           resumeData.experiences.some((exp: any) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
+                           resumeData.experiences.some((exp: Experience) => exp.position && exp.company && exp.startDate && exp.endDate && exp.description)
     if (!hasRequiredData) {
       throw new Error('Please complete all required fields (personal info and at least one complete work experience) before exporting PDF')
     }
     const payload = {
       title: `${resumeData.personalInfo.name || 'Untitled'} - Resume`,
       personalInfo: resumeData.personalInfo,
-      experiences: resumeData.experiences.filter((exp: any) => 
+      experiences: resumeData.experiences.filter((exp: Experience) => 
         exp.position?.trim() && 
         exp.company?.trim() && 
         exp.startDate?.trim() && 
         exp.endDate?.trim() && 
         exp.description?.trim()
       ),
-      education: resumeData.education.filter((edu: any) => 
+      education: resumeData.education.filter((edu: Education) => 
         edu.school?.trim() && 
         edu.degree?.trim() && 
         edu.graduationDate?.trim()
       ),
-      skills: resumeData.skills.filter((skill: any) => 
+      skills: resumeData.skills.filter((skill: Skill) => 
         skill.name?.trim() && 
         skill.level?.trim()
       ),
@@ -275,8 +278,8 @@ export async function exportPDF({
         throw new Error(`Failed to export PDF: ${pdfResponse.statusText}`)
       }
     }
-  } catch (error: any) {
-    setSaveMessage(`❌ Error: ${error.message || error.toString() || 'Unknown error occurred'}`)
+  } catch (error: unknown) {
+    setSaveMessage(`❌ Error: ${(error as Error).message || (error as Error).toString() || 'Unknown error occurred'}`)
   } finally {
     setIsLoading(false)
   }

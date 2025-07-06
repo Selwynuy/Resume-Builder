@@ -29,7 +29,7 @@ export const SkillsStep = ({
   removeSkill,
   resumeData
 }: SkillsStepProps) => {
-  const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
+  const _skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
   const [_aiModal, setAiModal] = useState(false)
   const [_aiLoading, setAiLoading] = useState(false)
   const [_aiError, setAiError] = useState('')
@@ -122,12 +122,10 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
           <div key={index} className="bg-white border border-slate-200 rounded-xl p-6">
             <SkillInputRow
               name={skill.name}
-              format={skillFormats[index]}
               onNameChange={value => handleNameChange(index, value)}
               formatValue={skillFormats[index]}
               onFormatChange={value => handleFormatChange(index, value as SkillFormat)}
               onRemove={skills.length > 1 ? () => removeSkill(index) : undefined}
-              skillLevels={skillLevels as unknown as string[]}
               showRemove={skills.length > 1}
             />
             {errors[index] && <p className="text-red-500 text-xs mt-1">{errors[index]}</p>}

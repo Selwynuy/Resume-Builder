@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
+import type { SortOrder } from 'mongoose'
 
-import dbConnect from '@/lib/db'
+import connectDB from '@/lib/db'
 import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss } from '@/lib/security'
 import Template from '@/models/Template'
 import User from '@/models/User'
@@ -9,7 +10,7 @@ import User from '@/models/User'
 // GET /api/templates - Fetch all public templates
 export async function GET(request: NextRequest) {
   try {
-    await dbConnect()
+    await connectDB()
 
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
@@ -33,25 +34,25 @@ export async function GET(request: NextRequest) {
     }
 
     // Build sort
-    let sortOption: { downloads?: number; rating?: number; createdAt?: number; price?: number } = {}
+    let sortOption: { [key: string]: SortOrder } = {}
     switch (sort) {
       case 'popular':
-        sortOption = { downloads: -1 }
+        sortOption = { downloads: -1 as SortOrder }
         break
       case 'rating':
-        sortOption = { rating: -1 }
+        sortOption = { rating: -1 as SortOrder }
         break
       case 'newest':
-        sortOption = { createdAt: -1 }
+        sortOption = { createdAt: -1 as SortOrder }
         break
       case 'price-low':
-        sortOption = { price: 1 }
+        sortOption = { price: 1 as SortOrder }
         break
       case 'price-high':
-        sortOption = { price: -1 }
+        sortOption = { price: -1 as SortOrder }
         break
       default:
-        sortOption = { downloads: -1 }
+        sortOption = { downloads: -1 as SortOrder }
     }
 
     const skip = (page - 1) * limit
@@ -62,9 +63,6 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .populate('createdBy', 'name')
       .lean()
-      .then((templates: Array<{ createdBy?: { name: string } }>) => templates.filter(template => 
-        template.createdBy && template.createdBy.name
-      ))
 
     // Transform data to include creator name and always include htmlTemplate/cssStyles
     const transformedTemplates = templates.map(template => ({
@@ -103,7 +101,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await dbConnect()
+    await connectDB()
 
     const body = await request.json()
     const {
@@ -145,7 +143,7 @@ export async function POST(request: NextRequest) {
     const sanitizedCss = sanitizeCss(cssStyles || '')
 
     // Get user details  
-    const _userId = session.user.id // Unused but kept for future use
+    const _userId = (session.user as any).id // Unused but kept for future use
     
     // Always try to find by email first since session.user.id might not be set properly
     const user = await User.findOne({ email: session.user.email })

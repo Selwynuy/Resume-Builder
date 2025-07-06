@@ -1,33 +1,36 @@
-"use client"
+import { Metadata } from 'next'
 
-import AIATSSection from "@/components/landing/AIATSSection"
-import ComingSoonSection from "@/components/landing/ComingSoonSection"
-import FAQSection from "@/components/landing/FAQSection"
-import FeaturesSection from "@/components/landing/FeaturesSection"
-import FinalCTASection from "@/components/landing/FinalCTASection"
-import FooterSection from "@/components/landing/FooterSection"
-import FreeModelSection from "@/components/landing/FreeModelSection"
-import HeroSection from "@/components/landing/HeroSection"
-import HowItWorksSection from "@/components/landing/HowItWorksSection"
-import StatsSection from "@/components/landing/StatsSection"
-import TestimonialsSection from "@/components/landing/TestimonialsSection"
-import Header from "@/components/layout/Header"
+import FAQSection from '@/components/landing/FAQSection'
+import FeaturesSection from '@/components/landing/FeaturesSection'
+import FinalCTASection from '@/components/landing/FinalCTASection'
+import HeroSection from '@/components/landing/HeroSection'
+import HowItWorksSection from '@/components/landing/HowItWorksSection'
+import TestimonialsSection from '@/components/landing/TestimonialsSection'
 
-export default function LandingPage() {
+export const metadata: Metadata = {
+  title: 'Resume Builder - Create Professional Resumes in Minutes',
+  description: 'Build professional resumes with AI-powered suggestions. Choose from modern templates, customize content, and export to PDF. Free to use with premium features available.',
+  keywords: 'resume builder, professional resume, CV maker, job application, career tools',
+  openGraph: {
+    title: 'Resume Builder - Create Professional Resumes in Minutes',
+    description: 'Build professional resumes with AI-powered suggestions. Choose from modern templates, customize content, and export to PDF.',
+    type: 'website',
+    url: 'https://resumebuilder.com',
+  },
+}
+
+// Static generation for landing page - content doesn't change frequently
+export const revalidate = 3600 // Revalidate every hour
+
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <Header />
+    <main className="min-h-screen">
       <HeroSection />
-      <StatsSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <AIATSSection />
-      <FreeModelSection />
-      <ComingSoonSection />
       <TestimonialsSection />
       <FAQSection />
       <FinalCTASection />
-      <FooterSection />
-    </div>
+    </main>
   )
 }

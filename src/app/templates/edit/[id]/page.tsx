@@ -155,7 +155,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     } finally {
       setLoading(false)
     }
-  }, [session, status, router, params.id])
+  }, [session, router, params.id])
 
   useEffect(() => {
     if (status === 'loading') return

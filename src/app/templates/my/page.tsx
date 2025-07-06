@@ -66,12 +66,12 @@ export default function MyTemplatesPage() {
     const averageRating = totalRatingCount > 0 ? totalRating / totalRatingCount : 0
     const totalEarnings = templateList.reduce((sum, t) => sum + (t.price * t.downloads), 0)
 
-    setStats({
+    return {
       totalTemplates,
       totalDownloads,
       averageRating,
       totalEarnings
-    })
+    }
   }
 
   const deleteTemplate = async (templateId: string) => {

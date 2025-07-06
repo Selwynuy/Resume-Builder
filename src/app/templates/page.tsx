@@ -1,5 +1,5 @@
 'use client'
-
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -62,6 +62,20 @@ function TemplatePreview({ html, css }: { html: string; css: string }) {
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Resume Templates - Professional CV Templates',
+  description: 'Choose from our collection of professional resume templates. Modern, clean designs optimized for ATS systems. Free and premium templates available.',
+  keywords: 'resume templates, CV templates, professional resume, job application templates',
+  openGraph: {
+    title: 'Resume Templates - Professional CV Templates',
+    description: 'Choose from our collection of professional resume templates. Modern, clean designs optimized for ATS systems.',
+    type: 'website',
+  },
+}
+
+// Server-side rendering for templates - dynamic content with user-specific data
+export const dynamic = 'force-dynamic'
 
 export default function TemplatesPage() {
   const { data: session } = useSession()

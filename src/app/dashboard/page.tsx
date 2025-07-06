@@ -1,24 +1,20 @@
-'use client';
-
 import {
   FileText,
-  Edit3,
+  Edit,
   Trash2,
   Plus,
-  Calendar,
   User,
-  FileCheck,
-  FilePlus,
-  Layout,
-} from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+  Calendar
+} from 'lucide-react'
+import { Metadata } from 'next'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 interface Resume {
   _id: string;
@@ -41,7 +37,16 @@ interface QuickStats {
   totalTemplates: number;
 }
 
-export default function Dashboard() {
+export const metadata: Metadata = {
+  title: 'Dashboard - Resume Builder',
+  description: 'Manage your resumes, templates, and account settings.',
+  robots: 'noindex, nofollow', // Dashboard should not be indexed
+}
+
+// Server-side rendering for dashboard - user-specific data
+export const dynamic = 'force-dynamic'
+
+export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [resumes, setResumes] = useState<Resume[]>([]);
@@ -195,7 +200,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 mt-1">Drafts</p>
                 </div>
                 <div className="p-2 bg-yellow-50 rounded-lg">
-                  <Edit3 className="h-5 w-5 text-yellow-600" />
+                  <Edit className="h-5 w-5 text-yellow-600" />
                 </div>
               </div>
             </CardContent>
@@ -208,7 +213,7 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-600 mt-1">Published</p>
                 </div>
                 <div className="p-2 bg-green-50 rounded-lg">
-                  <FileCheck className="h-5 w-5 text-green-600" />
+                  <FileText className="h-5 w-5 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -222,7 +227,7 @@ export default function Dashboard() {
                     <p className="text-sm text-gray-600 mt-1">Templates</p>
                   </div>
                   <div className="p-2 bg-purple-50 rounded-lg">
-                    <Layout className="h-5 w-5 text-purple-600" />
+                    <FileText className="h-5 w-5 text-purple-600" />
                   </div>
                 </div>
               </CardContent>
@@ -242,7 +247,7 @@ export default function Dashboard() {
               variant="outline"
               className="border-gray-200 hover:bg-gray-50 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-[1.02] shadow-sm bg-transparent"
             >
-              <FilePlus className="h-4 w-4 mr-2" />
+              <FileText className="h-4 w-4 mr-2" />
               Create Template
             </Button>
           </Link>
@@ -283,7 +288,7 @@ export default function Dashboard() {
                               variant="ghost"
                               className="text-blue-600 hover:bg-blue-50"
                             >
-                              <Edit3 className="h-4 w-4" />
+                              <Edit className="h-4 w-4" />
                             </Button>
                           </Link>
                           <Button
@@ -315,7 +320,7 @@ export default function Dashboard() {
                           Created: {formatDate(resume.createdAt)}
                         </div>
                         <div className="flex items-center">
-                          <Edit3 className="h-3 w-3 mr-1" />
+                          <Edit className="h-3 w-3 mr-1" />
                           Updated: {formatDate(resume.updatedAt)}
                         </div>
                       </div>
@@ -326,7 +331,7 @@ export default function Dashboard() {
                             size="sm"
                             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                           >
-                            <Edit3 className="h-3 w-3 mr-1" />
+                            <Edit className="h-3 w-3 mr-1" />
                             Edit
                           </Button>
                         </Link>

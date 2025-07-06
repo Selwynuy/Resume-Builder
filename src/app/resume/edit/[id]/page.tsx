@@ -1,5 +1,5 @@
 'use client'
-
+import { Metadata } from 'next'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState, useCallback } from 'react'
@@ -33,6 +33,15 @@ interface Skill {
   name: string
   level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
 }
+
+export const metadata: Metadata = {
+  title: 'Edit Resume - Resume Builder',
+  description: 'Edit your existing resume with our easy-to-use builder.',
+  robots: 'noindex, nofollow', // Builder pages should not be indexed
+}
+
+// Client-side rendering for resume builder - highly interactive
+export const dynamic = 'force-dynamic'
 
 export default function EditResumePage({ params }: { params: { id: string } }) {
   const { data: session, status } = useSession()
@@ -82,7 +91,7 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false)
     }
-  }, [session, status, router, params.id])
+  }, [router, params.id])
 
   useEffect(() => {
     if (status === 'loading') return

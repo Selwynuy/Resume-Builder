@@ -79,24 +79,24 @@ reviewSchema.statics.calculateTemplateRating = async function(templateId: string
 }
 
 // Post save middleware to update template rating
-// @ts-expect-error - Mongoose schema definition
-reviewSchema.post('save', function() {
-  this.constructor.calculateTemplateRating(this.templateId)
+reviewSchema.post('save', function(this: any) {
+  (this.constructor as any).calculateTemplateRating(this.templateId)
 })
 
 // Post remove middleware to update template rating
-// @ts-expect-error - Mongoose schema definition
-reviewSchema.post('deleteOne', function() {
-  this.constructor.calculateTemplateRating(this.templateId)
+reviewSchema.post('deleteOne', function(this: any) {
+  if (this.templateId) {
+    (this.constructor as any).calculateTemplateRating(this.templateId)
+  }
 })
 
-// @ts-expect-error - Mongoose schema definition
-reviewSchema.post('findOneAndDelete', function() {
-  this.constructor.calculateTemplateRating(this.templateId)
+reviewSchema.post('findOneAndDelete', function(this: any) {
+  if (this.templateId) {
+    (this.constructor as any).calculateTemplateRating(this.templateId)
+  }
 })
 
-// @ts-expect-error - Mongoose schema definition
-reviewSchema.virtual('id').get(function() {
+reviewSchema.virtual('id').get(function(this: any) {
   return this._id.toHexString();
 });
 

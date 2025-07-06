@@ -1,5 +1,5 @@
 'use client'
-
+import { Metadata } from 'next'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect, useCallback } from 'react'
@@ -26,6 +26,20 @@ interface Template {
   createdAt: string
 }
 
+export const metadata: Metadata = {
+  title: 'Resume Template - Professional CV Template',
+  description: 'Professional resume template with modern design. Optimized for ATS systems and easy to customize.',
+  keywords: 'resume template, CV template, professional resume, job application',
+  openGraph: {
+    title: 'Resume Template - Professional CV Template',
+    description: 'Professional resume template with modern design. Optimized for ATS systems and easy to customize.',
+    type: 'website',
+  },
+}
+
+// Static generation with incremental regeneration for template details
+export const revalidate = 1800 // Revalidate every 30 minutes
+
 export default function TemplateDetailPage() {
   const params = useParams()
   const router = useRouter()
@@ -33,25 +47,29 @@ export default function TemplateDetailPage() {
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchTemplate = useCallback(async (id: string) => {
-    try {
-      const response = await fetch(`/api/templates/${id}`)
-      if (response.ok) {
-        const data = await response.json()
-        setTemplate(data.template)
-      } else {
+  const fetchTemplate = useCallback(() => {
+    if (!params.id) return
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`/api/templates/${params.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setTemplate(data.template)
+        } else {
+          router.push('/templates')
+        }
+      } catch (err) {
+        console.error('Error fetching template:', err)
         router.push('/templates')
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('Error fetching template:', error)
-      router.push('/templates')
-    } finally {
-      setLoading(false)
     }
+    fetchData()
   }, [params.id, router])
 
   useEffect(() => {
-    if (params.id) fetchTemplate(params.id as string)
+    if (params.id) fetchTemplate()
   }, [fetchTemplate, params.id])
 
   const handleUseTemplate = () => {

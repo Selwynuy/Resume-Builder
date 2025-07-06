@@ -1,92 +1,89 @@
 # Resume Builder Documentation
 
-This directory contains comprehensive documentation for the Resume Builder project.
+Welcome to the Resume Builder documentation. This guide provides comprehensive information about the project structure, architecture, and development practices.
 
-## Directory Structure
+## Table of Contents
 
-### `/src/auth/`
-Centralized authentication logic and utilities.
+1. [Architecture Overview](./ARCHITECTURE.md) - System architecture and design patterns
+2. [Rendering Strategies](./RENDERING_STRATEGIES.md) - Performance optimization and rendering strategies
+3. [API Documentation](./API.md) - REST API endpoints and usage
+4. [Component Library](./COMPONENTS.md) - UI components and their usage
+5. [Testing Guide](./TESTING.md) - Testing practices and coverage
+6. [Deployment Guide](./DEPLOYMENT.md) - Deployment and environment setup
 
-### `/src/components/`
-UI components organized by feature with clean imports:
-- `/resume-builder/` - Resume creation components
-- `/landing/` - Landing page components  
-- `/ui/` - Reusable UI components
-- `/layout/` - Layout components
-- `/providers/` - Context providers
-- `index.ts` - Main export file for all components
+## Quick Start
 
-### `/src/hooks/`
-Custom React hooks for shared logic:
-- `index.ts` - Clean exports for all hooks
+### Prerequisites
+- Node.js 18+ 
+- MongoDB
+- NextAuth.js configuration
 
-### `/src/lib/`
-Utility functions and shared logic:
-- `db.ts` - Database utilities
-- `security.ts` - Security utilities
-- `gemini.ts` - AI integration
-- `pdf-generator.tsx` - PDF generation
-- `resume-api.ts` - Resume API utilities
-- `templates.ts` - Template utilities
-- `utils.ts` - General utilities
-- `index.ts` - Clean exports for all utilities
-
-### `/src/middleware/`
-Custom middleware functions:
-- `index.ts` - Main middleware with rate limiting and security
-
-### `/src/models/`
-Data models and types:
-- `index.ts` - Clean exports for all models
-
-### `/src/types/`
-TypeScript type definitions:
-- `index.ts` - Clean exports for all types
-
-## Architecture
-
-The project follows a modular, atomic component architecture with:
-- **Atomic Components**: Small, reusable UI components
-- **Validation Utilities**: Centralized field validation
-- **Custom Hooks**: Shared business logic
-- **Security Middleware**: Rate limiting and CSRF protection
-- **Type Safety**: Strict TypeScript throughout
-
-## Clean Imports
-
-The project uses index files throughout to enable clean, organized imports:
-
-### Import Examples
-
-```typescript
-// Instead of multiple imports from different files:
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { useResumeWizard } from '@/hooks/useResumeWizard'
-import { db } from '@/lib/db'
-
-// You can now use clean imports:
-import { Button, Card } from '@/components/ui'
-import { useResumeWizard } from '@/hooks'
-import { db } from '@/lib'
+### Installation
+```bash
+npm install
+npm run dev
 ```
 
-### Available Index Files
+### Environment Variables
+Create a `.env.local` file with:
+```
+MONGODB_URI=your_mongodb_connection_string
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GEMINI_API_KEY=your_gemini_api_key
+```
 
-- `@/components` - All UI components
-- `@/components/resume-builder` - Resume builder components
-- `@/components/ui` - Reusable UI components
-- `@/hooks` - Custom React hooks
-- `@/lib` - Utility functions
-- `@/models` - Data models
-- `@/types` - TypeScript types
+## Project Structure
 
-## Best Practices
+```
+src/
+├── app/                 # Next.js App Router pages
+├── components/          # Reusable UI components
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions and shared logic
+├── models/             # Database models
+├── types/              # TypeScript type definitions
+├── middleware/         # Custom middleware functions
+└── documentation/      # Project documentation
+```
 
-1. **Component Organization**: Use atomic design principles
-2. **Type Safety**: All components and functions are properly typed
-3. **Validation**: Centralized validation utilities
-4. **Security**: Rate limiting, CSRF protection, secure headers
-5. **Testing**: Comprehensive test coverage
-6. **Documentation**: Keep documentation updated with code changes
-7. **Clean Imports**: Use index files for organized imports 
+## Key Features
+
+- **AI-Powered Resume Building** - Intelligent suggestions and content generation
+- **Modern Templates** - Professional, ATS-optimized resume templates
+- **Real-time Preview** - Live preview as you build your resume
+- **Export Options** - PDF export with custom styling
+- **User Management** - Secure authentication and user profiles
+- **Admin Dashboard** - Template and content management
+
+## Development Practices
+
+### Code Style
+- TypeScript strict mode
+- ESLint + Prettier (Airbnb config)
+- Absolute imports (`@/components/...`)
+- Component-based architecture
+
+### Testing
+- Jest for unit and integration tests
+- 100% test coverage target
+- Tests alongside source files
+
+### Performance
+- Optimized rendering strategies (SSG/SSR/CSR)
+- Image optimization
+- Code splitting
+- SEO optimization
+
+## Contributing
+
+1. Follow the established code style
+2. Write tests for new features
+3. Update documentation as needed
+4. Ensure all tests pass before submitting
+
+## Support
+
+For questions or issues, please refer to the relevant documentation section or create an issue in the project repository. 

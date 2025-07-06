@@ -1,8 +1,17 @@
-'use client';
+import { Metadata } from 'next'
+'use client'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+export const metadata: Metadata = {
+  title: 'Sign Up - Resume Builder',
+  description: 'Create your Resume Builder account to start building professional resumes.',
+  robots: 'noindex, nofollow', // Signup page should not be indexed
+}
+
+// Server-side rendering for signup - form validation and error handling
+export const dynamic = 'force-dynamic'
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({

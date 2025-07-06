@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import mongoose from 'mongoose'
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import type { SortOrder } from 'mongoose'
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
@@ -20,7 +22,7 @@ export async function GET(
     
     const skip = (page - 1) * limit
     
-    let sortQuery: any = { createdAt: -1 } // Default: newest first
+    let sortQuery: unknown = { createdAt: -1 } // Default: newest first
     
     switch (sort) {
       case 'oldest':
@@ -38,7 +40,7 @@ export async function GET(
     }
     
     const reviews = await Review.find({ templateId: params.id })
-      .sort(sortQuery)
+      .sort(sortQuery as { [key: string]: SortOrder })
       .skip(skip)
       .limit(limit)
       .populate('userId', 'name')
@@ -90,9 +92,9 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
     
-    const { rating, comment } = await req.json()
+    const review: unknown = await req.json();
     
-    if (!rating || rating < 1 || rating > 5) {
+    if (!review || typeof review !== 'object' || !('rating' in review) || typeof (review as unknown as { rating: number }).rating !== 'number' || (review as unknown as { rating: number }).rating < 1 || (review as unknown as { rating: number }).rating > 5) {
       return NextResponse.json({ error: 'Rating must be between 1 and 5' }, { status: 400 })
     }
     
@@ -115,18 +117,18 @@ export async function POST(
     }
     
     // Create new review
-    const review = new Review({
+    const reviewToSave = new Review({
       templateId: params.id,
       userId: session.user.id,
       userName: session.user.name || 'Anonymous',
-      rating,
-      comment: comment || '',
+      rating: (review as unknown as { rating: number }).rating, // Cast to any for now
+      comment: (review as unknown as { comment: string }).comment || '', // Cast to any for now
       isVerified: false // User has used the template system
     })
     
-    await review.save()
+    await reviewToSave.save()
     
-    return NextResponse.json({ message: 'Review added successfully', review })
+    return NextResponse.json({ message: 'Review added successfully', review: reviewToSave })
     
   } catch (error: unknown) {
     console.error('Error creating review:', error)

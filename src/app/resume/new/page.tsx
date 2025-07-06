@@ -1,5 +1,5 @@
 'use client'
-
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -15,6 +15,15 @@ import {
   STEPS
 } from '@/components/resume-builder'
 import { useResumeWizard } from '@/hooks/useResumeWizard'
+
+export const metadata: Metadata = {
+  title: 'Create New Resume - Resume Builder',
+  description: 'Create a new professional resume with our easy-to-use builder.',
+  robots: 'noindex, nofollow', // Builder pages should not be indexed
+}
+
+// Client-side rendering for resume builder - highly interactive
+export const dynamic = 'force-dynamic'
 
 // Main Component
 export default function NewResumePage() {
@@ -121,7 +130,7 @@ export default function NewResumePage() {
         return (
           <ReviewStep 
             resumeData={resumeData}
-            selectedTemplate={selectedTemplateData}
+            selectedTemplate={selectedTemplateData as any}
             onSave={handleSaveResume}
             onExport={handleExportPDF}
             onChangeTemplate={handleChangeTemplate}

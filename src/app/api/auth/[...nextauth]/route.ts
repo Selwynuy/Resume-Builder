@@ -1,11 +1,10 @@
-import type { JWT } from 'next-auth/jwt'
 import NextAuth from 'next-auth/next'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
 import connectDB from '@/lib/db'
 import User from '@/models/User'
 
-interface UserData {
+interface _UserData {
   id: string
   email: string
   name: string
@@ -55,13 +54,15 @@ export const authOptions = {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: UserData | undefined }) {
+    async jwt(params: unknown) {
+      const { token, user } = params as { token: any; user: any }
       if (user) {
         token.id = user.id
       }
       return token
     },
-    async session({ session, token }: { session: { user?: { id?: string } }; token: JWT }) {
+    async session(params: unknown) {
+      const { session, token } = params as { session: any; token: any }
       if (token && session.user) {
         session.user.id = token.id as string
       }

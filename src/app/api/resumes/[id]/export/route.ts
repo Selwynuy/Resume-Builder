@@ -10,6 +10,7 @@ import Resume from '@/models/Resume'
 import Template from '@/models/Template'
 
 interface ExportData {
+  title?: string
   personalInfo: {
     name: string
     email: string

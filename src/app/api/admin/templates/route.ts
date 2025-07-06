@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
@@ -14,7 +14,6 @@ export async function GET() {
 
     // Simple admin check - enhance with proper role system
     const adminEmails = [
-      'admin@resumebuilder.com',
       'selwyn.cybersec@gmail.com',
       session?.user?.email || '' // Temporary: allow current user for testing
     ]

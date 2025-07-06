@@ -144,13 +144,14 @@ export default function CreateTemplatePage() {
     }
   }, [fetchTemplateForEdit])
 
-  const _handleLoadTemplate = (templateData: any) => {
-    setHtmlTemplate(templateData.htmlTemplate)
-    setCssStyles(templateData.cssStyles)
+  const _handleLoadTemplate = (templateData: unknown) => {
+    const data = templateData as { htmlTemplate: string; cssStyles: string; name: string; description: string }
+    setHtmlTemplate(data.htmlTemplate)
+    setCssStyles(data.cssStyles)
     setMetadata(prev => ({
       ...prev,
-      name: templateData.name,
-      description: templateData.description
+      name: data.name,
+      description: data.description
     }))
   }
 
