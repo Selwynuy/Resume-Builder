@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import DOMPurify from 'dompurify'
+import { z } from 'zod'
 
 // Validation patterns
 export const phoneRegex = /^\+?[\d\s\-()]{10,}$/

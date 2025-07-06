@@ -28,11 +28,7 @@ interface CustomTemplate {
   isApproved: boolean
 }
 
-function ensureWrapper(html: string) {
-  return html.includes('resume-document')
-    ? html
-    : `<div class="resume-document">${html}</div>`;
-}
+
 
 function TemplatePreview({ html, css }: { html: string; css: string }) {
   // Remove sampleData and renderTemplate from here

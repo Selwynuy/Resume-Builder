@@ -79,24 +79,24 @@ reviewSchema.statics.calculateTemplateRating = async function(templateId: string
 }
 
 // Post save middleware to update template rating
-reviewSchema.post('save', function(this: any) {
-  (this.constructor as any).calculateTemplateRating(this.templateId)
+reviewSchema.post('save', function(this: { templateId: string; constructor: { calculateTemplateRating: (id: string) => Promise<void> } }) {
+  this.constructor.calculateTemplateRating(this.templateId)
 })
 
 // Post remove middleware to update template rating
-reviewSchema.post('deleteOne', function(this: any) {
+reviewSchema.post('deleteOne', function(this: { templateId?: string; constructor: { calculateTemplateRating: (id: string) => Promise<void> } }) {
   if (this.templateId) {
-    (this.constructor as any).calculateTemplateRating(this.templateId)
+    this.constructor.calculateTemplateRating(this.templateId)
   }
 })
 
-reviewSchema.post('findOneAndDelete', function(this: any) {
+reviewSchema.post('findOneAndDelete', function(this: { templateId?: string; constructor: { calculateTemplateRating: (id: string) => Promise<void> } }) {
   if (this.templateId) {
-    (this.constructor as any).calculateTemplateRating(this.templateId)
+    this.constructor.calculateTemplateRating(this.templateId)
   }
 })
 
-reviewSchema.virtual('id').get(function(this: any) {
+reviewSchema.virtual('id').get(function(this: { _id: { toHexString: () => string } }) {
   return this._id.toHexString();
 });
 

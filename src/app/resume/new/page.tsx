@@ -124,7 +124,7 @@ export default function NewResumePage() {
         return (
           <ReviewStep 
             resumeData={resumeData}
-            selectedTemplate={selectedTemplateData as any}
+            selectedTemplate={selectedTemplateData as { id: string; name: string; description: string; htmlTemplate: string; cssStyles: string } | null}
             onSave={handleSaveResume}
             onExport={handleExportPDF}
             onChangeTemplate={handleChangeTemplate}

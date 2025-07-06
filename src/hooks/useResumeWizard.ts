@@ -131,7 +131,7 @@ export function useResumeWizard() {
   // Save resume
   const handleSaveResume = async () => {
     await saveResume({
-      session: session as any,
+      session: session as { user: { email: string } } | null,
       resumeData,
       isEditMode,
       editingResumeId,
@@ -146,7 +146,7 @@ export function useResumeWizard() {
   // Export PDF
   const handleExportPDF = async () => {
     await exportPDF({
-      session: session as any,
+      session: session as { user: { email: string } } | null,
       resumeData,
       isEditMode,
       editingResumeId,

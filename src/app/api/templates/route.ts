@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
     const sanitizedCss = sanitizeCss(cssStyles || '')
 
     // Get user details  
-    const _userId = (session.user as any).id // Unused but kept for future use
+    const _userId = (session.user as { id?: string }).id // Unused but kept for future use
     
     // Always try to find by email first since session.user.id might not be set properly
     const user = await User.findOne({ email: session.user.email })

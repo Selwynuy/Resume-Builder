@@ -55,14 +55,14 @@ export const authOptions = {
   },
   callbacks: {
     async jwt(params: unknown) {
-      const { token, user } = params as { token: any; user: any }
+      const { token, user } = params as { token: Record<string, unknown>; user: { id: string } | undefined }
       if (user) {
         token.id = user.id
       }
       return token
     },
     async session(params: unknown) {
-      const { session, token } = params as { session: any; token: any }
+      const { session, token } = params as { session: { user: { id?: string } }; token: { id?: string } }
       if (token && session.user) {
         session.user.id = token.id as string
       }
