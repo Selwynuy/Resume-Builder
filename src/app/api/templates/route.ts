@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import dbConnect from '@/lib/db'
-import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss, sanitizeError } from '@/lib/security'
+import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss } from '@/lib/security'
 import Template from '@/models/Template'
 import User from '@/models/User'
 
@@ -62,6 +62,9 @@ export async function GET(request: NextRequest) {
       .limit(limit)
       .populate('createdBy', 'name')
       .lean()
+      .then((templates: Array<{ createdBy?: { name: string } }>) => templates.filter(template => 
+        template.createdBy && template.createdBy.name
+      ))
 
     // Transform data to include creator name and always include htmlTemplate/cssStyles
     const transformedTemplates = templates.map(template => ({
@@ -82,12 +85,9 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit)
       }
     })
-  } catch (error) {
-    console.error('Error fetching templates:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch templates' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Get templates error:', error)
+    return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
   }
 }
 
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
     const sanitizedCss = sanitizeCss(cssStyles || '')
 
     // Get user details  
-    const userId = session.user.id || session.user.email
+    const _userId = session.user.id // Unused but kept for future use
     
     // Always try to find by email first since session.user.id might not be set properly
     const user = await User.findOne({ email: session.user.email })
@@ -186,15 +186,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     )
-  } catch (error: any) {
-    console.error('Error creating template:', error)
-    
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    return NextResponse.json(
-      { 
-        error: sanitizeError(error, isDevelopment)
-      },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Template creation error:', error)
+    return NextResponse.json({ error: 'Failed to create template' }, { status: 500 })
   }
 } 

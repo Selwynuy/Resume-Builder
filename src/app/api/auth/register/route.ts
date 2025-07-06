@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-
+import bcrypt from 'bcryptjs';
 import connectDB from '@/lib/db';
-import { UserRegistrationSchema, sanitizeError } from '@/lib/security';
 import User from '@/models/User';
 
 export async function POST(req: Request) {
@@ -43,11 +42,8 @@ export async function POST(req: Request) {
     };
 
     return NextResponse.json(userWithoutPassword, { status: 201 });
-  } catch (error: any) {
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    return NextResponse.json(
-      { error: sanitizeError(error, isDevelopment) },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    console.error('Registration error:', error)
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 })
   }
 } 

@@ -148,10 +148,7 @@ export async function saveResume({
       throw new Error(errorData.error || 'Failed to save resume')
     }
   } catch (error: any) {
-    console.log('🔍 Export PDF Final Error:', error)
-    const errorMessage = error.message || error.toString() || 'Unknown error occurred'
-    console.log('🔍 Final Error Message:', errorMessage)
-    setSaveMessage(`❌ Error: ${errorMessage}`)
+    setSaveMessage(`❌ Error: ${error.message || error.toString() || 'Unknown error occurred'}`)
   } finally {
     setIsLoading(false)
   }
@@ -259,10 +256,7 @@ export async function exportPDF({
       }
     }
   } catch (error: any) {
-    console.warn('🔍 Export PDF Final Error:', error)
-    const errorMessage = error.message || error.toString() || 'Unknown error occurred'
-    console.warn('🔍 Final Error Message:', errorMessage)
-    setSaveMessage(`❌ Error: ${errorMessage}`)
+    setSaveMessage(`❌ Error: ${error.message || error.toString() || 'Unknown error occurred'}`)
   } finally {
     setIsLoading(false)
   }

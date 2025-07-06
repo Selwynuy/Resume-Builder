@@ -59,7 +59,7 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
   const [title, setTitle] = useState('')
 
   const [currentTemplate, setCurrentTemplate] = useState('')
-  const [showTemplateSelector, setShowTemplateSelector] = useState(false)
+  const [_showTemplateSelector, setShowTemplateSelector] = useState(false)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -123,7 +123,7 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
     }
   }
 
-  const switchTemplate = (templateId: string) => {
+  const _switchTemplate = (templateId: string) => {
     setCurrentTemplate(templateId)
     setShowTemplateSelector(false)
   }

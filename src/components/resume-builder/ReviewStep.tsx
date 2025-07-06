@@ -52,7 +52,7 @@ export const ReviewStep = ({
   removeSkill,
   onChangeTemplate
 }: ReviewStepProps) => {
-  const router = useRouter();
+  const _router = useRouter();
   const [editingSection, setEditingSection] = useState<string | null>(null)
   const [aiModal, setAiModal] = useState<{ open: boolean; type: string }>({ open: false, type: '' })
   const [aiLoading, setAiLoading] = useState(false)

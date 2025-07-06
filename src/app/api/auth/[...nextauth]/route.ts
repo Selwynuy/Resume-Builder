@@ -5,7 +5,13 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import connectDB from '@/lib/db'
 import User from '@/models/User'
 
-export const authOptions: any = {
+interface UserData {
+  id: string
+  email: string
+  name: string
+}
+
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -36,8 +42,8 @@ export const authOptions: any = {
             email: user.email,
             name: user.name,
           }
-        } catch (error: any) {
-          throw new Error(error.message)
+        } catch (error: unknown) {
+          throw new Error(error instanceof Error ? error.message : 'Authentication error')
         }
       }
     })
@@ -49,7 +55,7 @@ export const authOptions: any = {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: any }) {
+    async jwt({ token, user }: { token: JWT; user: UserData | undefined }) {
       if (user) {
         token.id = user.id
       }
@@ -64,6 +70,6 @@ export const authOptions: any = {
   }
 }
 
-const handler = NextAuth(authOptions) as any
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST } 

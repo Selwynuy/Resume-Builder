@@ -106,7 +106,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
   const [saving, setSaving] = useState(false)
   const [htmlTemplate, setHtmlTemplate] = useState('')
   const [cssStyles, setCssStyles] = useState('')
-  const [activeTab, setActiveTab] = useState<'html' | 'css' | 'preview'>('html')
+  const [_activeTab, _setActiveTab] = useState<'html' | 'css' | 'preview'>('html')
   
   const [metadata, setMetadata] = useState<TemplateMetadata>({
     name: '',
@@ -114,9 +114,9 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     category: 'professional',
     price: 0
   })
-  const [showPreview, setShowPreview] = useState(false)
+  const [_showPreview, _setShowPreview] = useState(false)
   const [error, setError] = useState('')
-  const [scale, setScale] = useState(0.5)
+  const [_scale, setScale] = useState(0.5)
   const [showSettings, setShowSettings] = useState(false)
 
   const sampleData = getSampleResumeData()
@@ -137,8 +137,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
         const { template } = await response.json()
         
         // Check if user owns this template
-        console.log('DEBUG: template.createdBy =', template.createdBy, 'session.user.id =', session?.user?.id)
-        if (String(template.createdBy) !== String(session?.user?.id)) {
+        if (String(template.createdBy) !== String(session?.user?.email)) {
           alert('You can only edit your own templates')
           router.push('/dashboard')
           return

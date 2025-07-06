@@ -20,7 +20,7 @@ export const ExperienceStep = ({
   const [aiModal, setAiModal] = useState<{ open: boolean; index: number | null }>({ open: false, index: null })
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
-  const [aiSuggestion, setAiSuggestion] = useState('')
+  const [_aiSuggestion, setAiSuggestion] = useState('')
   const [multiSummaries, setMultiSummaries] = useState<null | {
     resultsOriented: string;
     teamPlayer: string;
@@ -39,7 +39,7 @@ export const ExperienceStep = ({
     } catch { /* ignore localStorage errors */ }
   }
 
-  const handleAISuggest = async (index: number) => {
+  const _handleAISuggest = async (index: number) => {
     setAiLoading(true)
     setAiError('')
     setAiSuggestion('')

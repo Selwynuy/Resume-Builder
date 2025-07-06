@@ -30,11 +30,11 @@ export const SkillsStep = ({
   resumeData
 }: SkillsStepProps) => {
   const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
-  const [aiModal, setAiModal] = useState(false)
-  const [aiLoading, setAiLoading] = useState(false)
-  const [aiError, setAiError] = useState('')
-  const [aiSkills, setAiSkills] = useState<string[]>([])
-  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [_aiModal, setAiModal] = useState(false)
+  const [_aiLoading, setAiLoading] = useState(false)
+  const [_aiError, setAiError] = useState('')
+  const [_aiSkills, setAiSkills] = useState<string[]>([])
+  const [_selected, setSelected] = useState<Set<string>>(new Set())
   // Track format per skill
   const [skillFormats, setSkillFormats] = useState<SkillFormat[]>(skills.map(() => 'name'));
   const [errors, setErrors] = useState<{ [key: number]: string }>({})
@@ -87,7 +87,9 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
     setSelected(new Set())
     handleAISuggest()
   }
-  const closeModal = () => setAiModal(false)
+  const _closeModal = () => {
+    setAiModal(false)
+  }
   if (skillFormats.length !== skills.length) {
     setSkillFormats(Array(skills.length).fill('name'));
   }

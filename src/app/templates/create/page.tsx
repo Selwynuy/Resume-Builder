@@ -60,7 +60,7 @@ export default function CreateTemplatePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   
-  const [activeTab, setActiveTab] = useState<'html' | 'css'>('html')
+  const [_activeTab, _setActiveTab] = useState<'html' | 'css' | 'preview'>('html')
   const [htmlTemplate, setHtmlTemplate] = useState('<div class="resume-document">\n  <h1>{{personalInfo.name}}</h1>\n  <p>{{personalInfo.email}} | {{personalInfo.phone}}</p>\n  <p>{{personalInfo.location}}</p>\n  <h2>Summary</h2>\n  <p>{{personalInfo.summary}}</p>\n</div>')
   const [cssStyles, setCssStyles] = useState('.resume-document { font-family: Arial, sans-serif; padding: 2rem; background: #fff; }')
   const [metadata, setMetadata] = useState<TemplateMetadata>({
@@ -70,12 +70,12 @@ export default function CreateTemplatePage() {
     price: 0
   })
   
-  const [showPreview, setShowPreview] = useState(false)
+  const [_showPreview, _setShowPreview] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
   const [error, setError] = useState('')
   const [isEditing, setIsEditing] = useState(false)
   const [templateId, setTemplateId] = useState<string | null>(null)
-  const [scale, setScale] = useState(0.5)
+  const [_scale, setScale] = useState(0.5)
   const [showSettings, setShowSettings] = useState(false)
 
   const sampleData = getSampleResumeData()
@@ -147,7 +147,7 @@ export default function CreateTemplatePage() {
     }
   }
 
-  const handleLoadTemplate = (templateData: any) => {
+  const _handleLoadTemplate = (templateData: any) => {
     setHtmlTemplate(templateData.htmlTemplate)
     setCssStyles(templateData.cssStyles)
     setMetadata(prev => ({

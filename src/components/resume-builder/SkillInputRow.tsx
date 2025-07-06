@@ -2,23 +2,19 @@ import React from 'react'
 
 interface SkillInputRowProps {
   name: string
-  format: string
   onNameChange: (value: string) => void
   formatValue: string
   onFormatChange: (value: string) => void
   onRemove?: () => void
-  skillLevels: string[]
   showRemove: boolean
 }
 
 export const SkillInputRow: React.FC<SkillInputRowProps> = ({
   name,
-  format,
   onNameChange,
   formatValue,
   onFormatChange,
   onRemove,
-  skillLevels,
   showRemove
 }) => (
   <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">

@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import connectDB from '@/lib/db'
-import { PersonalInfoSchema, ExperienceSchema, EducationSchema, SkillSchema, sanitizeError } from '@/lib/security'
 import Resume from '@/models/Resume'
 
 // GET - Fetch user's resumes
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as any
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -25,18 +24,16 @@ export async function GET() {
       .select('title personalInfo.name createdAt updatedAt isDraft')
 
     return NextResponse.json(resumes)
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch resumes' },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Get resumes error:', error)
+    return NextResponse.json({ error: 'Failed to fetch resumes' }, { status: 500 })
   }
 }
 
 // POST - Create new resume (publish)
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as any
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -112,7 +109,7 @@ export async function POST(req: Request) {
       }
 
       // Filter and validate experiences
-      const validExperiences = (experiences || []).filter((exp: any) => 
+      const validExperiences = (experiences || []).filter((exp: { company?: string; position?: string; startDate?: string; endDate?: string; description?: string }) => 
         exp.company?.trim() && exp.position?.trim() && exp.startDate?.trim() && exp.endDate?.trim() && exp.description?.trim()
       )
 
@@ -138,12 +135,8 @@ export async function POST(req: Request) {
     })
 
     return NextResponse.json(resume, { status: 201 })
-  } catch (error: any) {
-    console.error('Resume creation error:', error)
-    const isDevelopment = process.env.NODE_ENV === 'development'
-    return NextResponse.json(
-      { error: sanitizeError(error, isDevelopment) },
-      { status: 500 }
-    )
+  } catch (error: unknown) {
+    console.error('Create resume error:', error)
+    return NextResponse.json({ error: 'Failed to create resume' }, { status: 500 })
   }
 } 
