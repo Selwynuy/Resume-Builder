@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
-'use client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { signIn, getSession } from 'next-auth/react'
-import { useState } from 'react'
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
+
+import { authOptions } from '@/app/api/auth/options'
 
 export const metadata: Metadata = {
   title: 'Login - Resume Builder',
@@ -14,48 +14,11 @@ export const metadata: Metadata = {
 // Server-side rendering for login - form validation and error handling
 export const dynamic = 'force-dynamic'
 
-export default function LoginPage() {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const router = useRouter()
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    try {
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false
-      })
-
-      if (result?.error) {
-        setError('Invalid email or password')
-      } else {
-        // Check if user is authenticated
-        const session = await getSession()
-        if (session) {
-          router.push('/dashboard')
-        }
-      }
-    } catch (error: unknown) {
-      setError('Something went wrong')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    })
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions)
+  
+  if (session) {
+    redirect('/dashboard')
   }
 
   return (
@@ -66,7 +29,8 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" action="/api/auth/signin" method="POST">
+          <input type="hidden" name="callbackUrl" value="/dashboard" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input
@@ -75,8 +39,6 @@ export default function LoginPage() {
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
               />
             </div>
             <div>
@@ -86,23 +48,16 @@ export default function LoginPage() {
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
               />
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
-
           <div>
             <button
               type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              Sign in
             </button>
           </div>
 

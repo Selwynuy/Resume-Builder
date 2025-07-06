@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
-'use client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
+
+import { authOptions } from '@/app/api/auth/options'
 
 export const metadata: Metadata = {
   title: 'Sign Up - Resume Builder',
@@ -13,51 +14,12 @@ export const metadata: Metadata = {
 // Server-side rendering for signup - form validation and error handling
 export const dynamic = 'force-dynamic'
 
-export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const router = useRouter();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error);
-      }
-
-      router.push('/login');
-    } catch (error: unknown) {
-      if (error instanceof Error) setError(error.message);
-      else setError('Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+export default async function SignupPage() {
+  const session = await getServerSession(authOptions)
+  
+  if (session) {
+    redirect('/dashboard')
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center pt-20">
@@ -67,7 +29,7 @@ export default function SignupPage() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" action="/api/auth/register" method="POST">
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <input
@@ -76,8 +38,6 @@ export default function SignupPage() {
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Full name"
-                value={formData.name}
-                onChange={handleChange}
               />
             </div>
             <div>
@@ -87,8 +47,6 @@ export default function SignupPage() {
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
               />
             </div>
             <div>
@@ -98,23 +56,16 @@ export default function SignupPage() {
                 required
                 className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
               />
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center">{error}</div>
-          )}
-
           <div>
             <button
               type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
-              {loading ? 'Creating account...' : 'Sign up'}
+              Sign up
             </button>
           </div>
 
@@ -126,5 +77,5 @@ export default function SignupPage() {
         </form>
       </div>
     </div>
-  );
+  )
 } 

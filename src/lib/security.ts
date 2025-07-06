@@ -1,5 +1,18 @@
-import DOMPurify from 'dompurify'
 import { z } from 'zod'
+import createDOMPurify from 'dompurify';
+
+let DOMPurify: ReturnType<typeof createDOMPurify>;
+
+if (typeof window === 'undefined') {
+  // SSR: use jsdom
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { JSDOM } = require('jsdom');
+  const windowInstance = new JSDOM('').window;
+  DOMPurify = createDOMPurify(windowInstance as unknown as Window & typeof globalThis);
+} else {
+  // CSR: use window
+  DOMPurify = createDOMPurify(window);
+}
 
 // Validation patterns
 export const phoneRegex = /^\+?[\d\s\-()]{10,}$/
@@ -113,11 +126,10 @@ export function sanitizeHtml(html: string): string {
 
 // Template content sanitization (more restrictive)
 export function sanitizeTemplateContent(content: string): string {
-  // Allow all HTML except scripts and dangerous attributes
   return DOMPurify.sanitize(content, {
     FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
-    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'srcset', 'formaction']
-  })
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'srcset', 'formaction'],
+  });
 }
 
 // CSS Sanitization: only strip < and >

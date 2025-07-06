@@ -86,11 +86,11 @@
   - [x] 5.4 Add focus management and visible focus indicators
   - [x] 5.5 Create comprehensive accessibility documentation
 
-- [ ] 6.0 Optimize Rendering Strategy (SSR/CSR/SSG) for Each Page
-  - [ ] 6.1 Review each page and determine the best rendering method (SSR, SSG, CSR)
-  - [ ] 6.2 Update Next.js page configs to use the chosen strategy
-  - [ ] 6.3 Test all pages for correct rendering and data loading
-  - [ ] 6.4 Document rendering choices in `/documentation`
+- [x] 6.0 Optimize Rendering Strategy (SSR/CSR/SSG) for Each Page
+  - [x] 6.1 Review each page and determine the best rendering method (SSR, SSG, CSR)
+  - [x] 6.2 Update Next.js page configs to use the chosen strategy
+  - [x] 6.3 Test all pages for correct rendering and data loading
+  - [x] 6.4 Document rendering choices in `/documentation`
 
 - [ ] 7.0 Centralize Authentication Logic and Add Middleware
   - [ ] 7.1 Move all authentication logic to `src/auth/` or `src/authenticate/`

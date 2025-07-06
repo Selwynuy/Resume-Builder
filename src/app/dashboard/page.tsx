@@ -1,5 +1,6 @@
-'use client'
-
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
 import {
   FileText,
   Plus,
@@ -8,14 +9,11 @@ import {
   Calendar,
   User
 } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { authOptions } from '@/app/api/auth/options'
 
 interface Resume {
   _id: string;
@@ -31,6 +29,15 @@ interface Resume {
   isDraft: boolean;
 }
 
+interface Template {
+  _id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  downloads: number;
+  isApproved: boolean;
+}
+
 interface QuickStats {
   totalResumes: number;
   draftResumes: number;
@@ -41,116 +48,55 @@ interface QuickStats {
 // Server-side rendering for dashboard - user-specific data
 export const dynamic = 'force-dynamic'
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [resumeToDelete, setResumeToDelete] = useState<Resume | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [quickStats, setQuickStats] = useState<QuickStats>({
-    totalResumes: 0,
-    draftResumes: 0,
-    publishedResumes: 0,
-    totalTemplates: 0,
-  });
-
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) router.push('/login');
-    else {
-      fetchResumes();
-      fetchQuickStats();
+async function getResumes(): Promise<Resume[]> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/resumes`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      return await response.json()
     }
-  }, [session, status, router]);
+  } catch (error) {
+    console.error('Error fetching resumes:', error)
+  }
+  return []
+}
 
-  const fetchResumes = async () => {
-    try {
-      const response = await fetch('/api/resumes');
-      if (response.ok) {
-        const data = await response.json();
-        setResumes(data);
-        // Calculate stats from resumes
-        const draftCount = data.filter((r: Resume) => r.isDraft).length;
-        const publishedCount = data.filter((r: Resume) => !r.isDraft).length;
-        setQuickStats(prev => ({
-          ...prev,
-          totalResumes: data.length,
-          draftResumes: draftCount,
-          publishedResumes: publishedCount,
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching resumes:', error);
-    } finally {
-      setLoading(false);
+async function getTemplates(): Promise<Template[]> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/templates/my`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      return data.templates || []
     }
-  };
+  } catch (error) {
+    console.error('Error fetching templates:', error)
+  }
+  return []
+}
 
-  const fetchQuickStats = async () => {
-    try {
-      const templatesResponse = await fetch('/api/templates/my');
-      if (templatesResponse.ok) {
-        const templatesData = await templatesResponse.json();
-        setQuickStats(prev => ({
-          ...prev,
-          totalTemplates: templatesData.templates?.length || 0,
-        }));
-      }
-    } catch (error) {
-      console.error('Error fetching template stats:', error);
-    }
-  };
-
-  const handleDeleteClick = (resume: Resume) => {
-    setResumeToDelete(resume);
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!resumeToDelete) return;
-    setDeleting(true);
-    try {
-      const response = await fetch(`/api/resumes/${resumeToDelete._id}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        setResumes(resumes.filter(resume => resume._id !== resumeToDelete._id));
-        setShowDeleteModal(false);
-        setResumeToDelete(null);
-      } else {
-        alert('Error deleting resume');
-      }
-    } catch (error) {
-      alert('Error deleting resume');
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setResumeToDelete(null);
-  };
-
-  if (status === 'loading' || loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-        <div className="bg-white/80 backdrop-blur-sm p-12 rounded-3xl shadow-2xl border border-white/20 text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-200 border-t-primary-600 mx-auto"></div>
-            <div className="absolute inset-0 rounded-full h-16 w-16 border-4 border-transparent border-t-primary-400 animate-ping mx-auto"></div>
-          </div>
-          <p className="text-slate-700 mt-6 font-medium">Loading your workspace...</p>
-          <p className="text-slate-500 text-sm mt-2">Preparing your dashboard experience</p>
-        </div>
-      </div>
-    );
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions)
+  
+  if (!session) {
+    redirect('/login')
   }
 
-  if (!session) {
-    return null;
+  const [resumes, templates] = await Promise.all([
+    getResumes(),
+    getTemplates()
+  ])
+
+  // Calculate stats
+  const draftCount = resumes.filter((r: Resume) => r.isDraft).length
+  const publishedCount = resumes.filter((r: Resume) => !r.isDraft).length
+  const quickStats: QuickStats = {
+    totalResumes: resumes.length,
+    draftResumes: draftCount,
+    publishedResumes: publishedCount,
+    totalTemplates: templates.length,
   }
 
   const formatDate = (dateString: string) => {
@@ -213,214 +159,183 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
-          <Link href="/templates/my">
-            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">{quickStats.totalTemplates}</p>
-                    <p className="text-sm text-gray-600 mt-1">Templates</p>
-                  </div>
-                  <div className="p-2 bg-purple-50 rounded-lg">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                  </div>
+          <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{quickStats.totalTemplates}</p>
+                  <p className="text-sm text-gray-600 mt-1">Templates</p>
                 </div>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <User className="h-5 w-5 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="flex flex-wrap gap-4">
+            <Link href="/resume/new">
+              <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
+                <Plus className="w-5 h-5 mr-2" />
+                Create New Resume
+              </Button>
+            </Link>
+            <Link href="/templates/create">
+              <Button variant="outline" className="px-6 py-3 rounded-xl font-medium transition-all duration-300 border-2 hover:border-primary-500 hover:text-primary-600">
+                <Edit className="w-5 h-5 mr-2" />
+                Create Template
+              </Button>
+            </Link>
+            <Link href="/templates">
+              <Button variant="outline" className="px-6 py-3 rounded-xl font-medium transition-all duration-300 border-2 hover:border-primary-500 hover:text-primary-600">
+                <FileText className="w-5 h-5 mr-2" />
+                Browse Templates
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Recent Resumes */}
+        <div className="mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Recent Resumes</h2>
+            <Link href="/resume/new">
+              <Button variant="outline" size="sm" className="text-primary-600 border-primary-200 hover:bg-primary-50">
+                <Plus className="w-4 h-4 mr-1" />
+                New Resume
+              </Button>
+            </Link>
+          </div>
+          
+          {resumes.length === 0 ? (
+            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm">
+              <CardContent className="p-8 text-center">
+                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No resumes yet</h3>
+                <p className="text-gray-600 mb-4">Create your first professional resume to get started</p>
+                <Link href="/resume/new">
+                  <Button className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800">
+                    Create Your First Resume
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
-          </Link>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          <Link href="/resume/new">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-[1.02] shadow-sm">
-              <Plus className="h-4 w-4 mr-2" />
-              New Resume
-            </Button>
-          </Link>
-          <Link href="/templates/create">
-            <Button
-              variant="outline"
-              className="border-gray-200 hover:bg-gray-50 px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-[1.02] shadow-sm bg-transparent"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Create Template
-            </Button>
-          </Link>
-        </div>
-
-        {/* My Resumes Section */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">My Resumes</h2>
-            <p className="text-sm text-gray-600">{resumes.length} resumes</p>
-          </div>
-
-          {resumes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resumes.map(resume => (
-                <Card
-                  key={resume._id}
-                  className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-[1.02] group"
-                >
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {resumes.slice(0, 6).map((resume) => (
+                <Card key={resume._id} className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
                   <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Header */}
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate text-lg">
-                            {resume.title}
-                          </h3>
-                          <div className="flex items-center text-sm text-gray-600 mt-1">
-                            <User className="h-3 w-3 mr-1" />
-                            {resume.personalInfo.name}
-                          </div>
-                        </div>
-                        {/* Inline action buttons */}
-                        <div className="flex gap-2">
-                          <Link href={`/resume/new?edit=${resume._id}`}>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-blue-600 hover:bg-blue-50"
-                              aria-label={`Edit resume: ${resume.title || 'Untitled'}`}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-red-600 hover:bg-red-50"
-                            onClick={() => handleDeleteClick(resume)}
-                            aria-label={`Delete resume: ${resume.title || 'Untitled'}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      {/* Status Badge */}
-                      <div>
-                        <Badge
-                          className={
-                            resume.isDraft
-                            ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-0'
-                              : 'bg-green-100 text-green-800 hover:bg-green-100 border-0'
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {resume.title || resume.personalInfo.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {resume.personalInfo.summary ? 
+                            resume.personalInfo.summary.substring(0, 60) + '...' : 
+                            'No summary available'
                           }
-                        >
-                          {resume.isDraft ? 'Draft' : 'Complete'}
-                        </Badge>
+                        </p>
                       </div>
-                      {/* Dates */}
-                      <div className="space-y-2 text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          Created: {formatDate(resume.createdAt)}
-                        </div>
-                        <div className="flex items-center">
-                          <Edit className="h-3 w-3 mr-1" />
-                          Updated: {formatDate(resume.updatedAt)}
-                        </div>
+                      <Badge className={`ml-2 ${resume.isDraft ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                        {resume.isDraft ? 'Draft' : 'Published'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {formatDate(resume.updatedAt)}
                       </div>
-                      {/* Actions */}
-                      <div className="flex gap-2 pt-2">
-                        <Link href={`/resume/new?edit=${resume._id}`} className="flex-1">
-                          <Button
-                            size="sm"
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                        </Link>
-                        {/* Optionally add View logic here */}
+                      <div className="flex items-center">
+                        <FileText className="w-4 h-4 mr-1" />
+                        {resume.experience?.length || 0} experiences
                       </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Link href={`/resume/edit/${resume._id}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Button variant="outline" size="sm" className="text-red-600 border-red-200 hover:bg-red-50">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
-          ) : (
-            /* Empty State */
-            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm">
-              <CardContent className="p-12 text-center">
-                <div className="max-w-md mx-auto">
-                  <div className="p-4 bg-blue-50 rounded-full w-16 h-16 mx-auto mb-6 flex items-center justify-center">
-                    <FileText className="h-8 w-8 text-blue-600" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No resumes yet</h3>
-                  <p className="text-gray-600 mb-6">
-                    Get started by creating your first resume. Choose from our professional
-                    templates or start from scratch.
-                  </p>
-                  <Link href="/resume/new">
-                    <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-all duration-200 hover:scale-[1.02]">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Resume
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
           )}
         </div>
-        {/* Delete Confirmation Modal */}
-        {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl border border-white/20 p-8 max-w-md w-full mx-4 transform transition-all duration-300">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg
-                    className="w-8 h-8 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-3">Delete Resume</h3>
-                <p className="text-slate-600 mb-2">Are you sure you want to delete</p>
-                <p className="text-lg font-semibold text-slate-800 mb-6">
-                  &quot;{resumeToDelete?.title}&quot;?
-                </p>
-                <p className="text-sm text-slate-500 mb-8">
-                  This action cannot be undone. All resume data will be permanently removed.
-                </p>
-                <div className="flex gap-4">
-                  <button
-                    onClick={cancelDelete}
-                    disabled={deleting}
-                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50"
-                    aria-label="Cancel resume deletion"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={confirmDelete}
-                    disabled={deleting}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
-                    aria-label={deleting ? 'Deleting resume...' : `Permanently delete resume: ${resumeToDelete?.title || 'Untitled'}`}
-                  >
-                    {deleting ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" aria-hidden="true"></div>
-                        Deleting...
-                      </>
-                    ) : (
-                      <span>Delete Resume</span>
-                    )}
-                  </button>
-                </div>
-              </div>
+
+        {/* Recent Templates */}
+        {templates.length > 0 && (
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-900">Your Templates</h2>
+              <Link href="/templates/my">
+                <Button variant="outline" size="sm" className="text-primary-600 border-primary-200 hover:bg-primary-50">
+                  View All
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {templates.slice(0, 3).map((template) => (
+                <Card key={template._id} className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02] group">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                          {template.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {template.description.substring(0, 60) + '...'}
+                        </p>
+                      </div>
+                      <Badge className={`ml-2 ${template.isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {template.isApproved ? 'Approved' : 'Pending'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <div className="flex items-center">
+                        <Calendar className="w-4 h-4 mr-1" />
+                        {formatDate(template.createdAt)}
+                      </div>
+                      <div className="flex items-center">
+                        <FileText className="w-4 h-4 mr-1" />
+                        {template.downloads} downloads
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Link href={`/templates/edit/${template._id}`} className="flex-1">
+                        <Button variant="outline" size="sm" className="w-full">
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                      </Link>
+                      <Link href={`/templates/${template._id}`}>
+                        <Button variant="outline" size="sm">
+                          View
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         )}
       </main>
     </div>
-  );
+  )
 }

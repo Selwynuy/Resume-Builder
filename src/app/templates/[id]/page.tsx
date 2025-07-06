@@ -1,9 +1,8 @@
-'use client'
 import { Metadata } from 'next'
-import { useParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { useState, useEffect, useCallback } from 'react'
-
+import { notFound } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/app/api/auth/options'
+import Link from 'next/link'
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 
@@ -26,58 +25,52 @@ interface Template {
   createdAt: string
 }
 
-export const metadata: Metadata = {
-  title: 'Resume Template - Professional CV Template',
-  description: 'Professional resume template with modern design. Optimized for ATS systems and easy to customize.',
-  keywords: 'resume template, CV template, professional resume, job application',
-  openGraph: {
-    title: 'Resume Template - Professional CV Template',
-    description: 'Professional resume template with modern design. Optimized for ATS systems and easy to customize.',
-    type: 'website',
-  },
-}
-
 // Static generation with incremental regeneration for template details
 export const revalidate = 1800 // Revalidate every 30 minutes
 
-export default function TemplateDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { data: session } = useSession()
-  const [template, setTemplate] = useState<Template | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const fetchTemplate = useCallback(() => {
-    if (!params.id) return
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`/api/templates/${params.id}`)
-        if (response.ok) {
-          const data = await response.json()
-          setTemplate(data.template)
-        } else {
-          router.push('/templates')
-        }
-      } catch (err) {
-        console.error('Error fetching template:', err)
-        router.push('/templates')
-      } finally {
-        setLoading(false)
-      }
+async function getTemplate(id: string): Promise<Template | null> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/templates/${id}`, {
+      next: { revalidate: 1800 }
+    })
+    if (response.ok) {
+      const data = await response.json()
+      return data.template
     }
-    fetchData()
-  }, [params.id, router])
+  } catch (error) {
+    console.error('Error fetching template:', error)
+  }
+  return null
+}
 
-  useEffect(() => {
-    if (params.id) fetchTemplate()
-  }, [fetchTemplate, params.id])
-
-  const handleUseTemplate = () => {
-    if (!session) {
-      router.push('/login')
-      return
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const template = await getTemplate(params.id)
+  
+  if (!template) {
+    return {
+      title: 'Template Not Found - Resume Builder',
+      description: 'The requested template could not be found.',
     }
-    router.push(`/resume/new?customTemplate=${template?._id}`)
+  }
+
+  return {
+    title: `${template.name} - Resume Template`,
+    description: template.description,
+    keywords: 'resume template, CV template, professional resume, job application',
+    openGraph: {
+      title: `${template.name} - Resume Template`,
+      description: template.description,
+      type: 'website',
+    },
+  }
+}
+
+export default async function TemplateDetailPage({ params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions)
+  const template = await getTemplate(params.id)
+
+  if (!template) {
+    notFound()
   }
 
   // Get consistent sample data for preview
@@ -101,14 +94,6 @@ export default function TemplateDetailPage() {
   }
   const previewHtml = sanitizeTemplateContent(previewResult.html)
   const previewCss = previewResult.css
-
-  if (loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>
-  }
-
-  if (!template) {
-    return <div className="flex justify-center items-center min-h-screen">Template not found</div>
-  }
 
   return (
     <div className="min-h-screen pt-32 pb-12">
@@ -135,22 +120,26 @@ export default function TemplateDetailPage() {
                   <span className="font-medium">Downloads:</span>
                   <span>{template.downloads}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="font-medium">Rating:</span>
+                  <span>⭐ {template.rating.toFixed(1)}</span>
+                </div>
               </div>
 
               <div className="space-y-3">
-                <button
-                  onClick={handleUseTemplate}
-                  className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors"
+                <Link
+                  href={session ? `/resume/new?customTemplate=${template._id}` : '/login'}
+                  className="block w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors text-center"
                 >
                   Use This Template
-                </button>
+                </Link>
                 
-                <button
-                  onClick={() => router.push('/templates')}
-                  className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors"
+                <Link
+                  href="/templates"
+                  className="block w-full bg-gray-200 text-gray-800 py-3 rounded-lg hover:bg-gray-300 transition-colors text-center"
                 >
                   Back to Templates
-                </button>
+                </Link>
               </div>
 
               {!template.isApproved && (

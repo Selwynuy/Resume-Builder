@@ -1,8 +1,8 @@
-'use client'
 import { Metadata } from 'next'
-import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
+
+import { authOptions } from '@/app/api/auth/options'
 
 interface Template {
   _id: string
@@ -37,84 +37,29 @@ export const metadata: Metadata = {
 // Server-side rendering for admin - dynamic data and real-time updates
 export const dynamic = 'force-dynamic'
 
-export default function AdminPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [templates, setTemplates] = useState<Template[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'pending' | 'approved'>('pending')
-
-  useEffect(() => {
-    if (status === 'loading') return
-    
-    if (!session?.user?.email || !isAdmin(session.user.email, session?.user?.email)) {
-      router.push('/dashboard')
-      return
+async function getTemplates(): Promise<Template[]> {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/admin/templates`, {
+      cache: 'no-store'
+    })
+    if (response.ok) {
+      const data = await response.json()
+      return data.templates || []
     }
-
-    fetchTemplates()
-  }, [session, status, router])
-
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch('/api/admin/templates')
-      if (response.ok) {
-        const data = await response.json()
-        setTemplates(data.templates)
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error)
-    } finally {
-      setLoading(false)
-    }
+  } catch (error) {
+    console.error('Error fetching templates:', error)
   }
+  return []
+}
 
-  const approveTemplate = async (templateId: string) => {
-    try {
-      const response = await fetch(`/api/admin/templates/${templateId}/approve`, {
-        method: 'PATCH'
-      })
-      if (response.ok) {
-        fetchTemplates()
-        alert('Template approved!')
-      }
-    } catch (error) {
-      alert('Error approving template')
-    }
-  }
-
-  const rejectTemplate = async (templateId: string) => {
-    try {
-      const response = await fetch(`/api/admin/templates/${templateId}/reject`, {
-        method: 'PATCH'
-      })
-      if (response.ok) {
-        fetchTemplates()
-        alert('Template rejected!')
-      }
-    } catch (error) {
-      alert('Error rejecting template')
-    }
-  }
-
-  const filteredTemplates = templates.filter(template => {
-    switch (filter) {
-      case 'pending':
-        return !template.isApproved
-      case 'approved':
-        return template.isApproved
-      default:
-        return true
-    }
-  })
-
-  if (status === 'loading' || loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>
-  }
-
+export default async function AdminPage() {
+  const session = await getServerSession(authOptions)
+  
   if (!session?.user?.email || !isAdmin(session.user.email, session?.user?.email)) {
-    return <div className="flex justify-center items-center min-h-screen">Access Denied</div>
+    redirect('/dashboard')
   }
+
+  const templates = await getTemplates()
 
   return (
     <div className="min-h-screen pt-32 pb-12">
@@ -122,32 +67,20 @@ export default function AdminPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <div className="flex space-x-2">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
-              aria-label={`Show all templates (${templates.length} total)`}
-            >
+            <span className="px-4 py-2 rounded bg-blue-600 text-white">
               All ({templates.length})
-            </button>
-            <button
-              onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded ${filter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200'}`}
-              aria-label={`Show pending templates (${templates.filter(t => !t.isApproved).length} pending)`}
-            >
+            </span>
+            <span className="px-4 py-2 rounded bg-yellow-600 text-white">
               Pending ({templates.filter(t => !t.isApproved).length})
-            </button>
-            <button
-              onClick={() => setFilter('approved')}
-              className={`px-4 py-2 rounded ${filter === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
-              aria-label={`Show approved templates (${templates.filter(t => t.isApproved).length} approved)`}
-            >
+            </span>
+            <span className="px-4 py-2 rounded bg-green-600 text-white">
               Approved ({templates.filter(t => t.isApproved).length})
-            </button>
+            </span>
           </div>
         </div>
 
         <div className="grid gap-6">
-          {filteredTemplates.map((template) => (
+          {templates.map((template) => (
             <div key={template._id} className="bg-white rounded-lg shadow p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
@@ -193,40 +126,37 @@ export default function AdminPage() {
 
                   {!template.isApproved && (
                     <div className="flex space-x-2">
-                      <button
-                        onClick={() => approveTemplate(template._id)}
-                        className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => rejectTemplate(template._id)}
-                        className="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700"
-                      >
-                        Reject
-                      </button>
+                      <form action={`/api/admin/templates/${template._id}/approve`} method="POST">
+                        <button
+                          type="submit"
+                          className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+                        >
+                          Approve
+                        </button>
+                      </form>
+                      <form action={`/api/admin/templates/${template._id}/reject`} method="POST">
+                        <button
+                          type="submit"
+                          className="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700"
+                        >
+                          Reject
+                        </button>
+                      </form>
                     </div>
                   )}
-
-                  <a
-                    href={`/templates/${template._id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-sm"
-                  >
-                    Preview →
-                  </a>
                 </div>
               </div>
             </div>
           ))}
-
-          {filteredTemplates.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No templates found for the selected filter.</p>
-            </div>
-          )}
         </div>
+
+        {templates.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">📋</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No templates to review</h3>
+            <p className="text-gray-600">All templates have been processed.</p>
+          </div>
+        )}
       </div>
     </div>
   )
