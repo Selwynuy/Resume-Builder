@@ -99,7 +99,7 @@ export default function TemplateDetailPage() {
       }
     }
   }
-  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+  const previewHtml = sanitizeTemplateContent(previewResult.html)
   const previewCss = previewResult.css
 
   if (loading) {

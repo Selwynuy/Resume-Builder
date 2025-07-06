@@ -12,7 +12,8 @@ export default function Providers({
   session
 }: SessionProviderProps) {
   return (
-    <SessionProvider session={session}>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    <SessionProvider session={session as any}>
       {children}
     </SessionProvider>
   )

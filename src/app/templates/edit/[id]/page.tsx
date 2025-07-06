@@ -128,7 +128,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
         const { template } = await response.json()
         
         // Check if user owns this template
-        if (String(template.createdBy) !== String(session?.user?.id)) {
+        if (String(template.createdBy) !== String((session?.user as { id?: string })?.id)) {
           alert('You can only edit your own templates')
           router.push('/dashboard')
           return
@@ -216,7 +216,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
       css: ''
     }
   }
-  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+  const previewHtml = sanitizeTemplateContent(previewResult.html)
   const previewCss = previewResult.css
 
   // Responsive preview scaling

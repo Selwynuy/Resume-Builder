@@ -29,7 +29,7 @@ export const ResumePreview = ({ resumeData, selectedTemplate }: ResumePreviewPro
   };
 
   const preview = getResumePreview();
-  const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview, true) : sanitizeTemplateContent(preview.html, true);
+  const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview) : sanitizeTemplateContent(preview.html);
   const previewCss = typeof preview === 'string' ? '' : preview.css || '';
 
   return (

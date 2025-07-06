@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import puppeteer from 'puppeteer'
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth/options'
 import connectDB from '@/lib/db'
 import { renderTemplate } from '@/lib/template-renderer'
 import Resume from '@/models/Resume'

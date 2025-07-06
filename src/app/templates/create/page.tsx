@@ -89,7 +89,7 @@ export default function CreateTemplatePage() {
       css: ''
     }
   }
-  const previewHtml = sanitizeTemplateContent(previewResult.html, true)
+      const previewHtml = sanitizeTemplateContent(previewResult.html)
   const previewCss = previewResult.css
 
   // Responsive preview scaling

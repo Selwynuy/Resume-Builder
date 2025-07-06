@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/app/api/auth/options'
 import connectDB from '@/lib/db'
 import { PersonalInfoSchema, ExperienceSchema, EducationSchema, SkillSchema } from '@/lib/security'
 import Resume from '@/models/Resume'
