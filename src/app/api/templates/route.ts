@@ -1,6 +1,6 @@
+import type { SortOrder } from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
-import type { SortOrder } from 'mongoose'
 
 import connectDB from '@/lib/db'
 import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss } from '@/lib/security'

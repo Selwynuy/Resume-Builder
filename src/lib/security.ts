@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import DOMPurify from 'dompurify'
 
 // Validation patterns
 export const phoneRegex = /^\+?[\d\s\-()]{10,}$/
@@ -112,32 +113,16 @@ export function sanitizeHtml(html: string): string {
 
 // Template content sanitization (more restrictive)
 export function sanitizeTemplateContent(content: string, _forPreview: boolean = false): string {
-  return content
-    .replace(/[<>&'"]/g, (match) => {
-      switch (match) {
-        case '<': return '&lt;'
-        case '>': return '&gt;'
-        case '&': return '&amp;'
-        case "'": return '&#39;'
-        case '"': return '&quot;'
-        default: return match
-      }
-    })
+  // Allow all HTML except scripts and dangerous attributes
+  return DOMPurify.sanitize(content, {
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'srcset', 'formaction']
+  })
 }
 
-// CSS Sanitization
+// CSS Sanitization: only strip < and >
 export function sanitizeCss(css: string): string {
-  return css
-    .replace(/[<>&'"]/g, (match) => {
-      switch (match) {
-        case '<': return '&lt;'
-        case '>': return '&gt;'
-        case '&': return '&amp;'
-        case "'": return '&#39;'
-        case '"': return '&quot;'
-        default: return match
-      }
-    })
+  return css.replace(/[<>]/g, '')
 }
 
 // Rate limiting configuration

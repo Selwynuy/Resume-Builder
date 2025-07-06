@@ -1,12 +1,13 @@
+'use client'
+
 import {
   FileText,
+  Plus,
   Edit,
   Trash2,
-  Plus,
-  User,
-  Calendar
+  Calendar,
+  User
 } from 'lucide-react'
-import { Metadata } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -35,12 +36,6 @@ interface QuickStats {
   draftResumes: number;
   publishedResumes: number;
   totalTemplates: number;
-}
-
-export const metadata: Metadata = {
-  title: 'Dashboard - Resume Builder',
-  description: 'Manage your resumes, templates, and account settings.',
-  robots: 'noindex, nofollow', // Dashboard should not be indexed
 }
 
 // Server-side rendering for dashboard - user-specific data

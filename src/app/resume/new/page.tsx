@@ -1,5 +1,4 @@
 'use client'
-import { Metadata } from 'next'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -16,11 +15,6 @@ import {
 } from '@/components/resume-builder'
 import { useResumeWizard } from '@/hooks/useResumeWizard'
 
-export const metadata: Metadata = {
-  title: 'Create New Resume - Resume Builder',
-  description: 'Create a new professional resume with our easy-to-use builder.',
-  robots: 'noindex, nofollow', // Builder pages should not be indexed
-}
 
 // Client-side rendering for resume builder - highly interactive
 export const dynamic = 'force-dynamic'
@@ -213,7 +207,9 @@ export default function NewResumePage() {
 
           {currentStep < STEPS.length ? (
             <button
-              onClick={nextStep}
+              onClick={() => {
+                if (canProceed()) nextStep()
+              }}
               disabled={!canProceed()}
               className={`
                 px-6 py-3 rounded-xl font-medium transition-all duration-300

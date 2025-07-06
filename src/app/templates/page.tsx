@@ -1,5 +1,4 @@
 'use client'
-import { Metadata } from 'next'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -36,17 +35,16 @@ function ensureWrapper(html: string) {
 }
 
 function TemplatePreview({ html, css }: { html: string; css: string }) {
-  const sampleData = getSampleResumeData();
-  const { html: renderedHtml, css: renderedCss } = renderTemplate(ensureWrapper(html), css, sampleData, true);
+  // Remove sampleData and renderTemplate from here
   const scale = 0.355;
   return (
     <div
       className="bg-white shadow-lg rounded-md border w-full max-w-[320px] aspect-[8.5/11] overflow-hidden flex items-center justify-center"
       style={{ position: "relative" }}
     >
-      <style>{renderedCss}</style>
+      <style>{css}</style>
       <div
-        dangerouslySetInnerHTML={{ __html: renderedHtml }}
+        dangerouslySetInnerHTML={{ __html: html }}
         style={{
           width: 816,
           height: 1056,
@@ -61,17 +59,6 @@ function TemplatePreview({ html, css }: { html: string; css: string }) {
       />
     </div>
   );
-}
-
-export const metadata: Metadata = {
-  title: 'Resume Templates - Professional CV Templates',
-  description: 'Choose from our collection of professional resume templates. Modern, clean designs optimized for ATS systems. Free and premium templates available.',
-  keywords: 'resume templates, CV templates, professional resume, job application templates',
-  openGraph: {
-    title: 'Resume Templates - Professional CV Templates',
-    description: 'Choose from our collection of professional resume templates. Modern, clean designs optimized for ATS systems.',
-    type: 'website',
-  },
 }
 
 // Server-side rendering for templates - dynamic content with user-specific data
@@ -195,7 +182,7 @@ export default function TemplatesPage() {
   function getSanitizedPreviewAndCss(template: CustomTemplate) {
     const preview = getTemplatePreview(template)
     if (typeof preview === 'string') {
-      return { html: sanitizeTemplateContent(preview, true), css: '' }
+      return { html: preview, css: '' }
     }
     return {
       html: sanitizeTemplateContent(preview.html, true),
@@ -324,32 +311,35 @@ export default function TemplatesPage() {
             ) : (
                   <div className="px-4 py-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-8">
-                      {sortedCustomTemplates.map((template) => (
-                        <div key={template._id} className="flex flex-col items-center w-full h-full">
-                          <TemplatePreview html={template.htmlTemplate} css={template.cssStyles} />
-                          <div className="w-full mt-2 bg-white shadow rounded-md p-4 flex flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold text-lg">{template.name}</span>
-                              {template.price === 0 ? (
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Free</span>
-                              ) : (
-                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Premium</span>
-                              )}
+                      {sortedCustomTemplates.map((template) => {
+                        const { html, css } = getSanitizedPreviewAndCss(template);
+                        return (
+                          <div key={template._id} className="flex flex-col items-center w-full h-full">
+                            <TemplatePreview html={html} css={css} />
+                            <div className="w-full mt-2 bg-white shadow rounded-md p-4 flex flex-col gap-2">
+                              <div className="flex items-center justify-between">
+                                <span className="font-semibold text-lg">{template.name}</span>
+                                {template.price === 0 ? (
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Free</span>
+                                ) : (
+                                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">Premium</span>
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600">{template.description}</p>
+                              <div className="flex items-center text-xs text-gray-500">
+                                <span>★ {template.rating.toFixed(1)} ({template.ratingCount} reviews)</span>
+                                <span className="ml-auto flex items-center gap-1"><svg width="16" height="16" fill="currentColor" className="inline"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-2.33 0-7 1.17-7 3.5V15h14v-2.5C15 10.17 10.33 9 8 9z"/></svg>{template.downloads}</span>
+                              </div>
+                              <button
+                                onClick={() => handleSelectCustomTemplate(template)}
+                                className="mt-2 w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 transition"
+                              >
+                                Use Template
+                              </button>
                             </div>
-                            <p className="text-sm text-gray-600">{template.description}</p>
-                            <div className="flex items-center text-xs text-gray-500">
-                              <span>★ {template.rating.toFixed(1)} ({template.ratingCount} reviews)</span>
-                              <span className="ml-auto flex items-center gap-1"><svg width="16" height="16" fill="currentColor" className="inline"><path d="M8 8a3 3 0 100-6 3 3 0 000 6zm0 1c-2.33 0-7 1.17-7 3.5V15h14v-2.5C15 10.17 10.33 9 8 9z"/></svg>{template.downloads}</span>
-                            </div>
-                            <button
-                              onClick={() => handleSelectCustomTemplate(template)}
-                              className="mt-2 w-full bg-blue-600 text-white rounded py-2 font-medium hover:bg-blue-700 transition"
-                            >
-                              Use Template
-                            </button>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}

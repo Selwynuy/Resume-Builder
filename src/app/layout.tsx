@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 
 import Header from '@/components/layout/Header'
 import Providers from '@/components/providers/SessionProvider'

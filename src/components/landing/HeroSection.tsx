@@ -1,3 +1,5 @@
+'use client'
+
 import { motion } from "framer-motion"
 import { FileText, Play, CheckCircle, Sparkles } from "lucide-react"
 
