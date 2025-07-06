@@ -24,11 +24,20 @@
   - `index.ts` - Export file for all components and utilities
 - `src/components/` - All UI components, organized by feature
 - `src/hooks/` - Custom hooks, cleaned up and organized
-- `src/lib/` - Utility functions and shared logic
+- `src/lib/` - Utility functions and shared logic (cleaned up unused functions)
+  - `templates.ts` - Template interface and utilities (removed deprecated functions)
+  - `security.ts` - Security utilities and validation (cleaned up unused parameters)
+  - `template-renderer.ts` - Template rendering logic (cleaned up unused parameters)
 - `src/app/` - Main Next.js pages, to be optimized for SSR/CSR/SSG as appropriate
 - `jest.config.js` and all `*.test.ts(x)` files - For 100% test coverage
 - `.gitignore` - To be updated for sensitive/build files
 - `.env` - To be reviewed for secrets and best practices
+
+### Files Removed
+- `api-templates-response.json` - PowerShell response file (obsolete)
+- `file_line_counts.txt` - Empty file (obsolete)
+- `lint_output.txt` - Linter output file (temporary)
+- `tasks/prd-codebase-refactor.md` - Redundant PRD file (superseded by tasks file)
 
 ### Notes
 
@@ -41,7 +50,7 @@
 - [ ] 1.0 Audit and Remove Unused Code, Dead Files, and Linter Errors
   - [x] 1.1 Run linter and formatter (ESLint + Prettier) across the codebase
   - [x] 1.2 Identify and remove unused imports, variables, and functions
-  - [ ] 1.3 Delete dead files and obsolete modules
+  - [x] 1.3 Delete dead files and obsolete modules
   - [ ] 1.4 Fix all linter and TypeScript errors/warnings
   - [ ] 1.5 Commit and test after each cleanup step
 

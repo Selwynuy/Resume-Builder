@@ -182,10 +182,10 @@ export default function TemplatesPage() {
   function getSanitizedPreviewAndCss(template: CustomTemplate) {
     const preview = getTemplatePreview(template)
     if (typeof preview === 'string') {
-      return { html: preview, css: '' }
+      return { html: sanitizeTemplateContent(preview), css: '' }
     }
     return {
-      html: sanitizeTemplateContent(preview.html, true),
+      html: sanitizeTemplateContent(preview.html),
       css: preview.css || ''
     }
   }

@@ -163,7 +163,7 @@ export default function CreateTemplatePage() {
     }
     setIsPublishing(true)
     try {
-      const validation = validateTemplate(htmlTemplate, cssStyles)
+      const validation = validateTemplate(htmlTemplate)
       if (!validation.isValid) {
         alert(`Template validation failed: ${validation.errors.join(', ')}`)
         return

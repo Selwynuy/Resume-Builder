@@ -76,7 +76,7 @@ export function renderTemplate(htmlTemplate: string, cssStyles: string, resumeDa
     registerHandlebarsHelpers()
     
     // Sanitize template content before compilation
-    const sanitizedTemplate = sanitizeTemplateContent(htmlTemplate, forPreview)
+    const sanitizedTemplate = sanitizeTemplateContent(htmlTemplate)
     const template = Handlebars.compile(sanitizedTemplate)
     const renderedHtml = template(resumeData)
     
@@ -148,7 +148,7 @@ export function extractPlaceholders(htmlTemplate: string): string[] {
 /**
  * Validate template structure
  */
-export function validateTemplate(htmlTemplate: string, _cssStyles: string): {
+export function validateTemplate(htmlTemplate: string): {
   isValid: boolean
   errors: string[]
   warnings: string[]

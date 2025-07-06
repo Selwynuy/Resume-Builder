@@ -174,7 +174,7 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     }
     setSaving(true)
     try {
-    const validation = validateTemplate(htmlTemplate, cssStyles)
+    const validation = validateTemplate(htmlTemplate)
     if (!validation.isValid) {
       alert(`Template validation failed: ${validation.errors.join(', ')}`)
       return

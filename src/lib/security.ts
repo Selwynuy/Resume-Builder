@@ -112,7 +112,7 @@ export function sanitizeHtml(html: string): string {
 }
 
 // Template content sanitization (more restrictive)
-export function sanitizeTemplateContent(content: string, _forPreview: boolean = false): string {
+export function sanitizeTemplateContent(content: string): string {
   // Allow all HTML except scripts and dangerous attributes
   return DOMPurify.sanitize(content, {
     FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
