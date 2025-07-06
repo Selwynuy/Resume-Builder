@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { EducationInputRow } from '@/components/resume-builder/EducationInputRow'
 import { Education } from '@/components/resume-builder/types'
 import { validateEducationField } from '@/components/resume-builder/validateEducationField'
+import { Button } from '@/components/ui/button'
 
 interface EducationStepProps {
   education: Education[]
@@ -63,13 +64,12 @@ export const EducationStep = ({
       </div>
 
       <div className="flex justify-end mt-6">
-        <button
+        <Button
           type="button"
-          className="bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded px-6 py-3 transition-all duration-200"
           onClick={addEducation}
         >
           Add Education
-        </button>
+        </Button>
       </div>
     </div>
   )

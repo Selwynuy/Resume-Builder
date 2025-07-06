@@ -125,18 +125,21 @@ export default function AdminPage() {
             <button
               onClick={() => setFilter('all')}
               className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+              aria-label={`Show all templates (${templates.length} total)`}
             >
               All ({templates.length})
             </button>
             <button
               onClick={() => setFilter('pending')}
               className={`px-4 py-2 rounded ${filter === 'pending' ? 'bg-yellow-600 text-white' : 'bg-gray-200'}`}
+              aria-label={`Show pending templates (${templates.filter(t => !t.isApproved).length} pending)`}
             >
               Pending ({templates.filter(t => !t.isApproved).length})
             </button>
             <button
               onClick={() => setFilter('approved')}
               className={`px-4 py-2 rounded ${filter === 'approved' ? 'bg-green-600 text-white' : 'bg-gray-200'}`}
+              aria-label={`Show approved templates (${templates.filter(t => t.isApproved).length} approved)`}
             >
               Approved ({templates.filter(t => t.isApproved).length})
             </button>

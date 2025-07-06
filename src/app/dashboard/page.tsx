@@ -282,6 +282,7 @@ export default function DashboardPage() {
                               size="sm"
                               variant="ghost"
                               className="text-blue-600 hover:bg-blue-50"
+                              aria-label={`Edit resume: ${resume.title || 'Untitled'}`}
                             >
                               <Edit className="h-4 w-4" />
                             </Button>
@@ -291,6 +292,7 @@ export default function DashboardPage() {
                             variant="ghost"
                             className="text-red-600 hover:bg-red-50"
                             onClick={() => handleDeleteClick(resume)}
+                            aria-label={`Delete resume: ${resume.title || 'Untitled'}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -394,6 +396,7 @@ export default function DashboardPage() {
                     onClick={cancelDelete}
                     disabled={deleting}
                     className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-800 px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50"
+                    aria-label="Cancel resume deletion"
                   >
                     Cancel
                   </button>
@@ -401,10 +404,11 @@ export default function DashboardPage() {
                     onClick={confirmDelete}
                     disabled={deleting}
                     className="flex-1 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                    aria-label={deleting ? 'Deleting resume...' : `Permanently delete resume: ${resumeToDelete?.title || 'Untitled'}`}
                   >
                     {deleting ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" aria-hidden="true"></div>
                         Deleting...
                       </>
                     ) : (

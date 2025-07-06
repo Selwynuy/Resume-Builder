@@ -11,19 +11,19 @@ describe('/api/ai/summary', () => {
   });
 
   it('returns suggestion for generate', async () => {
-    mockGemini.mockResolvedValue('Generated summary');
+    mockGemini.mockResolvedValue(JSON.stringify({ professional: 'Generated summary', creative: '', friendly: '', technical: '' }));
     const req = { json: async () => ({ mode: 'generate' }) } as Partial<Request> as Request;
     const res = await POST(req);
     const data = await res.json();
-    expect(data.suggestion).toBe('Generated summary');
+    expect(data.summaries.professional).toBe('Generated summary');
   });
 
   it('returns suggestion for improve', async () => {
-    mockGemini.mockResolvedValue('Improved summary');
+    mockGemini.mockResolvedValue(JSON.stringify({ professional: 'Improved summary', creative: '', friendly: '', technical: '' }));
     const req = { json: async () => ({ text: 'Old summary', mode: 'improve' }) } as Partial<Request> as Request;
     const res = await POST(req);
     const data = await res.json();
-    expect(data.suggestion).toBe('Improved summary');
+    expect(data.summaries.professional).toBe('Improved summary');
   });
 
   it('returns error for missing mode', async () => {

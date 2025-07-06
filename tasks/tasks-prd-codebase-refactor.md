@@ -6,6 +6,7 @@
 - `src/documentation/` - Comprehensive documentation (new directory)
   - `README.md` - Project structure and organization guide
   - `ARCHITECTURE.md` - System architecture and design patterns
+  - `ACCESSIBILITY.md` - WCAG compliance and accessibility guidelines
 - `src/components/resume-builder/` - All resume builder components, modularized into atomic components
   - `PersonalInfoStep.tsx` - Personal information input step (refactored)
   - `SkillsStep.tsx` - Skills input step (refactored) 
@@ -23,6 +24,10 @@
   - `validateEducationField.ts` - Education field validation utility
   - `index.ts` - Export file for all components and utilities
 - `src/components/` - All UI components, organized by feature
+  - `ui/` - shadcn/ui components (Button, Card, Input, Label)
+  - `resume-builder/` - Resume builder specific components
+  - `landing/` - Landing page components
+  - `layout/` - Layout components (Header, etc.)
 - `src/hooks/` - Custom hooks, cleaned up and organized
 - `src/lib/` - Utility functions and shared logic (cleaned up unused functions)
   - `templates.ts` - Template interface and utilities (removed deprecated functions)
@@ -68,46 +73,53 @@
   - [x] 3.4 Add/Update index files for clean imports
   - [x] 3.5 Document the new file structure in `/documentation`
 
-- [ ] 4.0 Integrate and Standardize on a Component Library
-  - [ ] 4.1 Evaluate shadcn/ui and Chakra UI; select one for the project
-  - [ ] 4.2 Refactor UI to use the chosen component library for all common elements
-  - [ ] 4.3 Remove redundant or duplicate custom components
-  - [ ] 4.4 Update tests to cover new component usage
+- [x] 4.0 Integrate and Standardize on a Component Library
+  - [x] 4.1 Evaluate shadcn/ui and Chakra UI; select one for the project
+  - [x] 4.2 Refactor UI to use the chosen component library for all common elements
+  - [x] 4.3 Remove redundant or duplicate custom components
+  - [x] 4.4 Update tests to cover new component usage
 
-- [ ] 5.0 Optimize Rendering Strategy (SSR/CSR/SSG) for Each Page
-  - [ ] 5.1 Review each page and determine the best rendering method (SSR, SSG, CSR)
-  - [ ] 5.2 Update Next.js page configs to use the chosen strategy
-  - [ ] 5.3 Test all pages for correct rendering and data loading
-  - [ ] 5.4 Document rendering choices in `/documentation`
+- [x] 5.0 Accessibility & UX Hardening
+  - [x] 5.1 Audit for missing ARIA labels, alt text, and semantic HTML
+  - [x] 5.2 Add proper ARIA labels to all interactive elements
+  - [x] 5.3 Implement keyboard navigation and skip links
+  - [x] 5.4 Add focus management and visible focus indicators
+  - [x] 5.5 Create comprehensive accessibility documentation
 
-- [ ] 6.0 Centralize Authentication Logic and Add Middleware
-  - [ ] 6.1 Move all authentication logic to `src/auth/` or `src/authenticate/`
-  - [ ] 6.2 Create a `src/middleware/` folder for custom middleware (auth, logging, rate limiting)
-  - [ ] 6.3 Refactor API routes and pages to use centralized auth and middleware
-  - [ ] 6.4 Add/Update tests for auth and middleware
+- [ ] 6.0 Optimize Rendering Strategy (SSR/CSR/SSG) for Each Page
+  - [ ] 6.1 Review each page and determine the best rendering method (SSR, SSG, CSR)
+  - [ ] 6.2 Update Next.js page configs to use the chosen strategy
+  - [ ] 6.3 Test all pages for correct rendering and data loading
+  - [ ] 6.4 Document rendering choices in `/documentation`
 
-- [ ] 7.0 Apply Security Best Practices
-  - [ ] 7.1 Review and validate all user input (backend and frontend)
-  - [ ] 7.2 Implement CSRF protection where needed
-  - [ ] 7.3 Set secure HTTP headers (e.g., with helmet)
-  - [ ] 7.4 Add rate limiting to sensitive endpoints
-  - [ ] 7.5 Review and fix any other common web vulnerabilities (XSS, SQLi, etc.)
-  - [ ] 7.6 Document security practices in `/documentation`
+- [ ] 7.0 Centralize Authentication Logic and Add Middleware
+  - [ ] 7.1 Move all authentication logic to `src/auth/` or `src/authenticate/`
+  - [ ] 7.2 Create a `src/middleware/` folder for custom middleware (auth, logging, rate limiting)
+  - [ ] 7.3 Refactor API routes and pages to use centralized auth and middleware
+  - [ ] 7.4 Add/Update tests for auth and middleware
 
-- [ ] 8.0 Achieve and Maintain 100% Test Coverage (Jest)
-  - [ ] 8.1 Audit current test coverage
-  - [ ] 8.2 Write missing unit and integration tests for all modules
-  - [ ] 8.3 Ensure all tests pass after each refactor
-  - [ ] 8.4 Add coverage reporting to CI (if applicable)
+- [ ] 8.0 Apply Security Best Practices
+  - [ ] 8.1 Review and validate all user input (backend and frontend)
+  - [ ] 8.2 Implement CSRF protection where needed
+  - [ ] 8.3 Set secure HTTP headers (e.g., with helmet)
+  - [ ] 8.4 Add rate limiting to sensitive endpoints
+  - [ ] 8.5 Review and fix any other common web vulnerabilities (XSS, SQLi, etc.)
+  - [ ] 8.6 Document security practices in `/documentation`
 
-- [ ] 9.0 Create and Update Comprehensive Documentation
-  - [ ] 9.1 Write/Update code documentation (JSDoc, comments)
-  - [ ] 9.2 Add onboarding and architecture guides to `/documentation`
-  - [ ] 9.3 Add deployment and environment setup guides
-  - [ ] 9.4 Auto-generate API docs if feasible (e.g., Swagger)
-  - [ ] 9.5 Review and update documentation after each major refactor
+- [ ] 9.0 Achieve and Maintain 100% Test Coverage (Jest)
+  - [ ] 9.1 Audit current test coverage
+  - [ ] 9.2 Write missing unit and integration tests for all modules
+  - [ ] 9.3 Ensure all tests pass after each refactor
+  - [ ] 9.4 Add coverage reporting to CI (if applicable)
 
-- [ ] 10.0 Update .gitignore and Review .env for Best Practices
-  - [ ] 10.1 Update `.gitignore` to exclude sensitive/build files
-  - [ ] 10.2 Review `.env` for secrets and best practices
-  - [ ] 10.3 Document environment variable usage in `/documentation` 
+- [ ] 10.0 Create and Update Comprehensive Documentation
+  - [ ] 10.1 Write/Update code documentation (JSDoc, comments)
+  - [ ] 10.2 Add onboarding and architecture guides to `/documentation`
+  - [ ] 10.3 Add deployment and environment setup guides
+  - [ ] 10.4 Auto-generate API docs if feasible (e.g., Swagger)
+  - [ ] 10.5 Review and update documentation after each major refactor
+
+- [ ] 11.0 Update .gitignore and Review .env for Best Practices
+  - [ ] 11.1 Update `.gitignore` to exclude sensitive/build files
+  - [ ] 11.2 Review `.env` for secrets and best practices
+  - [ ] 11.3 Document environment variable usage in `/documentation` 

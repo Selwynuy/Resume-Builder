@@ -26,7 +26,7 @@ describe('/api/ai/feedback', () => {
 
   it('handles Gemini error', async () => {
     mockGemini.mockRejectedValue(new Error('fail'));
-    const req = { json: async () => ({ resume: 'My resume', jobDescription: 'Job desc' }) } as Partial<Request> as Request;
+    const req = { json: async () => ({ sectionText: 'Section text' }) } as Partial<Request> as Request;
     const res = await POST(req);
     const data = await res.json();
     expect(res.status).toBe(500);

@@ -397,6 +397,7 @@ export default function TemplatesPage() {
                               ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' 
                               : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                           }`}
+                          aria-label={showReviewForm ? 'Hide review form' : 'Write a review for this template'}
                         >
                           ⭐ {showReviewForm ? 'Hide Review Form' : 'Write Review'}
                         </button>
@@ -408,6 +409,7 @@ export default function TemplatesPage() {
                           setSelectedTemplate(null)
                         }}
                         className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-lg font-medium transition-colors text-sm"
+                        aria-label={`Use template: ${selectedTemplate?.name || 'Selected template'}`}
                       >
                         Use Template
                       </button>

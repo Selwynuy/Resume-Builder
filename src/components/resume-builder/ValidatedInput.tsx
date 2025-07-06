@@ -1,5 +1,9 @@
 import { ReactNode } from 'react';
 
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+
 interface ValidatedInputProps {
   label: string;
   type: 'text' | 'email' | 'tel' | 'textarea';
@@ -29,21 +33,15 @@ export const ValidatedInput = ({
   className = '',
   children
 }: ValidatedInputProps) => {
-  const inputClassName = `w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 ${
-    error 
-      ? 'border-red-300 focus:ring-red-400 focus:border-red-400' 
-      : 'border-slate-200 focus:ring-primary-400 focus:border-transparent'
-  } ${type === 'textarea' ? 'resize-none' : ''} ${className}`;
-
   return (
-    <div>
-      <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center justify-between">
+    <div className={className}>
+      <Label className="flex items-center justify-between mb-2">
         <span>
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
         </span>
         {children}
-      </label>
+      </Label>
       
       {type === 'textarea' ? (
         <textarea
@@ -52,24 +50,29 @@ export const ValidatedInput = ({
           onChange={(e) => onChange(e.target.value)}
           rows={rows}
           maxLength={maxLength}
-          className={inputClassName}
+          className={cn(
+            "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none",
+            error && "border-red-300 focus-visible:ring-red-400"
+          )}
         />
       ) : (
-        <input
+        <Input
           type={type}
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           maxLength={maxLength}
           pattern={pattern}
-          className={inputClassName}
+          className={cn(
+            error && "border-red-300 focus-visible:ring-red-400"
+          )}
         />
       )}
       
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       
       {maxLength && (
-        <p className="text-sm text-slate-500 mt-2">
+        <p className="text-sm text-muted-foreground mt-2">
           {value.length}/{maxLength} characters
         </p>
       )}

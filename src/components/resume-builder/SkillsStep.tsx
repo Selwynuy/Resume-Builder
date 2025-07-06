@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { SkillInputRow } from '@/components/resume-builder/SkillInputRow'
 import { Skill, ResumeData } from '@/components/resume-builder/types'
 import { validateSkillField } from '@/components/resume-builder/validateSkillField'
+import { Button } from '@/components/ui/button'
 
 const SKILL_FORMATS = [
   { key: 'name', label: 'Skill Only' },
@@ -109,13 +110,15 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex justify-end mb-4">
-        <button
+        <Button
           type="button"
-          className="text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-3 py-2 transition-all duration-200"
+          variant="outline"
+          size="sm"
+          className="text-primary-600 hover:text-primary-800 border-primary-200"
           onClick={openModal}
         >
           AI Suggest
-        </button>
+        </Button>
       </div>
       <div className="space-y-4">
         {skills.map((skill, index) => (
@@ -133,13 +136,12 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
         ))}
       </div>
       <div className="flex justify-end mt-6">
-        <button
+        <Button
           type="button"
-          className="bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded px-6 py-3 transition-all duration-200"
           onClick={addSkill}
         >
           Add Skill
-        </button>
+        </Button>
       </div>
       {/* AI Modal logic/UI remains unchanged for now */}
     </div>

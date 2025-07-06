@@ -25,8 +25,11 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers session={session as Session | null | undefined}>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <Header />
-          <main>
+          <main id="main-content">
             {children}
           </main>
         </Providers>

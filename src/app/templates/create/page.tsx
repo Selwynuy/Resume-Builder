@@ -4,6 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect, useCallback } from 'react'
 
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData } from '@/lib/template-renderer'
 
@@ -22,7 +25,7 @@ function SettingsModal({ open, onClose, metadata, setMetadata }: { open: boolean
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-semibold mb-4 text-gray-800">Settings</h2>
-        <label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Category</label>
+        <Label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Category</Label>
         <select
           value={localMeta.category}
           onChange={e => setLocalMeta(prev => ({ ...prev, category: e.target.value }))}
@@ -34,7 +37,7 @@ function SettingsModal({ open, onClose, metadata, setMetadata }: { open: boolean
           <option value="minimalist">Minimalist</option>
           <option value="academic">Academic</option>
         </select>
-        <label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Description</label>
+        <Label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Description</Label>
         <textarea
           value={localMeta.description}
           onChange={e => setLocalMeta(prev => ({ ...prev, description: e.target.value }))}
@@ -44,12 +47,12 @@ function SettingsModal({ open, onClose, metadata, setMetadata }: { open: boolean
           placeholder="A clean, professional template perfect for corporate positions..."
         />
         <div className="flex justify-end mt-6 gap-2">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-medium">Cancel</button>
-          <button
+          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button
             onClick={() => { setMetadata(localMeta); onClose(); }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+            className="bg-blue-600 hover:bg-blue-700"
             disabled={!localMeta.category || !localMeta.description.trim()}
-          >Save</button>
+          >Save</Button>
         </div>
       </div>
     </div>
@@ -215,14 +218,14 @@ export default function CreateTemplatePage() {
       <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200 mt-16">
         <div className="flex items-center gap-6">
           <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500 font-medium mb-0.5" htmlFor="template-name-input">Template Name</label>
-            <input
+            <Label htmlFor="template-name-input" className="text-xs text-gray-500 font-medium mb-0.5">Template Name</Label>
+            <Input
               id="template-name-input"
               type="text"
               value={metadata.name}
               onChange={e => setMetadata(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Untitled"
-              className="border border-gray-300 rounded-lg bg-white px-4 py-2 shadow-sm text-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64 placeholder-gray-400"
+              className="text-lg font-semibold text-gray-900 w-64 placeholder-gray-400"
               maxLength={100}
             />
           </div>
@@ -231,21 +234,22 @@ export default function CreateTemplatePage() {
           <button
             onClick={() => setShowSettings(true)}
             className="p-2 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
+            aria-label="Template settings"
             title="Settings"
           >
             {/* Heroicons Cog6Tooth (settings/gear) icon */}
-            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <svg className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.01c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.01 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.01 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.01c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.01c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.01-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.01-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.573-1.01z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </button>
-          <button
+          <Button
             onClick={handlePublish}
             disabled={isPublishing || !metadata.name.trim() || !metadata.category || !metadata.description.trim()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             {isPublishing ? 'Saving...' : 'Save Template'}
-          </button>
+          </Button>
         </div>
       </div>
       {/* Code Editor Panels */}

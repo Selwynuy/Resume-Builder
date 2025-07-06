@@ -8,11 +8,11 @@ export async function POST(req: Request) {
     const { text, mode, stylePrompt } = body;
     if (!mode) return NextResponse.json({ error: 'Missing mode' }, { status: 400 });
     let prompt = '';
-    if (mode === 'generate' || mode === 'improve') {
-      const base = mode === 'generate'
-        ? 'Write a professional resume summary for a job seeker.'
-        : `Improve this resume summary for clarity, impact, and professionalism: ${text}`;
-      prompt = `${base}\nGenerate 4 different versions of the summary in these styles: Professional, Creative, Friendly, Technical. Return only the summaries, each clearly labeled, in JSON:\n{\n  "professional": "...",\n  "creative": "...",\n  "friendly": "...",\n  "technical": "..."\n}\nNo explanations, no extra text.`;
+    if (mode === 'generate') {
+      prompt = 'Write a professional resume summary for a job seeker.\nGenerate 4 different versions of the summary in these styles: Professional, Creative, Friendly, Technical. Return only the summaries, each clearly labeled, in JSON:\n{\n  "professional": "...",\n  "creative": "...",\n  "friendly": "...",\n  "technical": "..."\n}\nNo explanations, no extra text.';
+    } else if (mode === 'improve') {
+      if (!text) return NextResponse.json({ error: 'Missing text for improve mode' }, { status: 400 });
+      prompt = `Improve this resume summary for clarity, impact, and professionalism: ${text}\nGenerate 4 different versions of the summary in these styles: Professional, Creative, Friendly, Technical. Return only the summaries, each clearly labeled, in JSON:\n{\n  "professional": "...",\n  "creative": "...",\n  "friendly": "...",\n  "technical": "..."\n}\nNo explanations, no extra text.`;
     } else {
       return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
     }

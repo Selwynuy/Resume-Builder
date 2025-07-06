@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ExperienceInputRow } from '@/components/resume-builder/ExperienceInputRow'
 import { Experience } from '@/components/resume-builder/types'
 import { validateExperienceField } from '@/components/resume-builder/validateExperienceField'
+import { Button } from '@/components/ui/button'
 
 interface ExperienceStepProps {
   experiences: Experience[]
@@ -148,13 +149,12 @@ export const ExperienceStep = ({
       </div>
 
       <div className="flex justify-end mt-6">
-        <button
+        <Button
           type="button"
-          className="bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded px-6 py-3 transition-all duration-200"
           onClick={addExperience}
         >
           Add Experience
-        </button>
+        </Button>
       </div>
 
       {/* AI Modal */}
@@ -177,7 +177,7 @@ export const ExperienceStep = ({
                   <div key={style} className="border border-slate-200 rounded-lg p-4">
                     <h5 className="font-medium text-slate-800 mb-2 capitalize">{style.replace(/([A-Z])/g, ' $1').trim()}</h5>
                     <p className="text-slate-600 text-sm mb-3">{suggestion}</p>
-                    <button
+                    <Button
                       onClick={() => {
                         if (aiModal.index !== null) {
                           saveEditPair(suggestion, experiences[aiModal.index].description)
@@ -185,19 +185,21 @@ export const ExperienceStep = ({
                           closeModal()
                         }
                       }}
-                      className="text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-2 py-1 transition-all duration-200"
+                      variant="outline"
+                      size="sm"
+                      className="text-primary-600 hover:text-primary-800 border-primary-200"
                     >
                       Use This
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
             ) : null}
             <div className="flex gap-2 justify-end mt-4">
-              <button
-                className="px-4 py-2 h-10 rounded bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-slate-400"
+              <Button
+                variant="outline"
                 onClick={closeModal}
-              >Dismiss</button>
+              >Dismiss</Button>
             </div>
           </div>
         </div>
