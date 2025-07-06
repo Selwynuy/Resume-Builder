@@ -66,6 +66,7 @@ function isRateLimited(request: NextRequest, maxRequests: number, windowMs: numb
   return false
 }
 
+// Export the middleware function for Next.js
 export function middleware(request: NextRequest) {
   const response = NextResponse.next()
 

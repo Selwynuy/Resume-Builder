@@ -35,8 +35,14 @@ src/components/
 │   ├── MultiStyleSummaryModal.tsx
 │   └── index.ts            # Clean exports
 ├── ui/                     # Reusable UI components
+│   └── index.ts            # UI component exports
 ├── layout/                 # Layout components
-└── providers/              # Context providers
+│   └── index.ts            # Layout component exports
+├── providers/              # Context providers
+│   └── index.ts            # Provider exports
+├── landing/                # Landing page components
+│   └── index.ts            # Landing component exports
+└── index.ts                # Main component exports
 ```
 
 ## Data Flow
@@ -47,6 +53,38 @@ src/components/
 - **Form State**: Controlled components with validation
 - **Global State**: NextAuth for authentication
 - **Persistence**: LocalStorage for drafts, database for final data
+
+### Import Organization
+
+The project uses a comprehensive index file system for clean imports:
+
+```
+src/
+├── components/
+│   ├── index.ts              # Main component exports
+│   ├── resume-builder/
+│   │   └── index.ts          # Resume builder exports
+│   ├── ui/
+│   │   └── index.ts          # UI component exports
+│   └── ...
+├── hooks/
+│   └── index.ts              # Hook exports
+├── lib/
+│   └── index.ts              # Utility exports
+├── models/
+│   └── index.ts              # Model exports
+├── types/
+│   └── index.ts              # Type exports
+└── middleware/
+    └── index.ts              # Middleware exports
+```
+
+This enables clean imports like:
+```typescript
+import { Button, Card } from '@/components/ui'
+import { useResumeWizard } from '@/hooks'
+import { db, security } from '@/lib'
+```
 
 ### Data Validation
 

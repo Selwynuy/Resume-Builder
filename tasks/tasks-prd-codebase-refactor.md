@@ -56,8 +56,8 @@
   - [x] 3.1 Organize files into `components/`, `hooks/`, `lib/`, `auth/`, `middleware/`, `documentation/`, etc.
   - [x] 3.2 Use absolute imports throughout the codebase
   - [x] 3.3 Enforce strict TypeScript mode in `tsconfig.json`
-  - [ ] 3.4 Add/Update index files for clean imports
-  - [ ] 3.5 Document the new file structure in `/documentation`
+  - [x] 3.4 Add/Update index files for clean imports
+  - [x] 3.5 Document the new file structure in `/documentation`
 
 - [ ] 4.0 Integrate and Standardize on a Component Library
   - [ ] 4.1 Evaluate shadcn/ui and Chakra UI; select one for the project
