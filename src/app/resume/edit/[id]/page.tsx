@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 // Import all your interfaces from the new resume page
 interface PersonalInfo {
@@ -61,13 +61,7 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
   const [currentTemplate, setCurrentTemplate] = useState('')
   const [_showTemplateSelector, setShowTemplateSelector] = useState(false)
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session) router.push('/login')
-    else fetchResume()
-  }, [session, status, router, params.id])
-
-  const fetchResume = async () => {
+  const fetchResume = useCallback(async () => {
     try {
       const response = await fetch(`/api/resumes/${params.id}`)
       if (response.ok) {
@@ -88,7 +82,13 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [session, status, router, params.id])
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session) router.push('/login')
+    else fetchResume()
+  }, [session, status, router, params.id, fetchResume])
 
   const saveResume = async () => {
     setSaving(true)

@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
@@ -33,13 +33,7 @@ export default function TemplateDetailPage() {
   const [template, setTemplate] = useState<Template | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (params.id) {
-      fetchTemplate(params.id as string)
-    }
-  }, [params.id])
-
-  const fetchTemplate = async (id: string) => {
+  const fetchTemplate = useCallback(async (id: string) => {
     try {
       const response = await fetch(`/api/templates/${id}`)
       if (response.ok) {
@@ -54,7 +48,11 @@ export default function TemplateDetailPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [params.id, router])
+
+  useEffect(() => {
+    if (params.id) fetchTemplate(params.id as string)
+  }, [fetchTemplate, params.id])
 
   const handleUseTemplate = () => {
     if (!session) {

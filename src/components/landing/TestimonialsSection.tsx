@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import Image from 'next/image'
 
 const testimonials = [
   {
@@ -71,11 +72,7 @@ const TestimonialsSection = () => {
                     &quot;{testimonials[currentTestimonial].content}&quot;
                   </p>
                   <div className="flex items-center justify-center space-x-4">
-                    <img
-                      src={testimonials[currentTestimonial].avatar || "/placeholder.svg"}
-                      alt={testimonials[currentTestimonial].name}
-                      className="w-16 h-16 rounded-full"
-                    />
+                    <Image src={testimonials[currentTestimonial].avatar || "/placeholder.svg"} alt={testimonials[currentTestimonial].name} width={48} height={48} className="w-12 h-12 rounded-full object-cover" />
                     <div className="text-left">
                       <div className="font-semibold text-slate-900">{testimonials[currentTestimonial].name}</div>
                       <div className="text-slate-600">{testimonials[currentTestimonial].role}</div>

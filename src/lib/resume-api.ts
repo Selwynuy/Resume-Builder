@@ -159,12 +159,22 @@ export async function exportPDF({
   resumeData,
   isEditMode,
   editingResumeId,
-  setIsEditMode,
-  setEditingResumeId,
+  _setIsEditMode,
+  _setEditingResumeId,
   setSaveMessage,
   setIsLoading,
-  router
-}: any): Promise<void> {
+  _router
+}: {
+  session: any
+  resumeData: any
+  isEditMode: boolean
+  editingResumeId: string | null
+  _setIsEditMode: (value: boolean) => void
+  _setEditingResumeId: (value: string | null) => void
+  setSaveMessage: (message: string) => void
+  setIsLoading: (loading: boolean) => void
+  _router: any
+}) {
   if (!session?.user?.email) {
     alert('Please sign in to export your resume')
     return

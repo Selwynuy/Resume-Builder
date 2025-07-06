@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData } from '@/lib/template-renderer'
@@ -112,6 +112,27 @@ export default function CreateTemplatePage() {
     return () => window.removeEventListener('resize', calculateScale)
   }, [])
 
+  const fetchTemplateForEdit = useCallback(async (id: string) => {
+    try {
+      const response = await fetch(`/api/templates/${id}`)
+      if (response.ok) {
+        const template = await response.json()
+        setHtmlTemplate(template.htmlTemplate)
+        setCssStyles(template.cssStyles)
+        setMetadata(template.metadata)
+        setTemplateId(id)
+        setIsEditing(true)
+      } else {
+        alert('Template not found')
+        router.push('/dashboard')
+      }
+    } catch (error) {
+      console.error('Error fetching template:', error)
+      alert('Error loading template')
+      router.push('/dashboard')
+    }
+  }, [router])
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
     const editId = urlParams.get('edit')
@@ -121,31 +142,7 @@ export default function CreateTemplatePage() {
       setTemplateId(editId)
       fetchTemplateForEdit(editId)
     }
-  }, [])
-
-  const fetchTemplateForEdit = async (id: string) => {
-    try {
-      const response = await fetch(`/api/templates/${id}`)
-      if (response.ok) {
-        const template = await response.json()
-        
-        setHtmlTemplate(template.htmlTemplate)
-        setCssStyles(template.cssStyles || '')
-        setMetadata({
-          name: template.name,
-          description: template.description,
-          category: template.category,
-          price: template.price || 0
-        })
-      } else {
-        alert('Template not found')
-        router.push('/dashboard')
-      }
-    } catch (error) {
-      alert('Error loading template')
-      router.push('/dashboard')
-    }
-  }
+  }, [fetchTemplateForEdit])
 
   const _handleLoadTemplate = (templateData: any) => {
     setHtmlTemplate(templateData.htmlTemplate)

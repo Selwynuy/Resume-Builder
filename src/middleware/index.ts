@@ -54,10 +54,6 @@ function isRateLimited(request: NextRequest, maxRequests: number, windowMs: numb
   }
 
   if (current.count >= maxRequests) {
-    // Debug logging in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Rate limit exceeded for ${key}: ${current.count}/${maxRequests}`)
-    }
     return true
   }
 

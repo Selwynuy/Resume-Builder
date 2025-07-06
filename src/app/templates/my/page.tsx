@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface UserTemplate {
   _id: string
@@ -32,6 +32,23 @@ export default function MyTemplatesPage() {
     totalEarnings: 0
   })
 
+  const fetchMyTemplates = useCallback(async () => {
+    try {
+      const response = await fetch('/api/templates/my')
+      if (response.ok) {
+        const data = await response.json()
+        setTemplates(data.templates || [])
+        setStats(calculateStats(data.templates || []))
+      } else {
+        console.error('Failed to fetch templates')
+      }
+    } catch (error) {
+      console.error('Error fetching templates:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     if (status === 'loading') return
     if (!session) {
@@ -39,22 +56,7 @@ export default function MyTemplatesPage() {
       return
     }
     fetchMyTemplates()
-  }, [session, status, router])
-
-  const fetchMyTemplates = async () => {
-    try {
-      const response = await fetch('/api/templates/my')
-      if (response.ok) {
-        const data = await response.json()
-        setTemplates(data.templates || [])
-        calculateStats(data.templates || [])
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  }, [session, status, router, fetchMyTemplates])
 
   const calculateStats = (templateList: UserTemplate[]) => {
     const totalTemplates = templateList.length

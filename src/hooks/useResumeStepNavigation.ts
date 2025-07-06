@@ -4,7 +4,7 @@ import { ResumeData } from '@/components/resume-builder'
 
 const TOTAL_STEPS = 6
 
-export const useResumeStepNavigation = (resumeData: ResumeData, initialStep: number, onStepChange: (step: number) => void) => {
+export const useResumeStepNavigation = (resumeData: ResumeData, initialStep: number, _onStepChange: (step: number) => void) => {
   const [currentStep, setCurrentStep] = useState(initialStep)
 
   const nextStep = () => {
@@ -31,7 +31,7 @@ export const useResumeStepNavigation = (resumeData: ResumeData, initialStep: num
     }
   }
 
-  const canAccessStep = (stepNumber: number) => {
+  const canAccessStep = (_stepNumber: number) => {
     return true // Allow skipping to any step
   }
 

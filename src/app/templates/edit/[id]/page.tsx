@@ -2,10 +2,10 @@
 
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { sanitizeTemplateContent } from '@/lib/security'
-import { renderTemplate, validateTemplate, extractPlaceholders, getSampleResumeData } from '@/lib/template-renderer'
+import { renderTemplate, validateTemplate, extractPlaceholders } from '@/lib/template-renderer'
 
 // Sample data for previews
 const sampleData = {
@@ -119,18 +119,9 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
   const [_scale, setScale] = useState(0.5)
   const [showSettings, setShowSettings] = useState(false)
 
-  const sampleData = getSampleResumeData()
+  const [_sampleData] = useState({})
 
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session) {
-      router.push('/login')
-      return
-    }
-    fetchTemplate()
-  }, [session, status, router, params.id])
-
-  const fetchTemplate = async () => {
+  const fetchTemplate = useCallback(async () => {
     try {
       const response = await fetch(`/api/templates/${params.id}`)
       if (response.ok) {
@@ -164,7 +155,16 @@ export default function EditTemplatePage({ params }: { params: { id: string } })
     } finally {
       setLoading(false)
     }
-  }
+  }, [session, status, router, params.id])
+
+  useEffect(() => {
+    if (status === 'loading') return
+    if (!session) {
+      router.push('/login')
+      return
+    }
+    fetchTemplate()
+  }, [session, status, router, params.id, fetchTemplate])
 
   const handleSave = async () => {
     setError('')

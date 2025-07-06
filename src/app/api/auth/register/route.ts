@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import connectDB from '@/lib/db';
-import User from '@/models/User';
+import { NextResponse } from 'next/server'
+
+import connectDB from '@/lib/db'
+import { UserRegistrationSchema } from '@/lib/security'
+import User from '@/models/User'
 
 export async function POST(req: Request) {
   try {

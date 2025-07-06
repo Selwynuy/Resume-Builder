@@ -111,7 +111,7 @@ export function sanitizeHtml(html: string): string {
 }
 
 // Template content sanitization (more restrictive)
-export function sanitizeTemplateContent(content: string, forPreview: boolean = false): string {
+export function sanitizeTemplateContent(content: string, _forPreview: boolean = false): string {
   return content
     .replace(/[<>&'"]/g, (match) => {
       switch (match) {

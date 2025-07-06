@@ -5,6 +5,7 @@ import {
   Menu,
   X,
 } from "lucide-react"
+import Image from 'next/image'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
@@ -62,7 +63,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-            <img src="/logo.svg" alt="Logo" className="h-5 w-5 text-white" />
+            <Image src="/logo.svg" alt="Logo" width={32} height={32} className="w-8 h-8" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             ResumeAI

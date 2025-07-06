@@ -19,6 +19,15 @@ interface Template {
   createdAt: string
 }
 
+const isAdmin = (email: string, sessionEmail: string) => {
+  const adminEmails = [
+    'admin@resumebuilder.com',
+    'selwyn.cybersec@gmail.com',
+    sessionEmail || ''
+  ]
+  return adminEmails.includes(email)
+}
+
 export default function AdminPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -29,22 +38,13 @@ export default function AdminPage() {
   useEffect(() => {
     if (status === 'loading') return
     
-    if (!session?.user?.email || !isAdmin(session.user.email)) {
+    if (!session?.user?.email || !isAdmin(session.user.email, session?.user?.email)) {
       router.push('/dashboard')
       return
     }
 
     fetchTemplates()
-  }, [session, status, router])
-
-  const isAdmin = (email: string) => {
-    const adminEmails = [
-      'admin@resumebuilder.com',
-      'selwyn.cybersec@gmail.com',
-      session?.user?.email || ''
-    ]
-    return adminEmails.includes(email)
-  }
+  }, [session, status, router, isAdmin])
 
   const fetchTemplates = async () => {
     try {
@@ -103,7 +103,7 @@ export default function AdminPage() {
     return <div className="flex justify-center items-center min-h-screen">Loading...</div>
   }
 
-  if (!session?.user?.email || !isAdmin(session.user.email)) {
+  if (!session?.user?.email || !isAdmin(session.user.email, session?.user?.email)) {
     return <div className="flex justify-center items-center min-h-screen">Access Denied</div>
   }
 

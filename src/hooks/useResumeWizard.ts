@@ -2,7 +2,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 
-import { ResumeData, PersonalInfo, Experience, Education, Skill, STEPS } from '@/components/resume-builder/types'
+import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/resume-builder/types'
 import { useResumeStepNavigation } from '@/hooks/useResumeStepNavigation'
 import { fetchTemplateData, loadResumeData, saveResume, exportPDF } from '@/lib/resume-api'
 
@@ -194,7 +194,7 @@ export function useResumeWizard() {
     nextStep,
     prevStep,
     canProceed,
-    canAccessStep,
+    _canAccessStep,
     handleStepClick
   } = useResumeStepNavigation(resumeData, currentStep, setCurrentStep)
 
@@ -234,7 +234,7 @@ export function useResumeWizard() {
         localStorage.removeItem('resumeBuilderData') // clear after restore
       }
     } catch (e) { /* ignore */ }
-  }, [])
+  }, [setCurrentStep])
 
   return {
     status,

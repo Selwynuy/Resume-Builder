@@ -148,7 +148,7 @@ export function extractPlaceholders(htmlTemplate: string): string[] {
 /**
  * Validate template structure
  */
-export function validateTemplate(htmlTemplate: string, cssStyles: string): {
+export function validateTemplate(htmlTemplate: string, _cssStyles: string): {
   isValid: boolean
   errors: string[]
   warnings: string[]
