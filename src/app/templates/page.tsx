@@ -37,7 +37,7 @@ async function getTemplates(): Promise<CustomTemplate[]> {
       return data.templates?.filter((t: CustomTemplate) => t.isApproved) || []
     }
   } catch (error) {
-    console.error('Error fetching templates:', error)
+    // All console.error statements removed for production
   }
   return []
 }

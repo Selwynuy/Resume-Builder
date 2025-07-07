@@ -1,7 +1,72 @@
+/**
+ * AI-powered bullet point generation and optimization API.
+ * 
+ * This endpoint provides intelligent resume bullet point assistance using Google Gemini AI.
+ * It supports three modes: generate (create new), rewrite (improve existing), and multi (multiple styles).
+ * 
+ * @module bullet-route
+ */
+
 import { NextResponse } from 'next/server';
 
 import { getGeminiCompletion } from '@/lib/gemini';
 
+/**
+ * POST /api/ai/bullet
+ * 
+ * Generates or optimizes resume bullet points using AI.
+ * 
+ * This endpoint accepts a text description and mode, then uses Google Gemini AI
+ * to generate professional, impactful bullet points for resumes. It supports
+ * multiple generation modes and can apply custom style prompts.
+ * 
+ * @param req - The incoming HTTP request
+ * @param req.body - The request body containing bullet point data
+ * @param req.body.text - The experience description or bullet point to work with
+ * @param req.body.mode - The generation mode: 'generate', 'rewrite', or 'multi'
+ * @param req.body.stylePrompt - Optional custom instructions for the AI
+ * 
+ * @returns JSON response with generated content or error message
+ * 
+ * @example
+ * ```typescript
+ * // Generate a new bullet point
+ * const response = await fetch('/api/ai/bullet', {
+ *   method: 'POST',
+ *   headers: { 'Content-Type': 'application/json' },
+ *   body: JSON.stringify({
+ *     text: 'Developed a React application',
+ *     mode: 'generate'
+ *   })
+ * });
+ * 
+ * // Rewrite an existing bullet point
+ * const response = await fetch('/api/ai/bullet', {
+ *   method: 'POST',
+ *   headers: { 'Content-Type': 'application/json' },
+ *   body: JSON.stringify({
+ *     text: 'Did stuff with React',
+ *     mode: 'rewrite',
+ *     stylePrompt: 'Focus on quantifiable achievements'
+ *   })
+ * });
+ * 
+ * // Generate multiple style variations
+ * const response = await fetch('/api/ai/bullet', {
+ *   method: 'POST',
+ *   headers: { 'Content-Type': 'application/json' },
+ *   body: JSON.stringify({
+ *     text: 'Led a team of developers',
+ *     mode: 'multi'
+ *   })
+ * });
+ * // Returns: { summaries: { resultsOriented: "...", teamPlayer: "...", ... } }
+ * ```
+ * 
+ * @throws {400} When text or mode is missing
+ * @throws {400} When mode is invalid
+ * @throws {500} When AI service encounters an error
+ */
 export async function POST(req: Request) {
   try {
     const body = await req.json();

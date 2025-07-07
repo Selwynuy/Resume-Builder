@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { requireAuth } from '@/auth'
+import { cookies } from 'next/headers'
 
 interface Resume {
   _id: string;
@@ -21,8 +22,8 @@ interface Resume {
     name: string;
     summary?: string;
   };
-  experience?: { description: string }[];
-  skills?: string[];
+  experiences?: { description: string }[];
+  skills?: { name: string }[];
   createdAt: string;
   updatedAt: string;
   isDraft: boolean;
@@ -49,29 +50,42 @@ export const dynamic = 'force-dynamic'
 
 async function getResumes(): Promise<Resume[]> {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/resumes`, {
-      cache: 'no-store'
+    const url = `${process.env.NEXTAUTH_URL}/api/resumes`
+    const cookieStore = cookies()
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        cookie: cookieStore.toString(),
+      },
     })
     if (response.ok) {
-      return await response.json()
+      const data = await response.json()
+      return Array.isArray(data) ? data : []
+    } else {
+      const errorText = await response.text()
     }
   } catch (error) {
-    console.error('Error fetching resumes:', error)
   }
   return []
 }
 
 async function getTemplates(): Promise<Template[]> {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL}/api/templates/my`, {
-      cache: 'no-store'
+    const url = `${process.env.NEXTAUTH_URL}/api/templates/my`
+    const cookieStore = cookies()
+    const response = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        cookie: cookieStore.toString(),
+      },
     })
     if (response.ok) {
       const data = await response.json()
-      return data.templates || []
+      return Array.isArray(data.templates) ? data.templates : []
+    } else {
+      const errorText = await response.text()
     }
   } catch (error) {
-    console.error('Error fetching templates:', error)
   }
   return []
 }
@@ -248,7 +262,7 @@ export default async function DashboardPage() {
                       </div>
                       <div className="flex items-center">
                         <FileText className="w-4 h-4 mr-1" />
-                        {resume.experience?.length || 0} experiences
+                        {resume.experiences?.length || 0} experiences
                       </div>
                     </div>
                     

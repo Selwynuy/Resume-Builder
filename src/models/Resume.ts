@@ -90,7 +90,7 @@ resumeSchema.post('save', async function(doc) {
       { new: true }
     )
   } catch (error) {
-    console.error('Error updating user resumes:', error)
+    // All console.error statements removed for production
   }
 })
 

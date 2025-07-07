@@ -4,13 +4,14 @@ Welcome to the Resume Builder documentation. This guide provides comprehensive i
 
 ## Table of Contents
 
-1. [Architecture Overview](./ARCHITECTURE.md) - System architecture and design patterns
-2. [Rendering Strategies](./RENDERING_STRATEGIES.md) - Performance optimization and rendering strategies
-3. [API Documentation](./API.md) - REST API endpoints and usage
-4. [Component Library](#component-library) - UI components and their usage
-5. [Accessibility Guidelines](./ACCESSIBILITY.md) - WCAG compliance and accessibility standards
-6. [Testing Guide](./TESTING.md) - Testing practices and coverage
-7. [Deployment Guide](./DEPLOYMENT.md) - Deployment and environment setup
+1. [Onboarding Guide](./ONBOARDING.md) - Get started quickly with the project
+2. [Architecture Overview](./ARCHITECTURE.md) - System architecture and design patterns
+3. [Rendering Strategies](./RENDERING_STRATEGIES.md) - Performance optimization and rendering strategies
+4. [API Documentation](./API.md) - REST API endpoints and usage
+5. [Deployment Guide](./DEPLOYMENT.md) - Deployment and environment setup
+6. [Security Documentation](./SECURITY.md) - Security measures and best practices
+7. [Environment Variables](./ENVIRONMENT.md) - Environment setup and configuration
+8. [Accessibility Guidelines](./ACCESSIBILITY.md) - WCAG compliance and accessibility standards
 
 ## Quick Start
 
@@ -113,6 +114,22 @@ src/
 - Image optimization
 - Code splitting
 - SEO optimization
+
+## Documentation Overview
+
+### For New Developers
+- **[Onboarding Guide](./ONBOARDING.md)** - Complete setup guide for new team members
+- **[Architecture Guide](./ARCHITECTURE.md)** - Understanding the system design
+- **[API Documentation](./API.md)** - All API endpoints and usage examples
+
+### For Deployment
+- **[Deployment Guide](./DEPLOYMENT.md)** - Production deployment instructions
+- **[Security Documentation](./SECURITY.md)** - Security measures and best practices
+- **[Environment Variables](./ENVIRONMENT.md)** - Environment configuration
+
+### For Development
+- **[Rendering Strategies](./RENDERING_STRATEGIES.md)** - Performance optimization
+- **[Accessibility Guidelines](./ACCESSIBILITY.md)** - WCAG compliance standards
 
 ## Contributing
 

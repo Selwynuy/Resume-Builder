@@ -44,7 +44,6 @@ userSchema.pre('save', async function(next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (error: unknown) {
-    console.error('Password comparison error:', error)
     return false
   }
 });

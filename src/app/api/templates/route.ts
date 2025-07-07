@@ -84,7 +84,6 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error: unknown) {
-    console.error('Get templates error:', error)
     return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
   }
 }
@@ -185,7 +184,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     )
   } catch (error: unknown) {
-    console.error('Template creation error:', error)
     return NextResponse.json({ error: 'Failed to create template' }, { status: 500 })
   }
 } 

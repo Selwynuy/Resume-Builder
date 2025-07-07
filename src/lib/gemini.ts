@@ -1,3 +1,10 @@
+/**
+ * Google Gemini API integration for AI-powered resume features.
+ * Provides intelligent content generation, optimization, and suggestions.
+ * 
+ * @module gemini
+ */
+
 let fetchFn: typeof fetch;
 if (typeof fetch === 'function') {
   fetchFn = fetch;
@@ -15,8 +22,44 @@ const MIN_INTERVAL = 1500 // ms between calls
 
 /**
  * Send a prompt to Google Gemini and return the completion.
- * @param prompt The prompt string to send
- * @param options Optional: { systemPrompt, temperature, maxTokens }
+ * 
+ * This function provides AI-powered content generation for resume features including:
+ * - Professional summary generation
+ * - Bullet point optimization
+ * - Skills suggestions
+ * - Cover letter assistance
+ * - Interview preparation
+ * 
+ * The function includes built-in rate limiting (1.5s between calls) to respect API limits
+ * and prevent excessive usage.
+ * 
+ * @param prompt - The text prompt to send to Gemini AI
+ * @param options - Optional configuration for the AI request
+ * @param options.temperature - Controls randomness in the response (0.0 to 1.0). Lower values = more deterministic
+ * @param options.maxTokens - Maximum number of tokens in the response (default: model limit)
+ * 
+ * @returns Promise<string> - The AI-generated text response
+ * 
+ * @throws {Error} When GEMINI_API_KEY is not set in environment variables
+ * @throws {Error} When the Gemini API returns an error response
+ * @throws {Error} When network or other errors occur during the request
+ * 
+ * @example
+ * ```typescript
+ * // Generate a professional summary
+ * const summary = await getGeminiCompletion(
+ *   'Write a professional summary for a software engineer with 5 years of experience',
+ *   { temperature: 0.7 }
+ * );
+ * 
+ * // Optimize a bullet point
+ * const optimized = await getGeminiCompletion(
+ *   'Rewrite this bullet point to be more impactful: "Did stuff with React"',
+ *   { temperature: 0.3 }
+ * );
+ * ```
+ * 
+ * @since 1.0.0
  */
 export async function getGeminiCompletion(prompt: string, options?: { temperature?: number; maxTokens?: number }): Promise<string> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not set in environment')
@@ -39,14 +82,12 @@ export async function getGeminiCompletion(prompt: string, options?: { temperatur
     })
     if (!res.ok) {
       const err = await res.text()
-      console.error('Gemini API error:', err)
       throw new Error('Gemini API error: ' + err)
     }
     const data: { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> } = await res.json()
     // Gemini returns candidates[0].content.parts[0].text
     return data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
   } catch (error: unknown) {
-    console.error('Gemini API error:', error)
     throw new Error('Failed to get AI completion')
   }
 } 

@@ -1,13 +1,25 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 
-import { authOptions } from './config'
+import { authOptions } from '@/app/api/auth/options'
 
 /**
  * Get the current user session on the server side
  */
 export async function getCurrentSession() {
-  return await getServerSession(authOptions)
+  // Check for cookies manually
+  try {
+    const cookieStore = await cookies()
+    const nextAuthToken = cookieStore.get('next-auth.token')
+    const nextAuthSessionToken = cookieStore.get('next-auth.session-token')
+  } catch (error) {
+  }
+  
+  const session = await getServerSession(authOptions)
+  if (session) {
+  }
+  return session
 }
 
 /**
@@ -15,7 +27,8 @@ export async function getCurrentSession() {
  */
 export async function getCurrentUserId(): Promise<string | null> {
   const session = await getCurrentSession()
-  return session?.user?.id || null
+  const userId = session?.user?.id || null
+  return userId
 }
 
 /**
@@ -23,7 +36,8 @@ export async function getCurrentUserId(): Promise<string | null> {
  */
 export async function getCurrentUserEmail(): Promise<string | null> {
   const session = await getCurrentSession()
-  return session?.user?.email || null
+  const email = session?.user?.email || null
+  return email
 }
 
 /**
@@ -73,5 +87,6 @@ export function isAdmin(email: string): boolean {
  * Optional authentication - returns session or null
  */
 export async function optionalAuth() {
-  return await getCurrentSession()
+  const session = await getCurrentSession()
+  return session
 } 

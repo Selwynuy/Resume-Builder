@@ -66,7 +66,7 @@ export async function registerUser(data: RegistrationData): Promise<Registration
       user: userWithoutPassword
     }
   } catch (error: unknown) {
-    console.error('Registration error:', error)
+    // All console.error statements removed for production
     return {
       success: false,
       error: 'Registration failed'

@@ -44,7 +44,6 @@ export default function TemplatePreview({ template }: { template: CustomTemplate
           })
         }
       } catch (error) {
-        console.error('Template preview error:', error)
         setPreview({
           html: `<div style="padding: 20px; text-align: center; color: #666; font-family: Arial;">
             <div style="font-size: 24px; margin-bottom: 8px;">📄</div>

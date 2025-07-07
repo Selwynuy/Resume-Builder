@@ -19,10 +19,10 @@ export function CSRFTokenInput({ name = 'csrfToken', className }: CSRFTokenInput
           const data = await response.json()
           setToken(data.token)
         } else {
-          console.error('Failed to fetch CSRF token')
+          // All console.error statements removed for production
         }
       } catch (error) {
-        console.error('Error fetching CSRF token:', error)
+        // All console.error statements removed for production
       } finally {
         setLoading(false)
       }

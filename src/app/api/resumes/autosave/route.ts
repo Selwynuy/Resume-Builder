@@ -73,7 +73,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, resumeId: resume._id })
   } catch (error: unknown) {
-    console.error('Autosave error:', error)
     return NextResponse.json({ error: 'Autosave failed' }, { status: 500 })
   }
 } 

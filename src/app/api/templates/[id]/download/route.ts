@@ -38,7 +38,6 @@ export async function POST(
     })
     
   } catch (error) {
-    console.error('Error tracking download:', error)
     return NextResponse.json({ error: 'Error tracking download' }, { status: 500 })
   }
 } 

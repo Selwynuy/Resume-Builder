@@ -38,7 +38,7 @@ async function getTemplate(id: string): Promise<Template | null> {
       return data.template
     }
   } catch (error) {
-    console.error('Error fetching template:', error)
+    // All console.error statements removed for production
   }
   return null
 }

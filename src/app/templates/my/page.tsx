@@ -31,7 +31,7 @@ async function getMyTemplates(): Promise<UserTemplate[]> {
       return data.templates || []
     }
   } catch (error) {
-    console.error('Error fetching templates:', error)
+    // All console.error statements removed for production
   }
   return []
 }

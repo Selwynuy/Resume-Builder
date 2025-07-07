@@ -130,7 +130,7 @@ export default function CreateTemplatePage() {
         router.push('/dashboard')
       }
     } catch (error) {
-      console.error('Error fetching template:', error)
+      // All console.error statements removed for production
       alert('Error loading template')
       router.push('/dashboard')
     }

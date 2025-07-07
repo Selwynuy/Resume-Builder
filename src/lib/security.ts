@@ -1,3 +1,19 @@
+/**
+ * Security utilities for input validation, sanitization, and protection.
+ * 
+ * This module provides comprehensive security measures including:
+ * - Input validation using Zod schemas
+ * - HTML/CSS sanitization using DOMPurify
+ * - XSS prevention through content sanitization
+ * - CSRF protection utilities
+ * - Rate limiting validation
+ * 
+ * All functions are designed to prevent common web vulnerabilities
+ * and ensure data integrity throughout the application.
+ * 
+ * @module security
+ */
+
 import { z } from 'zod'
 import createDOMPurify from 'dompurify';
 
@@ -145,7 +161,22 @@ export const TemplateMetadataSchema = z.object({
     .max(1000, 'Price cannot exceed 1000')
 })
 
-// Enhanced HTML Sanitization
+/**
+ * Sanitizes HTML content by escaping special characters.
+ * 
+ * This function prevents XSS attacks by converting potentially dangerous
+ * HTML characters to their safe entity equivalents. It's used for
+ * user-generated content that should be displayed as text, not rendered as HTML.
+ * 
+ * @param html - The HTML string to sanitize
+ * @returns The sanitized HTML string with escaped special characters
+ * 
+ * @example
+ * ```typescript
+ * const safe = sanitizeHtml('<script>alert("xss")</script>');
+ * // Returns: "&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;"
+ * ```
+ */
 export function sanitizeHtml(html: string): string {
   return html
     .replace(/[<>&'"]/g, (match) => {
@@ -160,7 +191,22 @@ export function sanitizeHtml(html: string): string {
     })
 }
 
-// Template content sanitization (more restrictive)
+/**
+ * Sanitizes template content using DOMPurify with restrictive settings.
+ * 
+ * This function allows safe HTML content while preventing XSS attacks.
+ * It's used for template content that needs to be rendered as HTML
+ * but must be safe from malicious scripts and dangerous attributes.
+ * 
+ * @param content - The HTML content to sanitize
+ * @returns The sanitized HTML content safe for rendering
+ * 
+ * @example
+ * ```typescript
+ * const safe = sanitizeTemplateContent('<b>Bold text</b><script>alert("xss")</script>');
+ * // Returns: "<b>Bold text</b>" (script tag removed)
+ * ```
+ */
 export function sanitizeTemplateContent(content: string): string {
   return DOMPurify.sanitize(content, {
     FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'select', 'textarea'],
@@ -169,12 +215,49 @@ export function sanitizeTemplateContent(content: string): string {
   });
 }
 
-// CSS Sanitization: only strip < and >
+/**
+ * Sanitizes CSS content by removing dangerous characters.
+ * 
+ * This function prevents CSS-based attacks by removing angle brackets
+ * that could be used for CSS injection attacks.
+ * 
+ * @param css - The CSS string to sanitize
+ * @returns The sanitized CSS string
+ * 
+ * @example
+ * ```typescript
+ * const safe = sanitizeCss('body { color: red; } <style>');
+ * // Returns: "body { color: red; } style"
+ * ```
+ */
 export function sanitizeCss(css: string): string {
   return css.replace(/[<>]/g, '')
 }
 
-// Enhanced input sanitization for different types
+/**
+ * Sanitizes input based on the specified type.
+ * 
+ * This function provides type-specific sanitization for different
+ * input types, ensuring appropriate security measures for each use case.
+ * 
+ * @param input - The input string to sanitize
+ * @param type - The type of input to determine sanitization method
+ * @param type.text - General text input (HTML escaped)
+ * @param type.email - Email input (lowercase, trimmed)
+ * @param type.url - URL input (validated and trimmed)
+ * @param type.html - HTML input (DOMPurify sanitized)
+ * @param type.css - CSS input (angle brackets removed)
+ * @returns The sanitized input string
+ * 
+ * @example
+ * ```typescript
+ * const safeText = sanitizeInput('<b>Hello</b>', 'text');
+ * // Returns: "&lt;b&gt;Hello&lt;/b&gt;"
+ * 
+ * const safeEmail = sanitizeInput('  USER@EXAMPLE.COM  ', 'email');
+ * // Returns: "user@example.com"
+ * ```
+ */
 export function sanitizeInput(input: string, type: 'text' | 'email' | 'url' | 'html' | 'css'): string {
   if (!input || typeof input !== 'string') return ''
   

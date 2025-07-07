@@ -176,7 +176,6 @@ export function createInputValidator<T extends z.ZodType>(
       }
 
       // Handle other errors
-      console.error('Input validation error:', error)
       return {
         success: false,
         response: NextResponse.json(

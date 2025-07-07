@@ -45,7 +45,94 @@ describe('Rate Limiting Middleware', () => {
       expect(checkRateLimit(authRequest)).toBeNull()
       expect(checkRateLimit(resumeRequest)).toBeNull()
       expect(checkRateLimit(apiRequest)).toBeNull()
-    })
+    });
+
+    it('should handle general API endpoints', () => {
+      const request = createMockRequest('127.0.0.1', '/api/some-other-endpoint')
+      // Exceed the general API limit
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.api.maxRequests; i++) {
+        checkRateLimit(request)
+      }
+      const result = checkRateLimit(request)
+      expect(result).not.toBeNull()
+      expect(result?.status).toBe(429)
+    });
+
+    it('should handle general non-API paths', () => {
+      const request = createMockRequest('127.0.0.1', '/some-other-path')
+      // General paths should not be rate limited by default
+      const result = checkRateLimit(request)
+      expect(result).toBeNull()
+    });
+
+    it('should handle session management paths', () => {
+      const sessionRequest = createMockRequest('127.0.0.1', '/api/auth/session')
+      const logRequest = createMockRequest('127.0.0.1', '/api/auth/_log')
+      
+      // Exceed the session limit
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.session.maxRequests; i++) {
+        checkRateLimit(sessionRequest)
+      }
+      const sessionResult = checkRateLimit(sessionRequest)
+      expect(sessionResult).not.toBeNull()
+      expect(sessionResult?.status).toBe(429)
+
+      // Log requests should also be rate limited
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.session.maxRequests; i++) {
+        checkRateLimit(logRequest)
+      }
+      const logResult = checkRateLimit(logRequest)
+      expect(logResult).not.toBeNull()
+      expect(logResult?.status).toBe(429)
+    });
+
+    it('should handle AI endpoints with strict limiting', () => {
+      const request = createMockRequest('127.0.0.1', '/api/ai/summary')
+      // Exceed the AI limit
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.ai.maxRequests; i++) {
+        checkRateLimit(request)
+      }
+      const result = checkRateLimit(request)
+      expect(result).not.toBeNull()
+      expect(result?.status).toBe(429)
+    });
+
+    it('should handle template endpoints', () => {
+      const request = createMockRequest('127.0.0.1', '/api/templates/123')
+      // Exceed the template limit
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.template.maxRequests; i++) {
+        checkRateLimit(request)
+      }
+      const result = checkRateLimit(request)
+      expect(result).not.toBeNull()
+      expect(result?.status).toBe(429)
+    });
+
+    it('should handle resume endpoints', () => {
+      const request = createMockRequest('127.0.0.1', '/api/resumes/123/edit')
+      // Exceed the resume limit
+      for (let i = 0; i < RATE_LIMIT_CONFIGS.resume.maxRequests; i++) {
+        checkRateLimit(request)
+      }
+      const result = checkRateLimit(request)
+      expect(result).not.toBeNull()
+      expect(result?.status).toBe(429)
+    });
+
+    it('should handle requests without IP address', () => {
+      const request = createMockRequest('', '/api/test')
+      Object.defineProperty(request, 'ip', { value: null })
+      const result = checkRateLimit(request)
+      expect(result).toBeNull()
+    });
+
+    it('should handle requests with x-forwarded-for header', () => {
+      const request = createMockRequest('', '/api/test')
+      Object.defineProperty(request, 'ip', { value: null })
+      request.headers.set('x-forwarded-for', '192.168.1.1')
+      const result = checkRateLimit(request)
+      expect(result).toBeNull()
+    });
   })
 
   describe('createRateLimitResponse', () => {
@@ -55,6 +142,22 @@ describe('Rate Limiting Middleware', () => {
       expect(result.status).toBe(429)
       expect(result.headers.get('Content-Type')).toBe('application/json')
       expect(result.headers.get('Retry-After')).toBe('900')
+    })
+
+    it('should create response with custom error message', async () => {
+      const config = { ...RATE_LIMIT_CONFIGS.auth, errorMessage: 'Custom error message' }
+      const result = createRateLimitResponse(config)
+      const body = await result.text()
+      const parsedBody = JSON.parse(body)
+      expect(parsedBody.error).toBe('Custom error message')
+    })
+
+    it('should create response with default error message', async () => {
+      const config = { maxRequests: 10, windowMs: 60000 }
+      const result = createRateLimitResponse(config)
+      const body = await result.text()
+      const parsedBody = JSON.parse(body)
+      expect(parsedBody.error).toBe('Rate limit exceeded')
     })
   })
 

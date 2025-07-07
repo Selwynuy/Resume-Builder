@@ -1,5 +1,5 @@
 // Export NextAuth configuration
-export { authOptions } from './config'
+export { authOptions } from '@/app/api/auth/options'
 
 // Export authentication utilities
 export {
@@ -15,7 +15,6 @@ export {
 // Export registration utilities
 export {
   registerUser,
-  handleRegistration,
   type RegistrationData,
   type RegistrationResult
 } from './register' 

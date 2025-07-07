@@ -53,7 +53,7 @@ export const useAutoSave = (data: AutoSaveData) => {
           }
         }
       } catch (error) {
-        console.error('Auto-save failed:', error)
+        // All console.error statements removed for production
       }
     }, 3000)
 

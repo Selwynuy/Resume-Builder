@@ -43,7 +43,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Template deleted successfully' })
   } catch (error) {
-    console.error('Error deleting template:', error)
     return NextResponse.json(
       { error: 'Failed to delete template' },
       { status: 500 }
@@ -103,7 +102,6 @@ export async function GET(
 
     return NextResponse.json({ template })
   } catch (error) {
-    console.error('Error fetching template:', error)
     return NextResponse.json(
       { error: 'Failed to fetch template' },
       { status: 500 }
@@ -168,7 +166,6 @@ export async function PUT(
 
     return NextResponse.json({ message: 'Template updated successfully', templateId: template._id })
   } catch (error) {
-    console.error('Error updating template:', error)
     return NextResponse.json(
       { error: 'Failed to update template' },
       { status: 500 }

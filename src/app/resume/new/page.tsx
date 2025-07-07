@@ -63,7 +63,6 @@ export default function NewResumePage() {
         return template
       }
     } catch (error) {
-      console.error('Error fetching template:', error)
       return null
     }
   }

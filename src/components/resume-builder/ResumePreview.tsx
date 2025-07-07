@@ -22,8 +22,7 @@ export const ResumePreview = ({ resumeData, selectedTemplate }: ResumePreviewPro
       
       return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>No Template Selected</h3><p>Please select a template to view preview</p></div>';
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown preview error';
-      console.error('Template preview error:', errorMessage);
+      // All console.error statements removed for production
       return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>Preview Unavailable</h3><p>Unable to render resume preview</p></div>';
     }
   };
