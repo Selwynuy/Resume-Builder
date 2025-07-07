@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth/next'
+import { cookies } from 'next/headers'
 
 import { authOptions } from '@/app/api/auth/options'
+import DeleteTemplateButton from '@/components/templates/DeleteTemplateButton'
 
 interface UserTemplate {
   _id: string
@@ -23,8 +25,12 @@ export const dynamic = 'force-dynamic'
 
 async function getMyTemplates(): Promise<UserTemplate[]> {
   try {
+    const cookieStore = cookies()
     const response = await fetch(`${process.env.NEXTAUTH_URL}/api/templates/my`, {
-      cache: 'no-store'
+      cache: 'no-store',
+      headers: {
+        cookie: cookieStore.toString(),
+      },
     })
     if (response.ok) {
       const data = await response.json()
@@ -181,19 +187,7 @@ export default async function MyTemplatesPage() {
                             >
                               Edit
                             </Link>
-                            <form action={`/api/templates/${template._id}`} method="DELETE" className="inline">
-                              <button
-                                type="submit"
-                                className="text-red-600 hover:text-red-900"
-                                onClick={(e) => {
-                                  if (!confirm('Are you sure you want to delete this template?')) {
-                                    e.preventDefault()
-                                  }
-                                }}
-                              >
-                                Delete
-                              </button>
-                            </form>
+                            <DeleteTemplateButton templateId={template._id} />
                           </div>
                         </td>
                       </tr>
