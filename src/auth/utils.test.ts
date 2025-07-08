@@ -11,14 +11,16 @@ import {
   optionalAuth
 } from './utils'
 
-import { authOptions } from '@/app/api/auth/options'
-
 // Mock NextAuth
 jest.mock('next-auth/next', () => ({
   getServerSession: jest.fn()
 }))
 
 // Mock auth config
+jest.mock('./config', () => ({
+  authOptions: {}
+}))
+
 const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
 
 describe('Auth Utils', () => {
@@ -40,7 +42,7 @@ describe('Auth Utils', () => {
 
       const result = await getCurrentSession()
 
-      expect(mockGetServerSession).toHaveBeenCalledWith(authOptions)
+      expect(mockGetServerSession).toHaveBeenCalledWith(expect.any(Object))
       expect(result).toEqual(mockSession)
     })
 

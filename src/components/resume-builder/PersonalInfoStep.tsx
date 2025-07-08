@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
-import { ValidatedInput, MultiStyleSummaryModal, validatePersonalInfoField } from '@/components/resume-builder'
+import { ValidatedInput, validatePersonalInfoField } from '@/components/resume-builder'
+import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 import { PersonalInfo } from '@/components/resume-builder/types'
 import { INPUT_LIMITS } from '@/lib/security'
 
@@ -16,49 +17,7 @@ export const PersonalInfoStep = ({
   updatePersonalInfo 
 }: PersonalInfoStepProps) => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [multiSummaries, setMultiSummaries] = useState<null | {
-    professional: string;
-    creative: string;
-    friendly: string;
-    technical: string;
-  }>(null);
-  const [multiLoading, setMultiLoading] = useState(false);
-  const [multiError, setMultiError] = useState<string | null>(null);
-  const [showMultiModal, setShowMultiModal] = useState(false);
-
-  // Helper to get/set multi-summaries in localStorage
-  const MULTI_SUMMARY_KEY = 'ai_summary_multi_suggestions';
-  function saveMultiSummariesToStorage(summaries: {
-    professional: string;
-    creative: string;
-    friendly: string;
-    technical: string;
-  }) {
-    try { localStorage.setItem(MULTI_SUMMARY_KEY, JSON.stringify(summaries)); } catch { /* ignore localStorage errors */ }
-  }
-  function getMultiSummariesFromStorage(): {
-    professional: string;
-    creative: string;
-    friendly: string;
-    technical: string;
-  } | null {
-    try {
-      const raw = localStorage.getItem(MULTI_SUMMARY_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (
-          parsed &&
-          typeof parsed.professional === 'string' &&
-          typeof parsed.creative === 'string' &&
-          typeof parsed.friendly === 'string' &&
-          typeof parsed.technical === 'string'
-        ) {
-          return parsed;
-        }
-      }
-    } catch { /* ignore localStorage/JSON errors */ }
-    return null;
-  }
+  const [aiModalOpen, setAiModalOpen] = useState(false)
 
   const validateAndUpdate = (field: keyof PersonalInfo, value: string) => {
     const newErrors = { ...errors }
@@ -76,42 +35,17 @@ export const PersonalInfoStep = ({
     updatePersonalInfo(field, value)
   }
 
-  const handleMultiSuggest = async (force = false) => {
-    const cached = !force && getMultiSummariesFromStorage();
-    setShowMultiModal(true);
-    setMultiError(null);
-    if (cached) {
-      setMultiSummaries(cached);
-      setMultiLoading(false);
-      return;
-    }
-    setMultiSummaries(null);
-    setMultiLoading(true);
-    try {
-      const res = await fetch('/api/ai/summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: personalInfo.summary ? 'improve' : 'generate', text: personalInfo.summary }),
-      });
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`API error: ${res.status} - ${errorText}`);
-      }
-      const data = await res.json();
-      if (data.summaries) {
-        setMultiSummaries(data.summaries);
-        saveMultiSummariesToStorage(data.summaries);
-      } else setMultiError(data.error || 'AI error');
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setMultiError(e.message || 'AI error');
-      } else {
-        setMultiError('An unexpected error occurred');
-      }
-    } finally {
-      setMultiLoading(false);
-    }
-  };
+  const openAIModal = () => {
+    setAiModalOpen(true)
+  }
+
+  const closeAIModal = () => {
+    setAiModalOpen(false)
+  }
+
+  const handleApplySuggestion = (suggestion: string) => {
+    updatePersonalInfo('summary', suggestion)
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -176,7 +110,7 @@ export const PersonalInfoStep = ({
           <button
             type="button"
             className="ml-2 text-primary-600 hover:text-primary-800 text-xs font-semibold border border-primary-200 rounded px-2 py-1 transition-all duration-200"
-            onClick={() => handleMultiSuggest()}
+            onClick={openAIModal}
           >
             AI Suggest
           </button>
@@ -188,17 +122,16 @@ export const PersonalInfoStep = ({
         </p>
       </div>
 
-      {/* Multi-Style Summary Modal */}
-      <MultiStyleSummaryModal
-        isOpen={showMultiModal}
-        onClose={() => setShowMultiModal(false)}
-        onRegenerate={() => handleMultiSuggest(true)}
-        onSelectSummary={(summary) => updatePersonalInfo('summary', summary)}
-        summaries={multiSummaries}
-        loading={multiLoading}
-        error={multiError}
-        currentSummary={personalInfo.summary}
-      />
+      {/* AI Suggestion Modal */}
+      {aiModalOpen && (
+        <AISuggestionModal
+          isOpen={aiModalOpen}
+          onClose={closeAIModal}
+          featureType="summary"
+          currentText={personalInfo.summary}
+          onApplySuggestion={handleApplySuggestion}
+        />
+      )}
     </div>
   )
 } 

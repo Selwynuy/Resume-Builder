@@ -1,71 +1,117 @@
-import { ResumeData } from '@/components/resume-builder/types';
-import { sanitizeTemplateContent } from '@/lib/security';
-import { renderTemplate } from '@/lib/template-renderer';
-import type { Template } from '@/lib/templates';
+'use client'
+
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { renderTemplate } from '@/lib/template-renderer'
+import { useToast } from '@/components/providers/ToastProvider'
 
 interface ResumePreviewProps {
-  resumeData: ResumeData;
-  selectedTemplate: Template | null;
+  resumeData: any
+  template: any
+  onEdit: () => void
 }
 
-export const ResumePreview = ({ resumeData, selectedTemplate }: ResumePreviewProps) => {
-  const getResumePreview = () => {
-    try {
-      if (selectedTemplate?.htmlTemplate && selectedTemplate?.cssStyles) {
-        return renderTemplate(
-          selectedTemplate.htmlTemplate, 
-          selectedTemplate.cssStyles, 
-          resumeData,
-          true // Enable preview mode
-        );
-      }
-      
-      return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>No Template Selected</h3><p>Please select a template to view preview</p></div>';
-    } catch (error: unknown) {
-      // All console.error statements removed for production
-      return '<div style="padding: 2rem; text-align: center; color: #666;"><h3>Preview Unavailable</h3><p>Unable to render resume preview</p></div>';
-    }
-  };
+export default function ResumePreview({ resumeData, template, onEdit }: ResumePreviewProps) {
+  const [isExporting, setIsExporting] = useState(false)
+  const { showToast } = useToast()
 
-  const preview = getResumePreview();
-  const previewHtml = typeof preview === 'string' ? sanitizeTemplateContent(preview) : sanitizeTemplateContent(preview.html);
-  const previewCss = typeof preview === 'string' ? '' : preview.css || '';
+  const handleExport = async () => {
+    if (!resumeData._id) {
+      showToast('Please save your resume before exporting', 'error')
+      return
+    }
+
+    setIsExporting(true)
+    try {
+      const response = await fetch(`/api/resumes/${resumeData._id}/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+
+      if (!response.ok) {
+        throw new Error('Export failed')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${resumeData.personalInfo?.name || 'resume'}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      showToast('Resume exported successfully!', 'success')
+    } catch (error) {
+      showToast('Failed to export resume. Please try again.', 'error')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  if (!template || !resumeData) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
+        <p className="text-gray-500">No template or resume data available</p>
+      </div>
+    )
+  }
+
+  let previewHtml = ''
+  let previewCss = ''
+
+  try {
+    const result = renderTemplate(
+      template.htmlTemplate || '',
+      template.cssStyles || '',
+      resumeData,
+      false
+    )
+    previewHtml = result.html
+    previewCss = result.css
+  } catch (error) {
+    console.error('Template rendering error:', error)
+    previewHtml = '<div style="color: red; padding: 1rem;">Error rendering template</div>'
+  }
 
   return (
-    <div className="order-1 lg:order-2">
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="bg-slate-50 px-4 py-3 border-b border-slate-200">
-          <h4 className="font-semibold text-slate-800 flex items-center">
-            <span className="text-lg mr-2">👁️</span>
-            Resume Preview
-          </h4>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Preview</h3>
+        <div className="space-x-2">
+          <Button onClick={onEdit} variant="outline" size="sm">
+            Edit
+          </Button>
+          <Button 
+            onClick={handleExport} 
+            disabled={isExporting || !resumeData._id}
+            size="sm"
+          >
+            {isExporting ? 'Exporting...' : 'Export PDF'}
+          </Button>
         </div>
-        
-        <div className="p-4">
-          <div className="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-            <style>{previewCss}</style>
-            <div 
-              className="transform scale-75 origin-top-left"
-              style={{ 
-                width: '133.33%', // Compensate for scale-75 (100/75 = 133.33)
-                height: 'auto'
-              }}
-            >
-              <div
-                style={{ 
-                  width: '612px', // 8.5 inches at 72 DPI
-                  minHeight: '792px', // 11 inches at 72 DPI
-                  padding: '36px', // 0.5 inch margins
-                  fontSize: '12px',
-                  lineHeight: '1.4',
-                  fontFamily: 'Arial, sans-serif'
-                }}
-                dangerouslySetInnerHTML={{ __html: previewHtml }}
-              />
-            </div>
-          </div>
+      </div>
+
+      <div className="border border-gray-200 rounded-lg bg-white shadow-lg overflow-hidden">
+        <style>{previewCss}</style>
+        <div 
+          className="transform scale-75 origin-top-left"
+          style={{ 
+            width: '133.33%',
+          }}
+        >
+          <div
+            style={{ 
+              height: '792px',
+              fontSize: '12px',
+              lineHeight: '1.4',
+              fontFamily: 'Arial, sans-serif'
+            }}
+            dangerouslySetInnerHTML={{ __html: previewHtml }}
+          />
         </div>
       </div>
     </div>
-  );
-}; 
+  )
+} 

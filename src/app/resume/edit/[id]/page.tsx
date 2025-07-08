@@ -1,175 +1,208 @@
 'use client'
-import { useRouter } from 'next/navigation'
+
 import { useSession } from 'next-auth/react'
-import { useEffect, useState, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 
-// Import all your interfaces from the new resume page
-interface PersonalInfo {
-  name: string
-  email: string
-  phone: string
-  location: string
-  summary: string
-}
+import { useResumeWizard } from '@/hooks/useResumeWizard'
+import { 
+  PersonalInfoStep, 
+  ExperienceStep, 
+  EducationStep, 
+  SkillsStep, 
+  ReviewStep,
+  ProgressBar 
+} from '@/components/resume-builder'
 
-interface Experience {
-  company: string
-  position: string
-  startDate: string
-  endDate: string
-  description: string
-}
-
-interface Education {
-  school: string
-  degree: string
-  field: string
-  graduationDate: string
-  gpa?: string
-}
-
-interface Skill {
-  name: string
-  level: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
-}
-
-// Client-side rendering for resume builder - highly interactive
-export const dynamic = 'force-dynamic'
+const STEPS = [
+  'Personal Info',
+  'Experience', 
+  'Education',
+  'Skills',
+  'Review & Export'
+]
 
 export default function EditResumePage({ params }: { params: { id: string } }) {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const {
+    isLoadingResume,
+    resumeData,
+    selectedTemplateData,
+    saveMessage,
+    isLoading,
+    updatePersonalInfo,
+    updateExperience,
+    addExperience,
+    removeExperience,
+    updateEducation,
+    addEducation,
+    removeEducation,
+    updateSkill,
+    addSkill,
+    removeSkill,
+    handleSaveResume,
+    handleExportPDF,
+    handleStepClick,
+    handleChangeTemplate,
+    currentStep,
+    nextStep,
+    prevStep,
+    canProceed
+  } = useResumeWizard()
+  
+  const { status: authStatus } = useSession()
+  const searchParams = useSearchParams()
 
-  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
-    name: '', email: '', phone: '', location: '', summary: ''
-  })
-
-  const [experiences, setExperiences] = useState<Experience[]>([
-    { company: '', position: '', startDate: '', endDate: '', description: '' }
-  ])
-
-  const [education, setEducation] = useState<Education[]>([
-    { school: '', degree: '', field: '', graduationDate: '', gpa: '' }
-  ])
-
-  const [skills, setSkills] = useState<Skill[]>([
-    { name: '', level: 'Intermediate' }
-  ])
-
-  const [title, setTitle] = useState('')
-
-  const [currentTemplate, setCurrentTemplate] = useState('')
-  const [_showTemplateSelector, setShowTemplateSelector] = useState(false)
-
-  const fetchResume = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/resumes/${params.id}`)
-      if (response.ok) {
-        const resume = await response.json()
-        setTitle(resume.title)
-        setPersonalInfo(resume.personalInfo)
-        setExperiences(resume.experiences.length > 0 ? resume.experiences : [{ company: '', position: '', startDate: '', endDate: '', description: '' }])
-        setEducation(resume.education.length > 0 ? resume.education : [{ school: '', degree: '', field: '', graduationDate: '', gpa: '' }])
-        setSkills(resume.skills.length > 0 ? resume.skills : [{ name: '', level: 'Intermediate' }])
-        setCurrentTemplate(resume.template || '')
-      } else if (response.status === 404) {
-        alert('Resume not found')
-        router.push('/dashboard')
-      }
-    } catch (error) {
-      alert('Error loading resume')
-      router.push('/dashboard')
-    } finally {
-      setLoading(false)
-    }
-  }, [router, params.id])
-
-  useEffect(() => {
-    if (status === 'loading') return
-    if (!session) router.push('/login')
-    else fetchResume()
-  }, [session, status, router, params.id, fetchResume])
-
-  const saveResume = async () => {
-    setSaving(true)
-    const resumeData = {
-      title,
-      personalInfo,
-      experiences: experiences.filter(exp => exp.company || exp.position),
-      education: education.filter(edu => edu.school || edu.degree),
-      skills: skills.filter(skill => skill.name),
-      template: currentTemplate
-    }
-    
-    try {
-      const response = await fetch(`/api/resumes/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(resumeData)
-      })
-
-      if (response.ok) {
-        alert('Resume updated successfully!')
-        router.push('/dashboard')
-      } else {
-        alert('Error updating resume')
-      }
-    } catch (error) {
-      alert('Error updating resume')
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const _switchTemplate = (templateId: string) => {
-    setCurrentTemplate(templateId)
-    setShowTemplateSelector(false)
-  }
-
-  // Include all your existing helper functions (addExperience, updatePersonalInfo, etc.)
-  // ... copy them from your new resume page
-
-  if (status === 'loading' || loading) {
-    return <div className="flex justify-center items-center min-h-screen">Loading...</div>
-  }
-
-  if (!session) {
-    return null
-  }
-
-  // Use the same JSX as your new resume page, but:
-  // 1. Change the title to "Edit Resume"
-  // 2. Add a title input field
-  // 3. Change the save button to show "Update Resume"
-  // 4. Add saving state to the button
-
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Edit Resume</h1>
-        <div className="space-x-3">
-          <input
-            type="text"
-            placeholder="Resume Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <PersonalInfoStep 
+            personalInfo={resumeData.personalInfo}
+            updatePersonalInfo={updatePersonalInfo}
           />
-          <button
-            onClick={saveResume}
-            disabled={saving}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-          >
-            {saving ? 'Updating...' : 'Update Resume'}
-          </button>
+        )
+      case 2:
+        return (
+          <ExperienceStep 
+            experiences={resumeData.experiences}
+            updateExperience={updateExperience}
+            addExperience={addExperience}
+            removeExperience={removeExperience}
+          />
+        )
+      case 3:
+        return (
+          <EducationStep 
+            education={resumeData.education}
+            updateEducation={updateEducation}
+            addEducation={addEducation}
+            removeEducation={removeEducation}
+          />
+        )
+      case 4:
+        return (
+          <SkillsStep 
+            skills={resumeData.skills}
+            updateSkill={updateSkill}
+            addSkill={addSkill}
+            removeSkill={removeSkill}
+            resumeData={resumeData}
+          />
+        )
+      case 5:
+        return (
+          <ReviewStep 
+            resumeData={resumeData}
+            selectedTemplate={selectedTemplateData as { id: string; name: string; description: string; htmlTemplate: string; cssStyles: string } | null}
+            onSave={handleSaveResume}
+            onExport={handleExportPDF}
+            onChangeTemplate={handleChangeTemplate}
+            isLoading={isLoading}
+            saveMessage={saveMessage}
+            updatePersonalInfo={updatePersonalInfo}
+            updateExperience={updateExperience}
+            addExperience={addExperience}
+            removeExperience={removeExperience}
+            updateEducation={updateEducation}
+            addEducation={addEducation}
+            removeEducation={removeEducation}
+            updateSkill={updateSkill}
+            addSkill={addSkill}
+            removeSkill={removeSkill}
+          />
+        )
+      default:
+        return <div>Step {currentStep} - Coming Soon!</div>
+    }
+  }
+
+  if (authStatus === 'loading' || isLoadingResume) {
+    return (
+      <div className="min-h-screen pt-32 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">
+            {authStatus === 'loading' ? 'Loading...' : 'Loading resume data...'}
+          </p>
         </div>
       </div>
-      
-      {/* Include all your form sections here - same as new resume page */}
-    </div>
+    )
+  }
+
+  if (authStatus === 'unauthenticated') {
+    return (
+      <div className="min-h-screen pt-32 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-800 mb-4">Please Sign In</h1>
+          <p className="text-slate-600 mb-6">You need to be signed in to edit a resume.</p>
+          <Link href="/login" className="btn-gradient">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="min-h-screen pt-32 pb-12">
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-slate-800 mb-2">Edit Resume</h1>
+            <p className="text-slate-600">Update your resume information and preview changes</p>
+          </div>
+
+          <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
+
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            {renderCurrentStep()}
+          </div>
+
+          <div className="flex justify-between items-center">
+            <button
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className={`
+                px-6 py-3 rounded-xl font-medium transition-all duration-300
+                ${currentStep === 1 
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                }
+              `}
+            >
+              ← Previous
+            </button>
+
+            <div className="text-center">
+              <span className="text-sm text-slate-500">
+                Step {currentStep} of {STEPS.length}
+              </span>
+            </div>
+
+            {currentStep < STEPS.length ? (
+              <button
+                onClick={() => {
+                  if (canProceed()) nextStep()
+                }}
+                disabled={!canProceed()}
+                className={`
+                  px-6 py-3 rounded-xl font-medium transition-all duration-300
+                  ${!canProceed()
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:scale-105'
+                  }
+                `}
+              >
+                Next →
+              </button>
+            ) : (
+              <div className="px-6 py-3 text-slate-500 text-sm">
+                ✨ All steps completed! Use the buttons above to save or export.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
   )
 } 

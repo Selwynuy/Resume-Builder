@@ -187,7 +187,14 @@ export default async function MyTemplatesPage() {
                             >
                               Edit
                             </Link>
-                            <DeleteTemplateButton templateId={template._id} />
+                            <DeleteTemplateButton 
+                              templateId={template._id} 
+                              templateName={template.name}
+                              onDelete={() => {
+                                // Refresh the page after deletion
+                                window.location.reload()
+                              }}
+                            />
                           </div>
                         </td>
                       </tr>

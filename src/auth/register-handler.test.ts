@@ -1,11 +1,12 @@
-// Mock the registerUser function before any imports
-const mockRegisterUser = jest.fn()
 jest.mock('./register', () => ({
   __esModule: true,
-  registerUser: mockRegisterUser
-}))
+  registerUser: jest.fn()
+}));
 
 import { handleRegistration } from './register-handler'
+import { registerUser } from './register'
+
+const mockRegisterUser = registerUser as jest.MockedFunction<typeof registerUser>
 
 describe('handleRegistration', () => {
   const validRegistrationData = {

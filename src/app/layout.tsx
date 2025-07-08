@@ -5,6 +5,9 @@ import { getServerSession } from 'next-auth/next'
 
 import Header from '@/components/layout/Header'
 import Providers from '@/components/providers/SessionProvider'
+import { LoadingProvider } from '@/components/providers/LoadingProvider'
+import { GlobalLoading } from '@/components/ui/GlobalLoading'
+import { ToastProvider } from '@/components/providers/ToastProvider'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -25,13 +28,18 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers session={session as Session | null | undefined}>
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
-          <Header />
-          <main id="main-content">
-            {children}
-          </main>
+          <ToastProvider>
+            <LoadingProvider>
+              <a href="#main-content" className="skip-link">
+                Skip to main content
+              </a>
+              <Header />
+              <main id="main-content">
+                {children}
+              </main>
+              <GlobalLoading />
+            </LoadingProvider>
+          </ToastProvider>
         </Providers>
       </body>
     </html>

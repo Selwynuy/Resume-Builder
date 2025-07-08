@@ -17,9 +17,9 @@
 ## Tasks
 
 - [ ] 1.0 Replace Export PDF Button with Download Button in ReviewStep
-  - [x] 1.1 Remove the existing Export PDF button from `ReviewStep.tsx`.
-  - [x] 1.2 Add a new "Download" button in the same location.
-  - [x] 1.3 Ensure the button is disabled or hidden if the resume is incomplete.
+  - [ ] 1.1 Remove the existing Export PDF button from `ReviewStep.tsx`.
+  - [ ] 1.2 Add a new "Download" button in the same location.
+  - [ ] 1.3 Ensure the button is disabled or hidden if the resume is incomplete.
 
 - [ ] 2.0 Implement Download Options Modal UI and Logic
   - [ ] 2.1 Create `DownloadOptionsModal.tsx` component matching existing modal UI/UX.

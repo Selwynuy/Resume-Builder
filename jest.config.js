@@ -1,15 +1,20 @@
-const { createDefaultPreset } = require("ts-jest");
-
-const tsJestTransformCfg = createDefaultPreset().transform;
-
-/** @type {import("jest").Config} **/
+/** @type {import('jest').Config} */
 module.exports = {
-  testEnvironment: "node",
-  transform: {
-    ...tsJestTransformCfg,
-  },
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  setupFiles: ["<rootDir>/jest.setup.js"],
+  transform: {
+    '^.+\\.(ts|tsx|js|jsx)$': ['babel-jest', { configFile: './jest-babel.config.js' }],
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(bson|mongodb|mongoose)/)',
+  ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
 };

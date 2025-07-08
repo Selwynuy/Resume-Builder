@@ -1,78 +1,73 @@
 "use client"
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import Link from 'next/link'
-import { CSRFTokenInput } from '@/components/ui/csrf-token'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useToast } from '@/components/providers/ToastProvider'
 
 export default function LoginForm() {
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-  const emailRef = useRef<HTMLInputElement>(null)
-  const passwordRef = useRef<HTMLInputElement>(null)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-    setLoading(true)
-    const email = emailRef.current?.value || ''
-    const password = passwordRef.current?.value || ''
-    const res = await signIn('credentials', {
-      redirect: false,
-      email,
-      password,
-      callbackUrl: '/dashboard',
-    })
-    setLoading(false)
-    if (res?.error) {
-      setError(res.error)
-    } else if (res?.ok) {
-      window.location.href = '/dashboard'
-    } else {
-      setError('Unknown error')
+    setIsLoading(true)
+
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false
+      })
+
+      if (result?.error) {
+        showToast('Invalid email or password. Please try again.', 'error')
+      } else {
+        showToast('Login successful!', 'success')
+        router.push('/dashboard')
+      }
+    } catch (error) {
+      showToast('An unexpected error occurred. Please try again.', 'error')
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-      <CSRFTokenInput />
-      <div className="rounded-md shadow-sm -space-y-px">
-        <div>
-          <input
-            name="email"
-            type="email"
-            required
-            className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            placeholder="Email address"
-            ref={emailRef}
-          />
-        </div>
-        <div>
-          <input
-            name="password"
-            type="password"
-            required
-            className="relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            placeholder="Password"
-            ref={passwordRef}
-          />
-        </div>
-      </div>
-      {error && <div className="text-red-600 text-sm text-center">{error}</div>}
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <button
-          type="submit"
-          className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-          disabled={loading}
-        >
-          {loading ? 'Signing in...' : 'Sign in'}
-        </button>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={isLoading}
+        />
       </div>
-      <div className="text-center">
-        <Link href="/signup" className="text-primary-600 hover:text-primary-500">
-          Don&apos;t have an account? Sign up
-        </Link>
+      
+      <div>
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
+        />
       </div>
+
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? 'Signing in...' : 'Sign In'}
+      </Button>
     </form>
   )
 } 

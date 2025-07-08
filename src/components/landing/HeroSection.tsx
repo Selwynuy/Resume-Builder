@@ -70,40 +70,9 @@ const HeroSection = () => (
             </div>
           </div>
         </motion.div>
-
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-        >
-          <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full"></div>
-                <div>
-                  <div className="h-4 bg-slate-200 rounded w-32 mb-2"></div>
-                  <div className="h-3 bg-slate-100 rounded w-24"></div>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="h-3 bg-slate-200 rounded w-full"></div>
-                <div className="h-3 bg-slate-200 rounded w-5/6"></div>
-                <div className="h-3 bg-slate-200 rounded w-4/6"></div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-4 bg-blue-100 rounded w-20"></div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-slate-100 rounded w-full"></div>
-                  <div className="h-3 bg-slate-100 rounded w-4/5"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-400 rounded-2xl transform -rotate-6 opacity-20"></div>
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl transform rotate-12 opacity-10"></div>
-        </motion.div>
+        <div>
+          <img src="/images/Roboto.png" alt="Hero Image" width={500} height={500} />
+        </div>
       </div>
     </div>
   </section>

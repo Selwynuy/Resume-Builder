@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Template } from '@/lib/templates';
 
 interface TemplateSelectorProps {

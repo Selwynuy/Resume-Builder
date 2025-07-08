@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import { SkillInputRow } from '@/components/resume-builder/SkillInputRow'
 import { Skill, ResumeData } from '@/components/resume-builder/types'
 import { validateSkillField } from '@/components/resume-builder/validateSkillField'
 import { Button } from '@/components/ui/button'
+import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 
 const SKILL_FORMATS = [
   { key: 'name', label: 'Skill Only' },
@@ -18,7 +19,7 @@ type SkillFormat = typeof SKILL_FORMATS[number]['key'];
 interface SkillsStepProps {
   skills: Skill[]
   updateSkill: (index: number, field: keyof Skill, value: string | number | undefined) => void
-  addSkill: () => void
+  addSkill: (name?: string) => void
   removeSkill: (index: number) => void
   resumeData?: ResumeData // Add optional resume data for AI context
 }
@@ -30,66 +31,47 @@ export const SkillsStep = ({
   removeSkill,
   resumeData
 }: SkillsStepProps) => {
-  const _skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'] as const
-  const [_aiModal, setAiModal] = useState(false)
-  const [_aiLoading, setAiLoading] = useState(false)
-  const [_aiError, setAiError] = useState('')
-  const [_aiSkills, setAiSkills] = useState<string[]>([])
-  const [_selected, setSelected] = useState<Set<string>>(new Set())
+  const [aiModalOpen, setAiModalOpen] = useState(false)
   // Track format per skill
   const [skillFormats, setSkillFormats] = useState<SkillFormat[]>(skills.map(() => 'name'));
   const [errors, setErrors] = useState<{ [key: number]: string }>({})
 
-  const handleAISuggest = async () => {
-    setAiLoading(true)
-    setAiError('')
-    setAiSkills([])
-    setSelected(new Set())
-    try {
-      const context: Record<string, unknown> = {}
-      if (resumeData) {
-        context.resumeContent = `
+  const openAIModal = () => {
+    setAiModalOpen(true)
+  }
+
+  const closeAIModal = () => {
+    setAiModalOpen(false)
+  }
+
+  const handleApplySuggestion = (suggestion: string) => {
+    // Add the suggested skill to the skills list and set its name
+    addSkill(suggestion)
+  }
+
+  const handleApplyAllSuggestions = (suggestions: string[]) => {
+    suggestions.forEach(suggestion => addSkill(suggestion))
+  }
+
+  const getAIContext = (): Record<string, unknown> => {
+    const context: Record<string, unknown> = {}
+    if (resumeData) {
+      context.resumeContent = `
 Personal Info: ${resumeData.personalInfo.name ? `${resumeData.personalInfo.name}, ` : ''}${resumeData.personalInfo.summary || ''}
 Experience: ${resumeData.experiences.map(exp => `${exp.position} at ${exp.company}: ${exp.description}`).filter(exp => exp.trim() !== ' at : ').join('\n')}
 Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from ${edu.school}`).filter(edu => edu.trim() !== ' in  from ').join('\n')}
-        `.trim()
-        const experienceDescriptions = resumeData.experiences.map(exp => exp.description).filter(desc => desc.trim()).join(' ')
-        if (experienceDescriptions) {
-          context.experienceDescriptions = experienceDescriptions
-        }
-        const recentExp = resumeData.experiences.find(exp => exp.position && exp.company)
-        if (recentExp) {
-          context.jobTitle = recentExp.position
-          context.industry = recentExp.company
-        }
+      `.trim()
+      const experienceDescriptions = resumeData.experiences.map(exp => exp.description).filter(desc => desc.trim()).join(' ')
+      if (experienceDescriptions) {
+        context.experienceDescriptions = experienceDescriptions
       }
-      const res = await fetch('/api/ai/skills', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(context)
-      })
-      const data = await res.json()
-      if (data.skills) setAiSkills(data.skills)
-      else setAiError(data.error || 'No skills returned')
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setAiError(e.message || 'AI error')
-      } else {
-        setAiError('An unexpected error occurred')
+      const recentExp = resumeData.experiences.find(exp => exp.position && exp.company)
+      if (recentExp) {
+        context.jobTitle = recentExp.position
+        context.industry = recentExp.company
       }
-    } finally {
-      setAiLoading(false)
     }
-  }
-  const openModal = () => {
-    setAiModal(true)
-    setAiSkills([])
-    setAiError('')
-    setSelected(new Set())
-    handleAISuggest()
-  }
-  const _closeModal = () => {
-    setAiModal(false)
+    return context
   }
   if (skillFormats.length !== skills.length) {
     setSkillFormats(Array(skills.length).fill('name'));
@@ -115,7 +97,7 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
           variant="outline"
           size="sm"
           className="text-primary-600 hover:text-primary-800 border-primary-200"
-          onClick={openModal}
+          onClick={openAIModal}
         >
           AI Suggest
         </Button>
@@ -138,12 +120,24 @@ Education: ${resumeData.education.map(edu => `${edu.degree} in ${edu.field} from
       <div className="flex justify-end mt-6">
         <Button
           type="button"
-          onClick={addSkill}
+          onClick={() => addSkill()}
         >
           Add Skill
         </Button>
       </div>
-      {/* AI Modal logic/UI remains unchanged for now */}
+      {/* AI Suggestion Modal */}
+      {aiModalOpen && (
+        <AISuggestionModal
+          isOpen={aiModalOpen}
+          onClose={closeAIModal}
+          featureType="skills"
+          currentText=""
+          onApplySuggestion={handleApplySuggestion}
+          onApplyAllSuggestions={handleApplyAllSuggestions}
+          context={getAIContext()}
+          existingSkillNames={skills.map(s => s.name.toLowerCase())}
+        />
+      )}
     </div>
   )
 } 

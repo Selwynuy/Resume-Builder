@@ -15,7 +15,7 @@ export function useResumeWizard() {
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingResumeId, setEditingResumeId] = useState<string | null>(null)
   const [resumeData, setResumeData] = useState<ResumeData>(() => {
-    const initialTemplate = searchParams.get('template') || searchParams.get('customTemplate') || ''
+    const initialTemplate = searchParams?.get('template') || searchParams?.get('customTemplate') || ''
     return {
       personalInfo: { name: '', email: '', phone: '', location: '', summary: '' },
       experiences: [{ company: '', position: '', startDate: '', endDate: '', description: '' }],
@@ -94,10 +94,10 @@ export function useResumeWizard() {
     }))
   }
 
-  const addSkill = () => {
+  const addSkill = (name?: string) => {
     setResumeData(prev => ({
       ...prev,
-      skills: [...prev.skills, { name: '', level: 'Intermediate' }]
+      skills: [...prev.skills, { name: name || '', level: 'Intermediate' }]
     }))
   }
 
@@ -119,7 +119,7 @@ export function useResumeWizard() {
     setIsLoadingResume(true)
     setSaveMessage('')
     try {
-      const data = await loadResumeData(resumeId, searchParams)
+      const data = await loadResumeData(resumeId, searchParams || new URLSearchParams())
       setResumeData(data)
     } catch (error: unknown) {
       setSaveMessage(`❌ Error: ${error instanceof Error ? error.message : 'Failed to load resume data'}`)
@@ -160,7 +160,7 @@ export function useResumeWizard() {
 
   // Initialize template data when component mounts
   useEffect(() => {
-    const initialTemplate = searchParams.get('template') || searchParams.get('customTemplate') || resumeData.template
+    const initialTemplate = searchParams?.get('template') || searchParams?.get('customTemplate') || resumeData.template
     if (initialTemplate) {
       handleFetchTemplateData(initialTemplate)
     } else {
@@ -179,7 +179,18 @@ export function useResumeWizard() {
 
   // Load existing resume data if editing
   useEffect(() => {
-    const resumeId = searchParams.get('id') || searchParams.get('edit')
+    // Check for resume ID in search params (for backward compatibility)
+    let resumeId = searchParams?.get('id') || searchParams?.get('edit')
+    
+    // If no resume ID in search params, check if we're on an edit page
+    if (!resumeId && typeof window !== 'undefined') {
+      const pathSegments = window.location.pathname.split('/')
+      const editIndex = pathSegments.indexOf('edit')
+      if (editIndex !== -1 && pathSegments[editIndex + 1]) {
+        resumeId = pathSegments[editIndex + 1]
+      }
+    }
+    
     if (resumeId && session?.user && status === 'authenticated') {
       setIsEditMode(true)
       setEditingResumeId(resumeId)

@@ -69,7 +69,7 @@ export default function NewResumePage() {
 
   // Initialize template data when component mounts
   useEffect(() => {
-    const initialTemplate = searchParams.get('template') || searchParams.get('customTemplate') || resumeData.template
+    const initialTemplate = searchParams?.get('template') || searchParams?.get('customTemplate') || resumeData.template
     if (initialTemplate) {
       fetchTemplateData(initialTemplate)
     }
