@@ -309,3 +309,31 @@ No explanations are shown—just the summaries and labels for quick selection.
 - AI Suggestion modals now handle large responses gracefully with a wide, scrollable design.
 - Users can copy AI-generated suggestions to clipboard with a single click.
 - Gemini API integration uses the latest gemini-2.0-flash model for faster, more cost-effective suggestions. 
+
+# HeroSection Redesign (2024)
+
+## Overview
+The HeroSection was redesigned for a modern, engaging, and accessible look inspired by user feedback and contemporary landing page trends.
+
+## Key Features
+- **Full viewport height**: Uses 100vh (`h-screen`) for an immersive hero section
+- **Light background** for a clean, modern feel
+- **Blue/purple/teal blobs**: Animated, blurred blobs and playful bubble blobs for visual interest
+- **Large heading** ("Build Your Future") partially behind the robot for visual impact, now highly readable
+- **Robot image** centered, with subtle floating animation
+- **Prominent CTA button** ("Create my Resume") below the hero area, with animated hover glow
+- **Left value prop**: Short, bold statement about the product
+- **Right features**: Key selling points (Free, No Credit Card, ATS Optimized)
+- **Responsive** layout for mobile and desktop
+- **Accessibility**: Good color contrast, alt text, keyboard navigation
+
+## Improvements
+- Subtle, modern animations for engagement (blobs, bubbles, robot float)
+- Clear, accessible CTA
+
+## File
+- `src/components/landing/HeroSection.tsx`
+
+---
+
+_Last updated: 2024-_ 

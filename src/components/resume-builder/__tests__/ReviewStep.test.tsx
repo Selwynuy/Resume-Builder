@@ -1,7 +1,10 @@
-import React from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ReviewStep } from '../ReviewStep'
+import React from 'react'
+
 import { ToastProvider } from '@/components/providers/ToastProvider'
+
+import { ReviewStep } from '../ReviewStep'
+
 
 const renderWithToast = (component: React.ReactElement) => {
   return render(

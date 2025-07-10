@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+
 import { 
   logRequest, 
   logResponse, 
   logError, 
   createRequestLog, 
   shouldLogRequest,
-  DEFAULT_LOGGING_CONFIG,
-  type RequestLog 
+  DEFAULT_LOGGING_CONFIG 
 } from './logging'
 
 // Mock console methods

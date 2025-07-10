@@ -28,7 +28,7 @@ export async function GET() {
     console.log('🔍 [RESUMES API] Querying resumes for userId:', userId)
     const resumes = await Resume.find({ userId })
       .sort({ updatedAt: -1 })
-      .select('title personalInfo.name createdAt updatedAt isDraft')
+      .select('title personalInfo experiences education skills createdAt updatedAt isDraft')
     
     console.log('🔍 [RESUMES API] Query executed, found resumes:', resumes.length)
     console.log('🔍 [RESUMES API] Resume data:', JSON.stringify(resumes, null, 2))

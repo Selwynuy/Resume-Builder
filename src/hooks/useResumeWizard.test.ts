@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react'
+
 import { useResumeWizard } from './useResumeWizard'
 
 // Mock Next.js hooks

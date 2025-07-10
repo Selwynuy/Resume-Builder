@@ -8,22 +8,9 @@ import {
   validateAIFeedbackRequest,
   validateAISummaryRequest,
   validateAIJobMatchRequest,
-  validateAICoverLetterRequest,
-  validateAIInterviewPrepRequest,
-  validateAIBulletRequest,
-  validateAISkillsRequest,
   validateUrlParams,
   validateQueryParams,
-  ResumeRequestSchema,
-  TemplateRequestSchema,
-  ReviewRequestSchema,
-  AIFeedbackRequestSchema,
-  AISummaryRequestSchema,
-  AIJobMatchRequestSchema,
-  AICoverLetterRequestSchema,
-  AIInterviewPrepRequestSchema,
-  AIBulletRequestSchema,
-  AISkillsRequestSchema
+  ResumeRequestSchema
 } from './input-validation'
 
 // Helper function to create mock requests with absolute URLs

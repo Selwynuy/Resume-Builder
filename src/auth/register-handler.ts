@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { registerUser, type RegistrationData } from './register'
+
+import { registerUser } from './register'
 
 /**
  * API route handler for user registration

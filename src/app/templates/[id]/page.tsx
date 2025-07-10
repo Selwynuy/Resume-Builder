@@ -1,8 +1,9 @@
 import { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getServerSession } from 'next-auth/next'
+
 import { authOptions } from '@/app/api/auth/options'
-import Link from 'next/link'
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 

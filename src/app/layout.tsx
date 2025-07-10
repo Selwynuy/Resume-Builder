@@ -4,10 +4,10 @@ import type { Session } from 'next-auth'
 import { getServerSession } from 'next-auth/next'
 
 import Header from '@/components/layout/Header'
-import Providers from '@/components/providers/SessionProvider'
 import { LoadingProvider } from '@/components/providers/LoadingProvider'
-import { GlobalLoading } from '@/components/ui/GlobalLoading'
+import Providers from '@/components/providers/SessionProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
+import { GlobalLoading } from '@/components/ui/GlobalLoading'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })

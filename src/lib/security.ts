@@ -14,8 +14,8 @@
  * @module security
  */
 
-import { z } from 'zod'
 import createDOMPurify from 'dompurify';
+import { z } from 'zod'
 
 let DOMPurify: ReturnType<typeof createDOMPurify>;
 

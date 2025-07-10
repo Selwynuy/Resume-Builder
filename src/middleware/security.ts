@@ -1,6 +1,7 @@
+import { randomBytes } from 'crypto'
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { randomBytes } from 'crypto'
 
 export const securityHeaders = {
   'X-Frame-Options': 'DENY',

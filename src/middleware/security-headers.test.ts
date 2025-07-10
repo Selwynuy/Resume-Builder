@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { addSecurityHeaders, checkCSRF, validateContentType, sanitizeHeaders, securityHeaders, generateCSRFToken, validateCSRFToken } from './security'
 
 describe('Security Headers Middleware', () => {

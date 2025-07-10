@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
+
+import { useToast } from '@/components/providers/ToastProvider'
 import { Button } from '@/components/ui/button'
 import { renderTemplate } from '@/lib/template-renderer'
-import { useToast } from '@/components/providers/ToastProvider'
 
 interface ResumePreviewProps {
   resumeData: any

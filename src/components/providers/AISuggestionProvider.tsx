@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, ReactNode } from 'react'
+
 import { AIFeatureType } from '@/components/resume-builder/AISuggestionModal'
 
 interface AISuggestionState {

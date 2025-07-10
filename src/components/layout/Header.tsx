@@ -63,7 +63,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
-            <Image src="/logo.svg" alt="Logo" width={32} height={32} className="w-8 h-8" />
+            <Image src="/logo.png" alt="Logo" width={32} height={32} className="w-8 h-8" />
           </div>
           <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             ResumeAI

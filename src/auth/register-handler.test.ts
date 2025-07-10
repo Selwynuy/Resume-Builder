@@ -3,8 +3,8 @@ jest.mock('./register', () => ({
   registerUser: jest.fn()
 }));
 
-import { handleRegistration } from './register-handler'
 import { registerUser } from './register'
+import { handleRegistration } from './register-handler'
 
 const mockRegisterUser = registerUser as jest.MockedFunction<typeof registerUser>
 

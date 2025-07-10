@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { STEPS } from '@/components/resume-builder/types'
 
 interface ProgressBarProps {

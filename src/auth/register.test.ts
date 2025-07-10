@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { registerUser, type RegistrationData } from './register'
+
 import { ZodError } from 'zod'
 
 // Mock dependencies for registerUser unit tests

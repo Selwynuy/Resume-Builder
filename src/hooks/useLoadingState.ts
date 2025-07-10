@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
+
 import { useLoading } from '@/components/providers/LoadingProvider'
 
 interface UseLoadingStateOptions {

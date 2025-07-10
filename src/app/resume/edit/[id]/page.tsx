@@ -1,10 +1,9 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
-import { useResumeWizard } from '@/hooks/useResumeWizard'
 import { 
   PersonalInfoStep, 
   ExperienceStep, 
@@ -13,6 +12,7 @@ import {
   ReviewStep,
   ProgressBar 
 } from '@/components/resume-builder'
+import { useResumeWizard } from '@/hooks/useResumeWizard'
 
 const STEPS = [
   'Personal Info',

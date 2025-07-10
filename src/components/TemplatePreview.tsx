@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, getSampleResumeData } from '@/lib/template-renderer'
 

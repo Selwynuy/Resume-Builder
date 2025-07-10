@@ -1,15 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
-import Link from 'next/link'
 import {
   FileText,
   Plus,
   Edit,
   Trash2,
-  Calendar,
   User
 } from 'lucide-react'
+import Link from 'next/link'
+import React, { useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -21,39 +20,48 @@ interface Resume {
   title: string;
   personalInfo: {
     name: string;
+    email?: string;
+    phone?: string;
+    location?: string;
     summary?: string;
   };
-  experiences?: { description: string }[];
-  skills?: { name: string }[];
+  experiences?: {
+    company?: string;
+    position?: string;
+    startDate?: string;
+    endDate?: string;
+    description?: string;
+  }[];
+  education?: {
+    school?: string;
+    degree?: string;
+    field?: string;
+    graduationDate?: string;
+    gpa?: string;
+  }[];
+  skills?: {
+    name?: string;
+    level?: string;
+  }[];
   createdAt: string;
   updatedAt: string;
   isDraft: boolean;
-}
-
-interface Template {
-  _id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  downloads: number;
-  isApproved: boolean;
 }
 
 interface QuickStats {
   totalResumes: number;
   draftResumes: number;
   publishedResumes: number;
-  totalTemplates: number;
 }
 
 interface DashboardClientProps {
   session: any;
   resumes: Resume[];
-  templates: Template[];
   quickStats: QuickStats;
+  error?: string;
 }
 
-export default function DashboardClient({ session, resumes, templates, quickStats }: DashboardClientProps) {
+export default function DashboardClient({ session, resumes, quickStats, error }: DashboardClientProps) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
@@ -88,6 +96,41 @@ export default function DashboardClient({ session, resumes, templates, quickStat
     });
   };
 
+  const getCompletionPercentage = (resume: Resume) => {
+    let totalFields = 0
+    let filledFields = 0
+
+    // Personal Info (5 fields, 3 required)
+    totalFields += 5
+    filledFields += Object.values(resume.personalInfo).filter(Boolean).length
+
+    // Experience
+    if (resume.experiences) {
+      resume.experiences.forEach(exp => {
+        totalFields += 5
+        filledFields += Object.values(exp).filter(Boolean).length
+      })
+    }
+
+    // Education
+    if (resume.education) {
+      resume.education.forEach(edu => {
+        totalFields += 5
+        filledFields += Object.values(edu).filter(Boolean).length
+      })
+    }
+
+    // Skills
+    if (resume.skills) {
+      resume.skills.forEach(skill => {
+        totalFields += 2
+        filledFields += skill.name ? 2 : 0
+      })
+    }
+
+    return Math.min(Math.round((filledFields / totalFields) * 100), 100)
+  }
+
   return (
     <>
       {toast && (
@@ -113,6 +156,23 @@ export default function DashboardClient({ session, resumes, templates, quickStat
             </h1>
             <p className="text-gray-600 text-lg">Here&apos;s what&apos;s happening with your resumes today</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Error loading resumes</h3>
+                  <p className="text-sm text-red-700 mt-1">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
@@ -154,19 +214,7 @@ export default function DashboardClient({ session, resumes, templates, quickStat
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-2xl font-bold text-gray-900">{quickStats.totalTemplates}</p>
-                    <p className="text-sm text-gray-600 mt-1">Templates</p>
-                  </div>
-                  <div className="p-2 bg-purple-50 rounded-lg">
-                    <FileText className="h-5 w-5 text-purple-600" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+
           </div>
 
           {/* Quick Actions */}
@@ -175,12 +223,6 @@ export default function DashboardClient({ session, resumes, templates, quickStat
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200">
                 <Plus className="h-5 w-5" />
                 Create New Resume
-              </Button>
-            </Link>
-            <Link href="/templates/create">
-              <Button variant="outline" className="px-6 py-3 rounded-lg flex items-center gap-2 border-2 hover:border-blue-300 transition-all duration-200">
-                <FileText className="h-5 w-5" />
-                Create Template
               </Button>
             </Link>
           </div>
@@ -231,6 +273,22 @@ export default function DashboardClient({ session, resumes, templates, quickStat
                               {formatDate(resume.updatedAt)}
                             </span>
                           </div>
+                          {/* Completion Progress */}
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-xs text-gray-600">Completion</span>
+                              <span className="text-xs font-medium text-gray-700">{getCompletionPercentage(resume)}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div 
+                                className={`h-1.5 rounded-full transition-all duration-300 ${
+                                  getCompletionPercentage(resume) >= 80 ? 'bg-green-500' :
+                                  getCompletionPercentage(resume) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                                }`}
+                                style={{ width: `${getCompletionPercentage(resume)}%` }}
+                              ></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                       
@@ -258,57 +316,7 @@ export default function DashboardClient({ session, resumes, templates, quickStat
             )}
           </div>
 
-          {/* Recent Templates */}
-          {templates.length > 0 && (
-            <div className="mb-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Your Templates</h2>
-                <Link href="/templates/my">
-                  <Button variant="outline" size="sm">
-                    View All
-                  </Button>
-                </Link>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {templates.slice(0, 3).map((template) => (
-                  <Card key={template._id} className="bg-white/60 backdrop-blur-sm border-0 shadow-sm hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1">{template.name}</h3>
-                          <p className="text-sm text-gray-600 mb-2">{template.description}</p>
-                          <div className="flex items-center gap-2 mb-3">
-                            <Badge className={`text-xs ${template.isApproved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                              {template.isApproved ? "Approved" : "Pending"}
-                            </Badge>
-                            <span className="text-xs text-gray-500">
-                              {template.downloads} downloads
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Link href={`/templates/edit/${template._id}`}>
-                          <Button size="sm" variant="outline" className="flex items-center gap-1">
-                            <Edit className="h-3 w-3" />
-                            Edit
-                          </Button>
-                        </Link>
-                        <Link href={`/templates/${template._id}`}>
-                          <Button size="sm" variant="outline" className="flex items-center gap-1">
-                            <FileText className="h-3 w-3" />
-                            View
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          )}
+
         </main>
       </div>
     </>

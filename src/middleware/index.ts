@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+import { createRequestLog, logRequest, logResponse, shouldLogRequest } from './logging'
 import { checkRateLimit } from './rate-limiting'
 import { addSecurityHeaders, checkCSRF, validateContentType, sanitizeHeaders } from './security'
-import { createRequestLog, logRequest, logResponse, shouldLogRequest } from './logging'
 
 // Export the middleware function for Next.js
 export function middleware(request: NextRequest) {

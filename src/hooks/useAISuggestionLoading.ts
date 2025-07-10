@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+
 import { AIFeatureType } from '@/components/resume-builder/AISuggestionModal'
 
 interface UseAISuggestionLoadingReturn {

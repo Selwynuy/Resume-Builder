@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
+
 import { checkRateLimit, RATE_LIMIT_CONFIGS, createRateLimitResponse, clearRateLimitStore } from './rate-limiting'
 
 describe('Rate Limiting Middleware', () => {

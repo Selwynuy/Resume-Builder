@@ -1,81 +1,105 @@
 'use client'
 
-import { motion } from "framer-motion"
-import { FileText, Play, CheckCircle, Sparkles } from "lucide-react"
+import { motion, useAnimation } from "framer-motion"
+import { CheckCircle } from "lucide-react"
+import { useEffect, useRef } from "react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-const HeroSection = () => (
-  <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
-    <div className="max-w-7xl mx-auto">
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        <motion.div
-          className="space-y-8"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
-        >
-          <div className="space-y-4">
-            <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100">
-              <Sparkles className="w-4 h-4 mr-1" />
-              AI-Powered Resume Builder
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-tight">
-              Create Your {" "}
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Perfect Resume
-              </span>{" "}
-              in Minutes
-            </h1>
-            <p className="text-xl text-slate-600 leading-relaxed">
-              Build ATS-optimized resumes with AI assistance. Get hired faster with our professional templates and
-              smart content suggestions.
-              <span className="font-semibold text-blue-600"> Completely free</span> - just watch a short ad to
-              unlock premium features!
-            </p>
-          </div>
+const HeroSection = () => {
+  const robotRef = useRef(null)
+  const controls = useAnimation()
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              <FileText className="w-5 h-5 mr-2" />
-              Create Resume Free
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-2 border-slate-300 hover:border-blue-600 hover:text-blue-600 px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 bg-transparent"
-            >
-              <Play className="w-5 h-5 mr-2" />
-              Watch Demo
-            </Button>
-          </div>
+  useEffect(() => {
+    controls.start({
+      y: [ -24, 24, -24 ],
+      transition: { duration: 4, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }
+    })
+  }, [controls])
 
-          <div className="flex items-center space-x-8 text-sm text-slate-600">
-            <div className="flex items-center space-x-2">
+  return (
+    <section className="relative overflow-hidden pt-24 pb-10 px-4 sm:px-6 lg:px-8 h-screen bg-gradient-radial from-blue-50 via-white to-white">
+      {/* Big heading behind robot */}
+      <h1
+        className="absolute z-10 left-1/2 top-16 -translate-x-1/2 text-[clamp(2.5rem,10vw,6rem)] font-extrabold text-slate-800 select-none pointer-events-none whitespace-nowrap tracking-tight opacity-95"
+        style={{ textShadow: '0 4px 24px rgba(0,0,0,0.18), 0 1.5px 0 #fff' }}
+      >
+        Build Your Future
+      </h1>
+      {/* Animated blue blob background */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-blue-400/70 rounded-full blur-3xl opacity-80 animate-pulse z-0 pointer-events-none" />
+      {/* Animated purple blob */}
+      <div className="absolute top-40 -left-40 w-[400px] h-[300px] bg-purple-400/60 rounded-full blur-3xl opacity-70 animate-pulse z-0 pointer-events-none" />
+      {/* Animated teal blob */}
+      <div className="absolute bottom-0 right-0 w-[350px] h-[250px] bg-teal-400/60 rounded-full blur-3xl opacity-70 animate-pulse z-0 pointer-events-none" />
+      {/* Animated bubble blobs */}
+      <div className="absolute z-0 pointer-events-none w-full h-full">
+        <div className="absolute left-20 top-24 w-12 h-12 bg-blue-300/70 rounded-full blur-md opacity-80 animate-bounce" />
+        <div className="absolute left-1/4 top-2/3 w-8 h-8 bg-indigo-200/80 rounded-full blur-sm opacity-70 animate-bounce" style={{ left: '25%', top: '66%' }} />
+        <div className="absolute right-40 top-1/3 w-10 h-10 bg-cyan-200/80 rounded-full blur-md opacity-60 animate-bounce" />
+        <div className="absolute right-1/4 bottom-24 w-7 h-7 bg-blue-200/80 rounded-full blur-sm opacity-70 animate-bounce" style={{ right: '25%' }} />
+        <div className="absolute left-1/2 bottom-10 w-9 h-9 bg-indigo-300/70 rounded-full blur-md opacity-60 animate-bounce" style={{ left: '50%' }} />
+      </div>
+      <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-center gap-12">
+        {/* Left value prop */}
+        <div className="flex-1 max-w-md text-slate-700 font-semibold text-lg mb-8 lg:mb-0">
+          <div className="bg-white/30 rounded-xl p-6">
+            Create stunning, ATS-optimized resumes with AI-powered suggestions and a futuristic design.<br />Free, fast, and easy.
+          </div>
+        </div>
+        {/* Robot + ellipse */}
+        <div className="relative flex flex-col items-center justify-center">
+          {/* Ellipse */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-72 h-32 bg-gradient-to-r from-blue-400/60 to-indigo-400/60 rounded-full blur-2xl z-0" data-testid="hero-ellipse" />
+          {/* Robot */}
+          <motion.img
+            ref={robotRef}
+            src="/images/Roboto.png"
+            alt="AI Robot holding resume"
+            width={420}
+            height={420}
+            className="relative z-10 drop-shadow-xl"
+            animate={controls}
+          />
+        </div>
+        {/* Right features */}
+        <div className="flex-1 max-w-md text-slate-700 font-semibold text-lg flex flex-col gap-4 items-end">
+          <div className="bg-white/30 rounded-xl p-6 w-full">
+            <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="w-5 h-5 text-green-500" />
-              <span>100% Free Forever</span>
+              100% Free Forever
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2 mb-2">
               <CheckCircle className="w-5 h-5 text-green-500" />
-              <span>No Credit Card Required</span>
+              No Credit Card Required
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-500" />
-              <span>ATS Optimized</span>
+              ATS Optimized
             </div>
           </div>
-        </motion.div>
-        <div>
-          <img src="/images/Roboto.png" alt="Hero Image" width={500} height={500} />
         </div>
       </div>
-    </div>
-  </section>
-)
+      {/* CTA Button below hero */}
+      <div className="flex justify-center mt-12">
+        <motion.div
+          whileHover={{ scale: 1.07 }}
+          whileTap={{ scale: 0.97 }}
+          className=""
+        >
+          <Button
+            size="lg"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-10 py-5 text-xl font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300 hover:shadow-[0_0_24px_4px_rgba(59,130,246,0.3)] hover:scale-105"
+          >
+            Create my Resume
+          </Button>
+        </motion.div>
+      </div>
+      {/* Trust badges & testimonial */}
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 mt-14">
+      </div>
+    </section>
+  )
+}
 
 export default HeroSection 

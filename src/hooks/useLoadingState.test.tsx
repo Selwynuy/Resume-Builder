@@ -1,6 +1,8 @@
-import React from 'react'
 import { render, screen, act, waitFor } from '@testing-library/react'
+import React from 'react'
+
 import { LoadingProvider, useLoading } from '@/components/providers/LoadingProvider'
+
 import { useLoadingState } from './useLoadingState'
 
 // Test component that uses the loading state hook and displays loading state

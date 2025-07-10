@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
+import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 import { ExperienceInputRow } from '@/components/resume-builder/ExperienceInputRow'
 import { Experience } from '@/components/resume-builder/types'
 import { validateExperienceField } from '@/components/resume-builder/validateExperienceField'
 import { Button } from '@/components/ui/button'
-import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 
 interface ExperienceStepProps {
   experiences: Experience[]

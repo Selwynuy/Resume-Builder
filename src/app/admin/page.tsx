@@ -2,9 +2,9 @@ import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
 import { getCurrentSession } from '@/auth'
+import { CSRFTokenInput } from '@/components/ui/csrf-token'
 import connectDB from '@/lib/db'
 import Template from '@/models/Template'
-import { CSRFTokenInput } from '@/components/ui/csrf-token'
 
 interface Template {
   _id: string

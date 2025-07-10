@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
+import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 import { SkillInputRow } from '@/components/resume-builder/SkillInputRow'
 import { Skill, ResumeData } from '@/components/resume-builder/types'
 import { validateSkillField } from '@/components/resume-builder/validateSkillField'
 import { Button } from '@/components/ui/button'
-import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
 
 const SKILL_FORMATS = [
   { key: 'name', label: 'Skill Only' },
