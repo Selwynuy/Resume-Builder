@@ -45,6 +45,7 @@ describe('useResumeWizard', () => {
     const { result } = renderHook(() => useResumeWizard())
     
     expect(result.current.resumeData).toEqual({
+      documentType: 'resume',
       personalInfo: { name: '', email: '', phone: '', location: '', summary: '' },
       experiences: [{ company: '', position: '', startDate: '', endDate: '', description: '' }],
       education: [{ school: '', degree: '', field: '', graduationDate: '', gpa: '' }],

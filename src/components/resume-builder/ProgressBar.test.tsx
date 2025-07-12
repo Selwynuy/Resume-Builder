@@ -107,8 +107,10 @@ describe('ProgressBar', () => {
     it('should apply completed step styling (checkmark)', () => {
       render(<ProgressBar {...defaultProps} currentStep={3} />);
       
-      const step1Button = screen.getByText('✓');
-      expect(step1Button).toBeInTheDocument();
+      // Get the first step button specifically
+      const stepButtons = screen.getAllByRole('button');
+      const step1Button = stepButtons[0];
+      expect(step1Button).toHaveTextContent('✓');
       expect(step1Button).toHaveClass('bg-primary-600', 'border-primary-600', 'text-white');
     });
 
@@ -145,35 +147,36 @@ describe('ProgressBar', () => {
     it('should render progress line with correct width for first step', () => {
       render(<ProgressBar {...defaultProps} currentStep={1} />);
       
-      const progressLine = screen.getByTestId('progress-line') || document.querySelector('.absolute.left-5.h-0\\.5.bg-primary-600');
+      const progressLine = screen.getByTestId('progress-line');
       expect(progressLine).toHaveStyle({ width: '0%' });
     });
 
     it('should render progress line with correct width for middle step', () => {
       render(<ProgressBar {...defaultProps} currentStep={3} />);
       
-      const progressLine = screen.getByTestId('progress-line') || document.querySelector('.absolute.left-5.h-0\\.5.bg-primary-600');
+      const progressLine = screen.getByTestId('progress-line');
       expect(progressLine).toHaveStyle({ width: '40%' });
     });
 
     it('should render progress line with correct width for last step', () => {
       render(<ProgressBar {...defaultProps} currentStep={5} />);
       
-      const progressLine = screen.getByTestId('progress-line') || document.querySelector('.absolute.left-5.h-0\\.5.bg-primary-600');
+      const progressLine = screen.getByTestId('progress-line');
       expect(progressLine).toHaveStyle({ width: '80%' });
     });
 
     it('should handle progress line for custom steps', () => {
       render(<ProgressBar {...defaultProps} currentStep={2} steps={customSteps} />);
       
-      const progressLine = screen.getByTestId('progress-line') || document.querySelector('.absolute.left-5.h-0\\.5.bg-primary-600');
-      expect(progressLine).toHaveStyle({ width: '33.33%' });
+      const progressLine = screen.getByTestId('progress-line');
+      // For 4 steps, step 2 should be 1/3 * 80% = 26.666666666666664%
+      expect(progressLine).toHaveStyle({ width: '26.666666666666664%' });
     });
 
     it('should cap progress line at 80%', () => {
       render(<ProgressBar {...defaultProps} currentStep={10} />);
       
-      const progressLine = screen.getByTestId('progress-line') || document.querySelector('.absolute.left-5.h-0\\.5.bg-primary-600');
+      const progressLine = screen.getByTestId('progress-line');
       expect(progressLine).toHaveStyle({ width: '80%' });
     });
   });

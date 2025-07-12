@@ -129,7 +129,10 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
         </div>
         
         <div className="space-y-4">
-          {cvData.publications.map((publication, index) => (
+          {((cvData.publications && cvData.publications.length > 0)
+            ? cvData.publications
+            : [{ title: '', authors: '', journal: '', year: '', doi: '' }]
+          ).map((publication, index) => (
             <div key={index} className="border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium text-slate-700">Publication {index + 1}</h4>
@@ -138,6 +141,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   variant="ghost" 
                   size="sm"
                   className="text-red-500 hover:text-red-700"
+                  data-testid={`remove-publication-${index}`}
                 >
                   Remove
                 </Button>
@@ -206,7 +210,10 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
         </div>
         
         <div className="space-y-4">
-          {cvData.researchExperience.map((research, index) => (
+          {((cvData.researchExperience && cvData.researchExperience.length > 0)
+            ? cvData.researchExperience
+            : [{ institution: '', position: '', startDate: '', endDate: '', description: '', funding: '' }]
+          ).map((experience, index) => (
             <div key={index} className="border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium text-slate-700">Research Experience {index + 1}</h4>
@@ -215,6 +222,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   variant="ghost" 
                   size="sm"
                   className="text-red-500 hover:text-red-700"
+                  data-testid={`remove-research-experience-${index}`}
                 >
                   Remove
                 </Button>
@@ -225,7 +233,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-institution-${index}`}>Institution *</Label>
                   <Input
                     id={`research-institution-${index}`}
-                    value={research.institution}
+                    value={experience.institution}
                     onChange={(e) => updateResearchExperience(index, 'institution', e.target.value)}
                     placeholder="University name"
                   />
@@ -234,7 +242,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-position-${index}`}>Position *</Label>
                   <Input
                     id={`research-position-${index}`}
-                    value={research.position}
+                    value={experience.position}
                     onChange={(e) => updateResearchExperience(index, 'position', e.target.value)}
                     placeholder="Research Assistant, Postdoc, etc."
                   />
@@ -243,7 +251,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-start-${index}`}>Start Date *</Label>
                   <Input
                     id={`research-start-${index}`}
-                    value={research.startDate}
+                    value={experience.startDate}
                     onChange={(e) => updateResearchExperience(index, 'startDate', e.target.value)}
                     placeholder="MM/YYYY"
                   />
@@ -252,7 +260,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-end-${index}`}>End Date</Label>
                   <Input
                     id={`research-end-${index}`}
-                    value={research.endDate}
+                    value={experience.endDate}
                     onChange={(e) => updateResearchExperience(index, 'endDate', e.target.value)}
                     placeholder="MM/YYYY or Present"
                   />
@@ -261,7 +269,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-funding-${index}`}>Funding Source (Optional)</Label>
                   <Input
                     id={`research-funding-${index}`}
-                    value={research.funding || ''}
+                    value={experience.funding || ''}
                     onChange={(e) => updateResearchExperience(index, 'funding', e.target.value)}
                     placeholder="NSF Grant, NIH, etc."
                   />
@@ -270,7 +278,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   <Label htmlFor={`research-description-${index}`}>Description *</Label>
                   <textarea
                     id={`research-description-${index}`}
-                    value={research.description}
+                    value={experience.description}
                     onChange={(e) => updateResearchExperience(index, 'description', e.target.value)}
                     placeholder="Describe your research role, projects, and contributions"
                     className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -293,7 +301,10 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
         </div>
         
         <div className="space-y-4">
-          {cvData.academicAchievements.map((achievement, index) => (
+          {((cvData.academicAchievements && cvData.academicAchievements.length > 0)
+            ? cvData.academicAchievements
+            : [{ title: '', institution: '', year: '', description: '' }]
+          ).map((achievement, index) => (
             <div key={index} className="border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium text-slate-700">Achievement {index + 1}</h4>
@@ -302,6 +313,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
                   variant="ghost" 
                   size="sm"
                   className="text-red-500 hover:text-red-700"
+                  data-testid={`remove-academic-achievement-${index}`}
                 >
                   Remove
                 </Button>
@@ -358,7 +370,7 @@ export const CVStep = ({ cvData, onUpdate, onNext, onPrevious }: CVStepProps) =>
         <Button onClick={onPrevious} variant="outline">
           Previous
         </Button>
-        <Button onClick={onNext} className="bg-gradient-to-r from-primary-500 to-primary-600">
+        <Button onClick={onNext} className="text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 bg-gradient-to-r from-primary-500 to-primary-600">
           Next
         </Button>
       </div>

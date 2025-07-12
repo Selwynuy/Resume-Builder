@@ -53,7 +53,7 @@ describe('ResumeValidationSchema', () => {
   it('should reject resume data with missing required fields', () => {
     const invalidData = { 
       ...validResumeData,
-      personalInfo: { ...validResumeData.personalInfo, name: undefined as any }
+      personalInfo: { ...validResumeData.personalInfo, name: '' }
     }
     
     const result = ResumeValidationSchema.safeParse(invalidData)

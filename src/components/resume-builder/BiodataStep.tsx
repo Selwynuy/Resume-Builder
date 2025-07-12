@@ -137,15 +137,19 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
         </div>
         
         <div className="space-y-4">
-          {biodataData.personalDetails.map((detail, index) => (
+          {((biodataData.personalDetails && biodataData.personalDetails.length > 0)
+            ? biodataData.personalDetails
+            : [{ field: '', value: '' }]
+          ).map((detail, index) => (
             <div key={index} className="border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium text-slate-700">Detail {index + 1}</h4>
-                <Button 
-                  onClick={() => removePersonalDetail(index)} 
-                  variant="ghost" 
+                <Button
+                  onClick={() => removePersonalDetail(index)}
+                  variant="ghost"
                   size="sm"
                   className="text-red-500 hover:text-red-700"
+                  data-testid={`remove-personal-detail-${index}`}
                 >
                   Remove
                 </Button>
@@ -192,15 +196,19 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
         </div>
         
         <div className="space-y-4">
-          {biodataData.familyMembers.map((member, index) => (
+          {((biodataData.familyMembers && biodataData.familyMembers.length > 0)
+            ? biodataData.familyMembers
+            : [{ name: '', relationship: '', age: '', occupation: '', education: '' }]
+          ).map((member, index) => (
             <div key={index} className="border border-slate-200 rounded-lg p-4 space-y-3">
               <div className="flex justify-between items-start">
                 <h4 className="font-medium text-slate-700">Family Member {index + 1}</h4>
-                <Button 
-                  onClick={() => removeFamilyMember(index)} 
-                  variant="ghost" 
+                <Button
+                  onClick={() => removeFamilyMember(index)}
+                  variant="ghost"
                   size="sm"
                   className="text-red-500 hover:text-red-700"
+                  data-testid={`remove-family-member-${index}`}
                 >
                   Remove
                 </Button>
@@ -269,7 +277,10 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
         </div>
         
         <div className="space-y-3">
-          {biodataData.hobbies.map((hobby, index) => (
+          {((biodataData.hobbies && biodataData.hobbies.length > 0)
+            ? biodataData.hobbies
+            : ['']
+          ).map((hobby, index) => (
             <div key={index} className="flex items-center space-x-3">
               <Input
                 value={hobby}
@@ -282,6 +293,7 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
                 variant="ghost" 
                 size="sm"
                 className="text-red-500 hover:text-red-700"
+                data-testid={`remove-hobby-${index}`}
               >
                 Remove
               </Button>
@@ -300,7 +312,10 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
         </div>
         
         <div className="space-y-3">
-          {biodataData.languages.map((language, index) => (
+          {((biodataData.languages && biodataData.languages.length > 0)
+            ? biodataData.languages
+            : ['']
+          ).map((language, index) => (
             <div key={index} className="flex items-center space-x-3">
               <Input
                 value={language}
@@ -313,6 +328,7 @@ export const BiodataStep = ({ biodataData, onUpdate, onNext, onPrevious }: Bioda
                 variant="ghost" 
                 size="sm"
                 className="text-red-500 hover:text-red-700"
+                data-testid={`remove-language-${index}`}
               >
                 Remove
               </Button>

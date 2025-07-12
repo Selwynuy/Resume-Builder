@@ -40,7 +40,7 @@ export const TemplateSelector = ({
   return (
     <div className="space-y-6">
       {/* Document Type Selection */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm" role="region" aria-label="Document Type Selection">
         <h3 className="font-semibold text-slate-800 mb-4">Document Type</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {Object.entries(DOCUMENT_TYPE_CONFIG).map(([type, config]) => (
@@ -79,7 +79,7 @@ export const TemplateSelector = ({
       </div>
 
       {/* Template Selection */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm" role="region" aria-label="Template Selection">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <span className="w-8 h-8 bg-pink-100 text-pink-600 rounded-lg flex items-center justify-center mr-3 text-sm">🎨</span>

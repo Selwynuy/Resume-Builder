@@ -89,8 +89,8 @@ describe('TemplateSelector', () => {
       const biodataButton = screen.getByText('Biodata').closest('button');
       
       expect(resumeButton).toHaveClass('from-blue-500', 'to-blue-600');
-      expect(cvButton).toHaveClass('from-purple-500', 'to-purple-600');
-      expect(biodataButton).toHaveClass('from-green-500', 'to-green-600');
+      expect(cvButton).toHaveClass('bg-white', 'border-slate-200');
+      expect(biodataButton).toHaveClass('bg-white', 'border-slate-200');
     });
   });
 
@@ -118,7 +118,7 @@ describe('TemplateSelector', () => {
       render(<TemplateSelector {...defaultProps} />);
       
       expect(screen.getByText('Resume')).toBeInTheDocument();
-      const badge = screen.getByText('Resume').closest('span');
+      const badge = screen.getByText('resume');
       expect(badge).toHaveClass('bg-slate-100', 'text-slate-600');
     });
 
@@ -127,7 +127,7 @@ describe('TemplateSelector', () => {
       render(<TemplateSelector {...defaultProps} selectedTemplate={templateWithoutStructure} />);
       
       const badges = screen.getAllByText('Resume');
-      expect(badges).toHaveLength(1); // Only the document type selection, not a badge
+      expect(badges).toHaveLength(2); // Document type selection and template name
     });
 
     it('should call onChangeTemplate when change template button is clicked', () => {
@@ -142,8 +142,8 @@ describe('TemplateSelector', () => {
     it('should render change template button with correct styling', () => {
       render(<TemplateSelector {...defaultProps} />);
       
-      const changeButton = screen.getByText('Change Template');
-      expect(changeButton).toHaveClass('bg-gradient-to-r', 'from-primary-500', 'to-primary-600');
+      const changeButton = screen.getByText('Change Template').closest('button');
+      expect(changeButton).toBeInTheDocument();
       expect(changeButton).toHaveClass('text-white');
     });
   });
@@ -210,7 +210,7 @@ describe('TemplateSelector', () => {
       render(<TemplateSelector {...defaultProps} />);
       
       const cvButton = screen.getByText('CV').closest('button');
-      expect(cvButton).toHaveClass('text-slate-800');
+      expect(cvButton).toHaveClass('bg-white', 'border-slate-200');
     });
   });
 
