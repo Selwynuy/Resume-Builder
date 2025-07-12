@@ -84,6 +84,12 @@ const templateSchema = new mongoose.Schema({
     type: String,
     trim: true
   }],
+  // Document type support
+  supportedDocumentTypes: [{
+    type: String,
+    enum: ['resume', 'cv', 'biodata'],
+    default: ['resume'] // Default to supporting resume type
+  }],
   // Template validation status
   validation: {
     isValid: {
@@ -143,6 +149,15 @@ templateSchema.statics.findPopular = function(limit = 10) {
 templateSchema.statics.findByCategory = function(category: string) {
   return this.find({ 
     category, 
+    isPublic: true, 
+    isApproved: true 
+  }).populate('createdBy', 'name')
+}
+
+// Static method to find by document type
+templateSchema.statics.findByDocumentType = function(documentType: string) {
+  return this.find({ 
+    supportedDocumentTypes: documentType,
     isPublic: true, 
     isApproved: true 
   }).populate('createdBy', 'name')

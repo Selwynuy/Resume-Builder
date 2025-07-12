@@ -32,15 +32,40 @@ export interface Skill {
   format?: string // display format: 'name', 'level', etc.
 }
 
+// Document Type Enum
+export enum DocumentType {
+  RESUME = 'resume',
+  CV = 'cv',
+  BIODATA = 'biodata'
+}
+
 export interface ResumeData {
   personalInfo: PersonalInfo
   experiences: Experience[]
   education: Education[]
   skills: Skill[]
   template: string
+  documentType: DocumentType
 }
 
-// Step Configuration
+// Step Configuration Interfaces
+export interface StepConfig {
+  id: number
+  title: string
+  icon: string
+  description: string
+  required: boolean
+  component: string
+}
+
+export interface DocumentStepConfiguration {
+  documentType: DocumentType
+  steps: StepConfig[]
+  maxSteps: number
+  minSteps: number
+}
+
+// Default Resume Steps (for backward compatibility)
 export const STEPS = [
   { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself' },
   { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history' },
