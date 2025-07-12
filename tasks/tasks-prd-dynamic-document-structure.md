@@ -37,7 +37,7 @@
   - [x] 2.3 Add visual indicators for document type differences
   - [x] 2.4 Implement template filtering based on selected document type
   - [x] 2.5 Add document type change functionality before wizard starts
-  - [ ] 2.6 Write unit tests for document type selection components
+  - [x] 2.6 Write unit tests for document type selection components
 - [x] 3.0 Create Dynamic Step Configuration System
   - [x] 3.1 Create step-configuration.ts utility with predefined configurations
   - [x] 3.2 Define step configurations for Resume (5-6 steps)
@@ -52,7 +52,7 @@
   - [x] 4.3 Implement step completion tracking for longer documents
   - [x] 4.4 Add visual indicators for optional vs required steps
   - [x] 4.5 Ensure mobile responsiveness with longer step counts
-  - [ ] 4.6 Write unit tests for updated ProgressBar functionality
+  - [x] 4.6 Write unit tests for updated ProgressBar functionality
 - [x] 5.0 Implement CV and Biodata Step Components
   - [x] 5.1 Create PublicationsStep component for CV documents
   - [x] 5.2 Create PresentationsStep component for CV documents
@@ -63,4 +63,4 @@
   - [x] 5.7 Create PersonalDetailsStep component for Biodata documents
   - [x] 5.8 Create DeclarationStep component for Biodata documents
   - [x] 5.9 Update useResumeWizard hook to handle new step components
-  - [ ] 5.10 Write unit tests for all new step components 
+  - [x] 5.10 Write unit tests for all new step components 
