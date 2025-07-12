@@ -5,20 +5,28 @@ import React, { useState } from 'react'
 import { useToast } from '@/components/providers/ToastProvider'
 import { Button } from '@/components/ui/button'
 import { renderTemplate } from '@/lib/template-renderer'
+import { DocumentType } from './types'
 
 interface ResumePreviewProps {
   resumeData: any
   template: any
   onEdit: () => void
+  documentType?: DocumentType
 }
 
-export default function ResumePreview({ resumeData, template, onEdit }: ResumePreviewProps) {
+const DOCUMENT_TYPE_LABELS = {
+  [DocumentType.RESUME]: 'Resume',
+  [DocumentType.CV]: 'CV',
+  [DocumentType.BIODATA]: 'Biodata'
+};
+
+export default function ResumePreview({ resumeData, template, onEdit, documentType = DocumentType.RESUME }: ResumePreviewProps) {
   const [isExporting, setIsExporting] = useState(false)
   const { showToast } = useToast()
 
-  const handleExport = async () => {
+  const handleExport = async (format: 'pdf' | 'docx' | 'txt' = 'pdf') => {
     if (!resumeData._id) {
-      showToast('Please save your resume before exporting', 'error')
+      showToast('Please save your document before exporting', 'error')
       return
     }
 
@@ -26,7 +34,8 @@ export default function ResumePreview({ resumeData, template, onEdit }: ResumePr
     try {
       const response = await fetch(`/api/resumes/${resumeData._id}/export`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ format })
       })
 
       if (!response.ok) {
@@ -37,15 +46,16 @@ export default function ResumePreview({ resumeData, template, onEdit }: ResumePr
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${resumeData.personalInfo?.name || 'resume'}.pdf`
+      const documentLabel = DOCUMENT_TYPE_LABELS[documentType];
+      a.download = `${resumeData.personalInfo?.name || documentLabel.toLowerCase()}.${format}`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
 
-      showToast('Resume exported successfully!', 'success')
+      showToast(`${documentLabel} exported successfully!`, 'success')
     } catch (error) {
-      showToast('Failed to export resume. Please try again.', 'error')
+      showToast(`Failed to export ${DOCUMENT_TYPE_LABELS[documentType].toLowerCase()}. Please try again.`, 'error')
     } finally {
       setIsExporting(false)
     }
@@ -54,7 +64,7 @@ export default function ResumePreview({ resumeData, template, onEdit }: ResumePr
   if (!template || !resumeData) {
     return (
       <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
-        <p className="text-gray-500">No template or resume data available</p>
+        <p className="text-gray-500">No template or document data available</p>
       </div>
     )
   }
@@ -76,21 +86,29 @@ export default function ResumePreview({ resumeData, template, onEdit }: ResumePr
     previewHtml = '<div style="color: red; padding: 1rem;">Error rendering template</div>'
   }
 
+  const documentLabel = DOCUMENT_TYPE_LABELS[documentType];
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Preview</h3>
+        <div>
+          <h3 className="text-lg font-semibold">{documentLabel} Preview</h3>
+          <p className="text-sm text-gray-600">Review your {documentLabel.toLowerCase()} before finalizing</p>
+        </div>
         <div className="space-x-2">
           <Button onClick={onEdit} variant="outline" size="sm">
             Edit
           </Button>
-          <Button 
-            onClick={handleExport} 
-            disabled={isExporting || !resumeData._id}
-            size="sm"
-          >
-            {isExporting ? 'Exporting...' : 'Export PDF'}
-          </Button>
+          <div className="relative inline-block">
+            <Button 
+              onClick={() => handleExport('pdf')} 
+              disabled={isExporting || !resumeData._id}
+              size="sm"
+            >
+              {isExporting ? 'Exporting...' : 'Export PDF'}
+            </Button>
+            {/* TODO: Add dropdown for other export formats when implemented */}
+          </div>
         </div>
       </div>
 

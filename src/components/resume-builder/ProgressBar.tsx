@@ -1,13 +1,17 @@
 import React from 'react';
 
-import { STEPS } from '@/components/resume-builder/types'
+import { STEPS, StepConfig } from '@/components/resume-builder/types'
 
 interface ProgressBarProps {
   currentStep: number
   onStepClick: (step: number) => void
+  steps?: StepConfig[]
 }
 
-export const ProgressBar = ({ currentStep, onStepClick }: ProgressBarProps) => {
+export const ProgressBar = ({ currentStep, onStepClick, steps = STEPS }: ProgressBarProps) => {
+  const totalSteps = steps.length;
+  const progressPercentage = totalSteps > 1 ? Math.min(((currentStep - 1) / (totalSteps - 1)) * 80, 80) : 0;
+
   return (
     <div className="mb-8">
       <div className="flex justify-center mb-4">
@@ -19,13 +23,13 @@ export const ProgressBar = ({ currentStep, onStepClick }: ProgressBarProps) => {
           <div 
             className="absolute left-5 h-0.5 bg-primary-600 top-1/2 transform -translate-y-1/2 transition-all duration-500"
             style={{ 
-              width: `${Math.min(((currentStep - 1) / (STEPS.length - 1)) * 80, 80)}%`
+              width: `${progressPercentage}%`
             }}
           ></div>
           
           {/* Step circles */}
           <div className="relative flex items-center space-x-16">
-            {STEPS.map((step) => (
+            {steps.map((step) => (
               <div
                 key={step.id}
                 onClick={() => onStepClick(step.id)}
@@ -54,9 +58,9 @@ export const ProgressBar = ({ currentStep, onStepClick }: ProgressBarProps) => {
       
       <div className="text-center">
         <h2 className="text-2xl font-bold text-slate-800 mb-2">
-          {STEPS[currentStep - 1]?.icon} {STEPS[currentStep - 1]?.title}
+          {steps[currentStep - 1]?.icon} {steps[currentStep - 1]?.title}
         </h2>
-        <p className="text-slate-600">{STEPS[currentStep - 1]?.description}</p>
+        <p className="text-slate-600">{steps[currentStep - 1]?.description}</p>
       </div>
     </div>
   )

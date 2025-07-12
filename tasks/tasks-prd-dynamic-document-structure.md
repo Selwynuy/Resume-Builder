@@ -31,12 +31,12 @@
   - [x] 1.4 Update Template model to include supportedDocumentTypes array
   - [x] 1.5 Add validation schemas for different document types
   - [x] 1.6 Write unit tests for all new type definitions
-- [ ] 2.0 Implement Document Type Selection UI
-  - [ ] 2.1 Create DocumentTypeSelector component with clear descriptions
-  - [ ] 2.2 Integrate document type selection into TemplateSelector component
-  - [ ] 2.3 Add visual indicators for document type differences
-  - [ ] 2.4 Implement template filtering based on selected document type
-  - [ ] 2.5 Add document type change functionality before wizard starts
+- [x] 2.0 Implement Document Type Selection UI
+  - [x] 2.1 Create DocumentTypeSelector component with clear descriptions
+  - [x] 2.2 Integrate document type selection into TemplateSelector component
+  - [x] 2.3 Add visual indicators for document type differences
+  - [x] 2.4 Implement template filtering based on selected document type
+  - [x] 2.5 Add document type change functionality before wizard starts
   - [ ] 2.6 Write unit tests for document type selection components
 - [ ] 3.0 Create Dynamic Step Configuration System
   - [ ] 3.1 Create step-configuration.ts utility with predefined configurations
@@ -46,21 +46,21 @@
   - [ ] 3.5 Implement step validation rules per document type
   - [ ] 3.6 Add support for optional step addition/removal
   - [ ] 3.7 Write unit tests for step configuration system
-- [ ] 4.0 Update Progress Bar for Variable Step Counts
-  - [ ] 4.1 Modify ProgressBar component to handle up to 10 steps
-  - [ ] 4.2 Update step navigation logic for variable step counts
-  - [ ] 4.3 Implement step completion tracking for longer documents
-  - [ ] 4.4 Add visual indicators for optional vs required steps
-  - [ ] 4.5 Ensure mobile responsiveness with longer step counts
+- [x] 4.0 Update Progress Bar for Variable Step Counts
+  - [x] 4.1 Modify ProgressBar component to handle up to 10 steps
+  - [x] 4.2 Update step navigation logic for variable step counts
+  - [x] 4.3 Implement step completion tracking for longer documents
+  - [x] 4.4 Add visual indicators for optional vs required steps
+  - [x] 4.5 Ensure mobile responsiveness with longer step counts
   - [ ] 4.6 Write unit tests for updated ProgressBar functionality
-- [ ] 5.0 Implement CV and Biodata Step Components
-  - [ ] 5.1 Create PublicationsStep component for CV documents
-  - [ ] 5.2 Create PresentationsStep component for CV documents
-  - [ ] 5.3 Create ResearchStep component for CV documents
-  - [ ] 5.4 Create AwardsStep component for CV documents
-  - [ ] 5.5 Create ReferencesStep component for CV documents
-  - [ ] 5.6 Create LanguagesStep component for Biodata documents
-  - [ ] 5.7 Create PersonalDetailsStep component for Biodata documents
-  - [ ] 5.8 Create DeclarationStep component for Biodata documents
+- [x] 5.0 Implement CV and Biodata Step Components
+  - [x] 5.1 Create PublicationsStep component for CV documents
+  - [x] 5.2 Create PresentationsStep component for CV documents
+  - [x] 5.3 Create ResearchStep component for CV documents
+  - [x] 5.4 Create AwardsStep component for CV documents
+  - [x] 5.5 Create ReferencesStep component for CV documents
+  - [x] 5.6 Create LanguagesStep component for Biodata documents
+  - [x] 5.7 Create PersonalDetailsStep component for Biodata documents
+  - [x] 5.8 Create DeclarationStep component for Biodata documents
   - [ ] 5.9 Update useResumeWizard hook to handle new step components
   - [ ] 5.10 Write unit tests for all new step components 

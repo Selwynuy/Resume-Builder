@@ -1,3 +1,5 @@
+import type { DocumentStructure } from '@/types';
+
 export interface Template {
   id: string
   _id?: string // MongoDB document ID (optional for compatibility)
@@ -18,6 +20,8 @@ export interface Template {
   downloads?: number
   rating?: number
   isApproved?: boolean
+  // Document structure support
+  documentStructure?: DocumentStructure
 }
 
 // Remove built-in templates - now using only community templates

@@ -58,6 +58,13 @@ export interface StepConfig {
   component: string
 }
 
+export interface DocumentStructure {
+  documentType: DocumentType
+  steps: StepConfig[]
+  maxSteps: number
+  minSteps: number
+}
+
 export interface DocumentStepConfiguration {
   documentType: DocumentType
   steps: StepConfig[]
@@ -66,10 +73,10 @@ export interface DocumentStepConfiguration {
 }
 
 // Default Resume Steps (for backward compatibility)
-export const STEPS = [
-  { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself' },
-  { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history' },
-  { id: 3, title: 'Education', icon: '🎓', description: 'Add your education' },
-  { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities' },
-  { id: 5, title: 'Review', icon: '✨', description: 'Finalize your resume' }
+export const STEPS: StepConfig[] = [
+  { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
+  { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
+  { id: 3, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
+  { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
+  { id: 5, title: 'Review', icon: '✨', description: 'Finalize your resume', required: true, component: 'ReviewStep' }
 ] 
