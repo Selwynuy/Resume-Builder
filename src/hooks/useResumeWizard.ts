@@ -2,9 +2,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 
-import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/resume-builder/types'
+import { ResumeData, PersonalInfo, Experience, Education, Skill, DocumentType } from '@/components/resume-builder/types'
 import { useResumeStepNavigation } from '@/hooks/useResumeStepNavigation'
 import { fetchTemplateData, loadResumeData, saveResume, exportPDF } from '@/lib/resume-api'
+import { StepConfigurationManager } from '@/lib/step-configuration'
 
 export function useResumeWizard() {
   const { data: session, status } = useSession()
@@ -14,6 +15,7 @@ export function useResumeWizard() {
   // State Management
   const [isEditMode, setIsEditMode] = useState(false)
   const [editingResumeId, setEditingResumeId] = useState<string | null>(null)
+  const [documentType, setDocumentType] = useState<DocumentType>(DocumentType.RESUME)
   const [resumeData, setResumeData] = useState<ResumeData>(() => {
     const initialTemplate = searchParams?.get('template') || searchParams?.get('customTemplate') || ''
     return {
@@ -21,7 +23,8 @@ export function useResumeWizard() {
       experiences: [{ company: '', position: '', startDate: '', endDate: '', description: '' }],
       education: [{ school: '', degree: '', field: '', graduationDate: '', gpa: '' }],
       skills: [{ name: '', level: 'Intermediate' }],
-      template: initialTemplate
+      template: initialTemplate,
+      documentType: DocumentType.RESUME
     }
   })
   const [isLoading, setIsLoading] = useState(false)
@@ -30,6 +33,101 @@ export function useResumeWizard() {
   const [selectedTemplateData, setSelectedTemplateData] = useState<unknown>(null)
   const [returnToStep, setReturnToStep] = useState<number | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+
+  // Get current step configuration
+  const getCurrentStepConfig = () => {
+    return StepConfigurationManager.getConfiguration(documentType)
+  }
+
+  // Get current step details
+  const getCurrentStepDetails = () => {
+    return StepConfigurationManager.getStepConfig(documentType, currentStep)
+  }
+
+  // Check if current step is required
+  const isCurrentStepRequired = () => {
+    return StepConfigurationManager.isStepRequired(documentType, currentStep)
+  }
+
+  // Check if step can be accessed
+  const canAccessStep = (stepId: number) => {
+    return StepConfigurationManager.canAccessStep(documentType, stepId, completedSteps)
+  }
+
+  // Get next available step
+  const getNextStep = () => {
+    return StepConfigurationManager.getNextStep(documentType, currentStep, completedSteps)
+  }
+
+  // Get previous step
+  const getPreviousStep = () => {
+    return StepConfigurationManager.getPreviousStep(documentType, currentStep)
+  }
+
+  // Check if current step is the last step
+  const isLastStep = () => {
+    return StepConfigurationManager.isLastStep(documentType, currentStep)
+  }
+
+  // Check if current step is the first step
+  const isFirstStep = () => {
+    return StepConfigurationManager.isFirstStep(documentType, currentStep)
+  }
+
+  // Get completion percentage
+  const getCompletionPercentage = () => {
+    return StepConfigurationManager.getCompletionPercentage(documentType, completedSteps)
+  }
+
+  // Validate step completion
+  const validateStepCompletion = () => {
+    return StepConfigurationManager.validateStepCompletion(documentType, completedSteps)
+  }
+
+  // Navigation functions
+  const goToStep = (stepId: number) => {
+    if (canAccessStep(stepId)) {
+      setCurrentStep(stepId)
+    }
+  }
+
+  const goToNextStep = () => {
+    const nextStep = getNextStep()
+    if (nextStep) {
+      setCurrentStep(nextStep)
+    }
+  }
+
+  const goToPreviousStep = () => {
+    const prevStep = getPreviousStep()
+    if (prevStep) {
+      setCurrentStep(prevStep)
+    }
+  }
+
+  const markStepAsCompleted = (stepId: number) => {
+    if (!completedSteps.includes(stepId)) {
+      setCompletedSteps(prev => [...prev, stepId])
+    }
+  }
+
+  const markStepAsIncomplete = (stepId: number) => {
+    setCompletedSteps(prev => prev.filter(id => id !== stepId))
+  }
+
+  // Document type management
+  const handleDocumentTypeChange = (newDocumentType: DocumentType) => {
+    setDocumentType(newDocumentType)
+    setResumeData(prev => ({
+      ...prev,
+      documentType: newDocumentType
+    }))
+    
+    // Reset to first step when document type changes
+    setCurrentStep(1)
+    setCompletedSteps([])
+  }
 
   // Helper Functions
   const updatePersonalInfo = (field: keyof PersonalInfo, value: string) => {
@@ -121,6 +219,20 @@ export function useResumeWizard() {
     try {
       const data = await loadResumeData(resumeId, searchParams || new URLSearchParams())
       setResumeData(data)
+      
+      // Set document type from loaded data
+      if (data.documentType) {
+        setDocumentType(data.documentType)
+      }
+      
+      // Determine completed steps based on loaded data
+      const loadedCompletedSteps: number[] = []
+      if (data.personalInfo?.name) loadedCompletedSteps.push(1)
+      if (data.experiences?.length > 0 && data.experiences[0]?.company) loadedCompletedSteps.push(2)
+      if (data.education?.length > 0 && data.education[0]?.school) loadedCompletedSteps.push(3)
+      if (data.skills?.length > 0 && data.skills[0]?.name) loadedCompletedSteps.push(4)
+      
+      setCompletedSteps(loadedCompletedSteps)
     } catch (error: unknown) {
       setSaveMessage(`❌ Error: ${error instanceof Error ? error.message : 'Failed to load resume data'}`)
     } finally {
@@ -273,6 +385,23 @@ export function useResumeWizard() {
     nextStep,
     prevStep,
     canProceed,
-    saveStateToLocalStorage
+    saveStateToLocalStorage,
+    documentType,
+    handleDocumentTypeChange,
+    getCurrentStepConfig,
+    getCurrentStepDetails,
+    isCurrentStepRequired,
+    canAccessStep,
+    getNextStep,
+    getPreviousStep,
+    isLastStep,
+    isFirstStep,
+    getCompletionPercentage,
+    validateStepCompletion,
+    goToStep,
+    goToNextStep,
+    goToPreviousStep,
+    markStepAsCompleted,
+    markStepAsIncomplete
   }
 } 

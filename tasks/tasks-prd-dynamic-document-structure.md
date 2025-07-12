@@ -38,14 +38,14 @@
   - [x] 2.4 Implement template filtering based on selected document type
   - [x] 2.5 Add document type change functionality before wizard starts
   - [ ] 2.6 Write unit tests for document type selection components
-- [ ] 3.0 Create Dynamic Step Configuration System
-  - [ ] 3.1 Create step-configuration.ts utility with predefined configurations
-  - [ ] 3.2 Define step configurations for Resume (5-6 steps)
-  - [ ] 3.3 Define step configurations for CV (8-10 steps)
-  - [ ] 3.4 Define step configurations for Biodata (6-8 steps)
-  - [ ] 3.5 Implement step validation rules per document type
-  - [ ] 3.6 Add support for optional step addition/removal
-  - [ ] 3.7 Write unit tests for step configuration system
+- [x] 3.0 Create Dynamic Step Configuration System
+  - [x] 3.1 Create step-configuration.ts utility with predefined configurations
+  - [x] 3.2 Define step configurations for Resume (5-6 steps)
+  - [x] 3.3 Define step configurations for CV (8-10 steps)
+  - [x] 3.4 Define step configurations for Biodata (6-8 steps)
+  - [x] 3.5 Implement step validation rules per document type
+  - [x] 3.6 Add support for optional step addition/removal
+  - [x] 3.7 Write unit tests for step configuration system
 - [x] 4.0 Update Progress Bar for Variable Step Counts
   - [x] 4.1 Modify ProgressBar component to handle up to 10 steps
   - [x] 4.2 Update step navigation logic for variable step counts
@@ -62,5 +62,5 @@
   - [x] 5.6 Create LanguagesStep component for Biodata documents
   - [x] 5.7 Create PersonalDetailsStep component for Biodata documents
   - [x] 5.8 Create DeclarationStep component for Biodata documents
-  - [ ] 5.9 Update useResumeWizard hook to handle new step components
+  - [x] 5.9 Update useResumeWizard hook to handle new step components
   - [ ] 5.10 Write unit tests for all new step components 
