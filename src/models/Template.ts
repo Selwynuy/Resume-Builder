@@ -76,6 +76,10 @@ const templateSchema = new mongoose.Schema({
     type: Boolean,
     default: false // Templates need approval before public visibility
   },
+  isPremium: {
+    type: Boolean,
+    default: false // Premium templates require paid subscription
+  },
   tags: [{
     type: String,
     trim: true

@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth/next'
 import Header from '@/components/layout/Header'
 import { LoadingProvider } from '@/components/providers/LoadingProvider'
 import Providers from '@/components/providers/SessionProvider'
+import PayPalProvider from '@/components/providers/PayPalProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
 import { GlobalLoading } from '@/components/ui/GlobalLoading'
 import './globals.css'
@@ -28,18 +29,20 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers session={session as Session | null | undefined}>
-          <ToastProvider>
-            <LoadingProvider>
-              <a href="#main-content" className="skip-link">
-                Skip to main content
-              </a>
-              <Header />
-              <main id="main-content">
-                {children}
-              </main>
-              <GlobalLoading />
-            </LoadingProvider>
-          </ToastProvider>
+          <PayPalProvider>
+            <ToastProvider>
+              <LoadingProvider>
+                <a href="#main-content" className="skip-link">
+                  Skip to main content
+                </a>
+                <Header />
+                <main id="main-content">
+                  {children}
+                </main>
+                <GlobalLoading />
+              </LoadingProvider>
+            </ToastProvider>
+          </PayPalProvider>
         </Providers>
       </body>
     </html>

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth/next'
 
 import { authOptions } from '@/app/api/auth/options'
+import connectDB from '@/lib/db'
+import User from '@/models/User'
 
 /**
  * Get the current user session on the server side
@@ -41,6 +43,23 @@ export async function getCurrentUserEmail(): Promise<string | null> {
 }
 
 /**
+ * Get the current user's role from database
+ */
+export async function getCurrentUserRole(): Promise<string | null> {
+  const userId = await getCurrentUserId()
+  if (!userId) return null
+  
+  try {
+    await connectDB()
+    const user = await User.findById(userId).select('role')
+    return user?.role || 'user'
+  } catch (error) {
+    console.error('Error fetching user role:', error)
+    return 'user' // Default to user role on error
+  }
+}
+
+/**
  * Require authentication - redirects to login if not authenticated
  */
 export async function requireAuth() {
@@ -75,12 +94,8 @@ export async function requireAdmin() {
 /**
  * Check if user is admin
  */
-export function isAdmin(email: string): boolean {
-  const adminEmails = [
-    'admin@resumebuilder.com',
-    'selwyn.cybersec@gmail.com'
-  ]
-  return adminEmails.includes(email)
+export function isAdmin(role: string | undefined): boolean {
+  return role === 'admin'
 }
 
 /**
@@ -89,4 +104,36 @@ export function isAdmin(email: string): boolean {
 export async function optionalAuth() {
   const session = await getCurrentSession()
   return session
+}
+
+/**
+ * Require creator access - redirects to dashboard if not creator
+ */
+export async function requireCreator() {
+  const session = await getCurrentSession()
+  if (!session?.user?.id) {
+    redirect('/login')
+  }
+
+  const userRole = await getCurrentUserRole()
+  if (userRole !== 'creator' && userRole !== 'admin') {
+    redirect('/dashboard')
+  }
+  
+  return session
+}
+
+/**
+ * Check if user is creator (async version for role-based checking)
+ */
+export async function isCreatorAsync(): Promise<boolean> {
+  const userRole = await getCurrentUserRole()
+  return userRole === 'creator' || userRole === 'admin'
+}
+
+/**
+ * Check if user is creator (legacy email-based version - deprecated)
+ */
+export function isCreator(role: string | undefined): boolean {
+  return role === 'creator' || role === 'admin'
 } 

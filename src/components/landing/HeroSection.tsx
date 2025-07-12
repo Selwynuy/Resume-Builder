@@ -5,6 +5,7 @@ import { CheckCircle } from "lucide-react"
 import { useEffect, useRef } from "react"
 
 import { Button } from "@/components/ui/button"
+import React from 'react'
 
 const HeroSection = () => {
   const robotRef = useRef(null)

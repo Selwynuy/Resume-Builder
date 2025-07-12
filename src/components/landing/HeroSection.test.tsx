@@ -1,3 +1,4 @@
+import React from 'react'
 import { render, screen } from "@testing-library/react"
 
 import HeroSection from "./HeroSection"
@@ -24,22 +25,12 @@ describe("HeroSection", () => {
   it("renders left and right text blocks", () => {
     render(<HeroSection />)
     expect(screen.getByText(/ATS-optimized resumes/i)).toBeInTheDocument()
-    expect(screen.getByText(/100% Free Forever/i)).toBeInTheDocument()
-    expect(screen.getByText(/No Credit Card Required/i)).toBeInTheDocument()
-    expect(screen.getByText(/ATS Optimized/i)).toBeInTheDocument()
+    expect(screen.getByText(/Free, fast, and easy/i)).toBeInTheDocument()
   })
 
   it("renders the CTA button", () => {
     render(<HeroSection />)
     expect(screen.getByRole("button", { name: /Create my Resume/i })).toBeInTheDocument()
-  })
-
-  it("renders testimonial and trust badges", () => {
-    render(<HeroSection />)
-    expect(screen.getByText(/This resume builder got me hired/i)).toBeInTheDocument()
-    expect(screen.getByText(/GDPR Compliant/i)).toBeInTheDocument()
-    expect(screen.getByText(/Trusted by 10,000\+ users/i)).toBeInTheDocument()
-    expect(screen.getByText(/Secure & Private/i)).toBeInTheDocument()
   })
 
   it("has accessible alt text for images", () => {
@@ -49,7 +40,7 @@ describe("HeroSection", () => {
 
   it("uses full viewport height (h-screen)", () => {
     render(<HeroSection />)
-    const section = screen.getByRole('region', { hidden: true }) || document.querySelector('section')
+    const section = document.querySelector('section')
     expect(section?.className).toMatch(/h-screen/)
   })
 

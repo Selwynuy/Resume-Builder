@@ -6,9 +6,13 @@ export {
   getCurrentSession,
   getCurrentUserId,
   getCurrentUserEmail,
+  getCurrentUserRole,
   requireAuth,
   requireAdmin,
+  requireCreator,
   isAdmin,
+  isCreator,
+  isCreatorAsync,
   optionalAuth
 } from './utils'
 

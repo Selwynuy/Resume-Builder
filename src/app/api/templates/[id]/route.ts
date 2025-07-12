@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 
-import { getCurrentUserId, getCurrentUserEmail, isAdmin } from '@/auth'
+import { getCurrentUserId, getCurrentUserEmail, isAdmin, requireCreator } from '@/auth'
 import dbConnect from '@/lib/db'
 import Template from '@/models/Template'
 
@@ -11,14 +11,9 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Require creator role for template deletion
+    const session = await requireCreator()
     const userId = await getCurrentUserId()
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
 
     if (!mongoose.Types.ObjectId.isValid(params.id)) {
       return NextResponse.json(
@@ -115,14 +110,9 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Require creator role for template updates
+    const session = await requireCreator()
     const userId = await getCurrentUserId()
-    
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
 
     const body = await request.json()
     const { name, description, category, price, htmlTemplate, cssStyles, placeholders, layout } = body

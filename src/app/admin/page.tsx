@@ -5,6 +5,7 @@ import { getCurrentSession } from '@/auth'
 import { CSRFTokenInput } from '@/components/ui/csrf-token'
 import connectDB from '@/lib/db'
 import Template from '@/models/Template'
+import Link from 'next/link'
 
 interface Template {
   _id: string
@@ -77,6 +78,7 @@ export default async function AdminPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
           <p className="mt-2 text-gray-600">Review and approve template submissions</p>
+          <Link href="/admin/users" className="inline-block mt-4 text-blue-600 hover:underline font-semibold">Go to User Management</Link>
         </div>
 
         <div className="bg-white shadow overflow-hidden sm:rounded-md">

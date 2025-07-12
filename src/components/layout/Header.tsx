@@ -40,6 +40,10 @@ const navItems = [
     ],
   },
   {
+    name: "Pricing",
+    href: "/pricing",
+  },
+  {
     name: "Resources",
     href: "/resources",
     dropdown: [
@@ -82,7 +86,7 @@ export default function Header() {
                 <span>{item.name}</span>
                 <ChevronDown className="w-4 h-4" />
               </Link>
-              {activeDropdown === item.name && (
+              {activeDropdown === item.name && item.dropdown && (
                 <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 animate-in fade-in-0 zoom-in-95 duration-200">
                   {item.dropdown.map((dropdownItem) => (
                     <Link
@@ -154,17 +158,19 @@ export default function Header() {
               <Link href={item.href} className="block text-slate-700 hover:text-blue-600 font-medium">
                 {item.name}
               </Link>
-              <div className="ml-4 mt-2 space-y-2">
-                {item.dropdown.map((dropdownItem) => (
-                  <Link
-                    key={dropdownItem.name}
-                    href={dropdownItem.href}
-                    className="block text-sm text-slate-600 hover:text-blue-600"
-                  >
-                    {dropdownItem.name}
-                  </Link>
-                ))}
-              </div>
+              {item.dropdown && (
+                <div className="ml-4 mt-2 space-y-2">
+                  {item.dropdown.map((dropdownItem) => (
+                    <Link
+                      key={dropdownItem.name}
+                      href={dropdownItem.href}
+                      className="block text-sm text-slate-600 hover:text-blue-600"
+                    >
+                      {dropdownItem.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
           <hr className="border-slate-200" />

@@ -2,6 +2,7 @@ import type { SortOrder } from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 
+import { requireCreator } from '@/auth'
 import connectDB from '@/lib/db'
 import { TemplateMetadataSchema, sanitizeTemplateContent, sanitizeCss } from '@/lib/security'
 import Template from '@/models/Template'
@@ -91,14 +92,8 @@ export async function GET(request: NextRequest) {
 // POST /api/templates - Create a new template
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession()
-    
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      )
-    }
+    // Require creator role for template creation
+    const session = await requireCreator()
 
     await connectDB()
 

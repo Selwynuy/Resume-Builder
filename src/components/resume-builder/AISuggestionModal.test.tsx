@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import React from 'react';
+import { act } from 'react-dom/test-utils'
 
 import '@testing-library/jest-dom'
 import AISuggestionModal, { AISuggestionModalProps } from './AISuggestionModal'
@@ -340,15 +341,12 @@ describe('AISuggestionModal', () => {
       })
 
       render(<AISuggestionModal {...mockProps} featureType="skills" />)
-
-      await waitFor(() => {
-        expect(screen.getByText('Add Skill')).toBeInTheDocument()
+      const addButton = await screen.findByRole('button', { name: /add skill/i })
+      await act(async () => {
+        addButton.click()
       })
-
-      fireEvent.click(screen.getByText('Add Skill'))
-
       expect(mockProps.onApplySuggestion).toHaveBeenCalledWith('JavaScript')
-      expect(mockProps.onClose).toHaveBeenCalled()
+      expect(mockProps.onClose).not.toHaveBeenCalled() // Modal should stay open for skills
     })
   })
 

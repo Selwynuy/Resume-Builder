@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+import Link from 'next/link'
 
 import { useToast } from '@/components/providers/ToastProvider'
 import { Button } from '@/components/ui/button'
@@ -64,6 +65,14 @@ export default function LoginForm() {
           required
           disabled={isLoading}
         />
+        <div className="text-right mt-1">
+          <Link
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:text-blue-500"
+          >
+            Forgot password?
+          </Link>
+        </div>
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
