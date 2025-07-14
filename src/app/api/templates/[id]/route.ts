@@ -115,11 +115,21 @@ export async function PUT(
     const userId = await getCurrentUserId()
 
     const body = await request.json()
-    const { name, description, category, price, htmlTemplate, cssStyles, placeholders, layout } = body
+    const { name, description, category, price, htmlTemplate, cssStyles, placeholders, layout, supportedDocumentTypes } = body
 
     if (!name || !description || !htmlTemplate || !placeholders) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    // Validate supportedDocumentTypes
+    const allowedTypes = ['resume', 'cv', 'biodata']
+    if (!Array.isArray(supportedDocumentTypes) || supportedDocumentTypes.length === 0 ||
+      !supportedDocumentTypes.every((t) => allowedTypes.includes(t))) {
+      return NextResponse.json(
+        { error: 'supportedDocumentTypes must be a non-empty array containing only resume, cv, or biodata.' },
         { status: 400 }
       )
     }
@@ -137,6 +147,7 @@ export async function PUT(
         cssStyles: cssStyles || '',
         placeholders,
         layout: layout || 'single-column',
+        supportedDocumentTypes, // <-- add this
         validation: {
           isValid: true,
           requiredMissing: [],

@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 
-import { AIFeatureType } from '@/components/resume-builder/AISuggestionModal'
+import { AIFeatureType } from '@/components/document-builder/AISuggestionModal'
 
 interface UseAISuggestionLoadingReturn {
   loading: boolean

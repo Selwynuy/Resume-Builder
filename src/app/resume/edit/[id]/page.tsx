@@ -11,7 +11,7 @@ import {
   SkillsStep, 
   ReviewStep,
   ProgressBar 
-} from '@/components/resume-builder'
+} from '@/components/document-builder'
 import { useResumeWizard } from '@/hooks/useResumeWizard'
 
 const STEPS = [

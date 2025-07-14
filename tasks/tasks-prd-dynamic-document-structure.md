@@ -55,12 +55,23 @@
   - [x] 4.6 Write unit tests for updated ProgressBar functionality
 - [x] 5.0 Implement CV and Biodata Step Components
   - [x] 5.1 Create PublicationsStep component for CV documents
-  - [x] 5.2 Create PresentationsStep component for CV documents
-  - [x] 5.3 Create ResearchStep component for CV documents
-  - [x] 5.4 Create AwardsStep component for CV documents
-  - [x] 5.5 Create ReferencesStep component for CV documents
-  - [x] 5.6 Create LanguagesStep component for Biodata documents
-  - [x] 5.7 Create PersonalDetailsStep component for Biodata documents
-  - [x] 5.8 Create DeclarationStep component for Biodata documents
-  - [x] 5.9 Update useResumeWizard hook to handle new step components
-  - [x] 5.10 Write unit tests for all new step components 
+  - [x] 5.2 Create ResearchStep component for CV documents
+  - [x] 5.3 Create AwardsStep component for CV documents
+  - [x] 5.4 Create PersonalDetailsStep component for Biodata documents
+  - [x] 5.5 Create LanguagesStep component for Biodata documents
+  - [x] 5.6 Update useResumeWizard hook to handle new step components
+  - [x] 5.7 Update step configuration for new individual steps
+  - [x] 5.8 Update main resume builder page to handle new components
+  - [x] 5.9 Update all tests to match new step structure
+  - [x] 5.10 Verify all tests pass with new implementation 
+- [x] 6.0 Add Step Customization and Advanced Features
+  - [x] 6.1 Implement step customization options (add/remove optional steps)
+  - [x] 6.2 Add step reordering functionality within document type constraints
+  - [x] 6.3 Implement step completion tracking and validation
+  - [x] 6.4 Add step-specific help text and guidance
+  - [x] 6.5 Implement step preview functionality
+  - [x] 6.6 Add step export/import functionality for custom configurations
+  - [x] 6.7 Write unit tests for step customization features
+  - [x] 6.8 Update documentation for step customization
+  - [x] 6.9 Performance optimization for step customization
+  - [x] 6.10 Final testing and validation of all features

@@ -1,9 +1,27 @@
 import React from 'react'
-import { render, screen } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
+import { useRouter } from "next/navigation"
 
 import HeroSection from "./HeroSection"
 
+// Mock Next.js router
+jest.mock("next/navigation", () => ({
+  useRouter: jest.fn(),
+}))
+
 describe("HeroSection", () => {
+  const mockPush = jest.fn()
+
+  beforeEach(() => {
+    (useRouter as jest.Mock).mockReturnValue({
+      push: mockPush,
+    })
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it("renders the main heading", () => {
     expect.assertions(1)
     render(<HeroSection />)
@@ -30,7 +48,7 @@ describe("HeroSection", () => {
 
   it("renders the CTA button", () => {
     render(<HeroSection />)
-    expect(screen.getByRole("button", { name: /Create my Resume/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
   })
 
   it("has accessible alt text for images", () => {
@@ -49,5 +67,57 @@ describe("HeroSection", () => {
     // Look for a div with animate-bounce and rounded-full
     const bubbles = document.querySelectorAll('div.animate-bounce.rounded-full')
     expect(bubbles.length).toBeGreaterThan(0)
+  })
+
+  it("renders the Create New Document button", () => {
+    render(<HeroSection />)
+    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
+  })
+
+  it("navigates to templates page with modal parameter when Create New Document is clicked", () => {
+    render(<HeroSection />)
+    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
+    
+    fireEvent.click(createNewDocumentButton)
+    
+    expect(mockPush).toHaveBeenCalledWith('/templates?modal=open')
+  })
+
+  it("renders the CTA button", () => {
+    render(<HeroSection />)
+    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
+  })
+
+  it("has proper button styling for Create New Document button", () => {
+    render(<HeroSection />)
+    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
+    
+    expect(createNewDocumentButton).toHaveClass('border-2', 'border-slate-300', 'bg-white/80')
+  })
+
+  it("has proper accessibility attributes for Create New Document button", () => {
+    render(<HeroSection />)
+    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
+    
+    expect(createNewDocumentButton).toBeInTheDocument()
+    // The button should be focusable
+    createNewDocumentButton.focus()
+    expect(document.activeElement).toBe(createNewDocumentButton)
+  })
+
+  it("has responsive design classes for button container", () => {
+    render(<HeroSection />)
+    const buttonContainer = document.querySelector('.flex.flex-col.sm\\:flex-row')
+    
+    expect(buttonContainer).toBeInTheDocument()
+    expect(buttonContainer).toHaveClass('flex', 'flex-col', 'sm:flex-row', 'justify-center', 'items-center', 'gap-4')
+  })
+
+  it("button is keyboard accessible", () => {
+    render(<HeroSection />)
+    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
+    
+    createNewDocumentButton.focus()
+    expect(document.activeElement).toBe(createNewDocumentButton)
   })
 }) 

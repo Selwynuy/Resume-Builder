@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { STEPS, StepConfig } from '@/components/resume-builder/types'
+import { STEPS, StepConfig } from '@/components/document-builder/types'
 
 interface ProgressBarProps {
   currentStep: number

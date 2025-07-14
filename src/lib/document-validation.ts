@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DocumentType } from '@/components/resume-builder/types'
+import { DocumentType } from '@/components/document-builder/types'
 import { INPUT_LIMITS } from './security'
 
 // Base validation schemas for common fields

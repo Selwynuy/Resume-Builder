@@ -32,6 +32,62 @@ export interface Skill {
   format?: string // display format: 'name', 'level', etc.
 }
 
+// CV-specific interfaces
+export interface Publication {
+  title: string
+  authors: string
+  journal: string
+  year: string
+  doi?: string
+}
+
+export interface ResearchExperience {
+  institution: string
+  position: string
+  startDate: string
+  endDate: string
+  description: string
+  funding?: string
+}
+
+export interface AcademicAchievement {
+  title: string
+  institution: string
+  year: string
+  description?: string
+}
+
+export interface CVData {
+  publications: Publication[]
+  researchExperience: ResearchExperience[]
+  academicAchievements: AcademicAchievement[]
+  teachingExperience: any[]
+  grants: any[]
+  conferences: any[]
+}
+
+// Biodata-specific interfaces
+export interface FamilyMember {
+  name: string
+  relationship: string
+  age?: string
+  occupation?: string
+  education?: string
+}
+
+export interface PersonalDetail {
+  field: string
+  value: string
+}
+
+export interface BiodataData {
+  personalDetails: PersonalDetail[]
+  familyMembers: FamilyMember[]
+  hobbies: string[]
+  languages: string[]
+  references: any[]
+}
+
 // Document Type Enum
 export enum DocumentType {
   RESUME = 'resume',
@@ -46,6 +102,8 @@ export interface ResumeData {
   skills: Skill[]
   template: string
   documentType: DocumentType
+  cvData?: CVData
+  biodataData?: BiodataData
 }
 
 // Step Configuration Interfaces

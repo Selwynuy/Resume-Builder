@@ -5,40 +5,46 @@ export const STEP_CONFIGURATIONS: Record<DocumentType, DocumentStructure> = {
   [DocumentType.RESUME]: {
     documentType: DocumentType.RESUME,
     steps: [
-      { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
-      { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
-      { id: 3, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
-      { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
-      { id: 5, title: 'Review', icon: '✨', description: 'Finalize your resume', required: true, component: 'ReviewStep' }
-    ],
-    maxSteps: 5,
-    minSteps: 5
-  },
-  [DocumentType.CV]: {
-    documentType: DocumentType.CV,
-    steps: [
-      { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
-      { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
-      { id: 3, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
-      { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
-      { id: 5, title: 'CV Details', icon: '📋', description: 'Add academic and research credentials', required: true, component: 'CVStep' },
-      { id: 6, title: 'Review', icon: '✨', description: 'Finalize your CV', required: true, component: 'ReviewStep' }
+      { id: 1, title: 'Document Type & Template', icon: '🎨', description: 'Choose your document type and template', required: true, component: 'TemplateSelector' },
+      { id: 2, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
+      { id: 3, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
+      { id: 4, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
+      { id: 5, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
+      { id: 6, title: 'Review', icon: '✨', description: 'Finalize your resume', required: true, component: 'ReviewStep' }
     ],
     maxSteps: 6,
     minSteps: 6
   },
+  [DocumentType.CV]: {
+    documentType: DocumentType.CV,
+    steps: [
+      { id: 1, title: 'Document Type & Template', icon: '🎨', description: 'Choose your document type and template', required: true, component: 'TemplateSelector' },
+      { id: 2, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
+      { id: 3, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
+      { id: 4, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
+      { id: 5, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
+      { id: 6, title: 'Publications', icon: '📚', description: 'Add your academic publications', required: true, component: 'PublicationsStep' },
+      { id: 7, title: 'Research Experience', icon: '🔬', description: 'Add your research positions', required: true, component: 'ResearchStep' },
+      { id: 8, title: 'Awards & Achievements', icon: '🏆', description: 'Add your academic awards', required: true, component: 'AwardsStep' },
+      { id: 9, title: 'Review', icon: '✨', description: 'Finalize your CV', required: true, component: 'ReviewStep' }
+    ],
+    maxSteps: 9,
+    minSteps: 9
+  },
   [DocumentType.BIODATA]: {
     documentType: DocumentType.BIODATA,
     steps: [
-      { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
-      { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: false, component: 'ExperienceStep' },
-      { id: 3, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
-      { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: false, component: 'SkillsStep' },
-      { id: 5, title: 'Biodata Details', icon: '👤', description: 'Add personal and family information', required: true, component: 'BiodataStep' },
-      { id: 6, title: 'Review', icon: '✨', description: 'Finalize your biodata', required: true, component: 'ReviewStep' }
+      { id: 1, title: 'Document Type & Template', icon: '🎨', description: 'Choose your document type and template', required: true, component: 'TemplateSelector' },
+      { id: 2, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
+      { id: 3, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: false, component: 'ExperienceStep' },
+      { id: 4, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
+      { id: 5, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: false, component: 'SkillsStep' },
+      { id: 6, title: 'Personal Details', icon: '👤', description: 'Add personal information and identification', required: true, component: 'PersonalDetailsStep' },
+      { id: 7, title: 'Languages', icon: '🗣️', description: 'Add languages you speak', required: true, component: 'LanguagesStep' },
+      { id: 8, title: 'Review', icon: '✨', description: 'Finalize your biodata', required: true, component: 'ReviewStep' }
     ],
-    maxSteps: 6,
-    minSteps: 4 // Personal Info, Education, Biodata Details, Review are required
+    maxSteps: 8,
+    minSteps: 6 // Document Type & Template, Personal Info, Education, Personal Details, Languages, Review are required
   }
 };
 
@@ -52,27 +58,33 @@ export interface StepValidationRule {
 
 export const STEP_VALIDATION_RULES: Record<DocumentType, StepValidationRule[]> = {
   [DocumentType.RESUME]: [
-    { stepId: 1, required: true },
-    { stepId: 2, required: true, dependencies: [1] },
-    { stepId: 3, required: true, dependencies: [1] },
-    { stepId: 4, required: true, dependencies: [1] },
-    { stepId: 5, required: true, dependencies: [1, 2, 3, 4] }
+    { stepId: 1, required: true }, // TemplateSelector
+    { stepId: 2, required: true, dependencies: [1] }, // PersonalInfo
+    { stepId: 3, required: true, dependencies: [1] }, // Experience
+    { stepId: 4, required: true, dependencies: [1] }, // Education
+    { stepId: 5, required: true, dependencies: [1] }, // Skills
+    { stepId: 6, required: true, dependencies: [1, 2, 3, 4, 5] } // Review
   ],
   [DocumentType.CV]: [
-    { stepId: 1, required: true },
-    { stepId: 2, required: true, dependencies: [1] },
-    { stepId: 3, required: true, dependencies: [1] },
-    { stepId: 4, required: true, dependencies: [1] },
-    { stepId: 5, required: true, dependencies: [1, 2, 3, 4] },
-    { stepId: 6, required: true, dependencies: [1, 2, 3, 4, 5] }
+    { stepId: 1, required: true }, // TemplateSelector
+    { stepId: 2, required: true, dependencies: [1] }, // PersonalInfo
+    { stepId: 3, required: true, dependencies: [1] }, // Experience
+    { stepId: 4, required: true, dependencies: [1] }, // Education
+    { stepId: 5, required: true, dependencies: [1] }, // Skills
+    { stepId: 6, required: true, dependencies: [1, 2, 3, 4, 5] }, // Publications
+    { stepId: 7, required: true, dependencies: [1, 2, 3, 4, 5, 6] }, // Research Experience
+    { stepId: 8, required: true, dependencies: [1, 2, 3, 4, 5, 6, 7] }, // Awards & Achievements
+    { stepId: 9, required: true, dependencies: [1, 2, 3, 4, 5, 6, 7, 8] } // Review
   ],
   [DocumentType.BIODATA]: [
-    { stepId: 1, required: true },
-    { stepId: 2, required: false, dependencies: [1] },
-    { stepId: 3, required: true, dependencies: [1] },
-    { stepId: 4, required: false, dependencies: [1] },
-    { stepId: 5, required: true, dependencies: [1] },
-    { stepId: 6, required: true, dependencies: [1, 3, 5] }
+    { stepId: 1, required: true }, // TemplateSelector
+    { stepId: 2, required: true, dependencies: [1] }, // PersonalInfo
+    { stepId: 3, required: false, dependencies: [1] }, // Experience (optional)
+    { stepId: 4, required: true, dependencies: [1] }, // Education
+    { stepId: 5, required: false, dependencies: [1] }, // Skills (optional)
+    { stepId: 6, required: true, dependencies: [1] }, // Personal Details
+    { stepId: 7, required: true, dependencies: [1] }, // Languages
+    { stepId: 8, required: true, dependencies: [1, 2, 4, 6, 7] } // Review
   ]
 };
 

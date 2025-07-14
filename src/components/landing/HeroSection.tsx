@@ -3,6 +3,7 @@
 import { motion, useAnimation } from "framer-motion"
 import { CheckCircle } from "lucide-react"
 import { useEffect, useRef } from "react"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import React from 'react'
@@ -10,6 +11,11 @@ import React from 'react'
 const HeroSection = () => {
   const robotRef = useRef(null)
   const controls = useAnimation()
+  const router = useRouter()
+
+  const handleCreateNewDocument = () => {
+    router.push('/templates?modal=open')
+  }
 
   useEffect(() => {
     controls.start({
@@ -81,8 +87,8 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-      {/* CTA Button below hero */}
-      <div className="flex justify-center mt-12">
+      {/* CTA Buttons below hero */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12">
         <motion.div
           whileHover={{ scale: 1.07 }}
           whileTap={{ scale: 0.97 }}
@@ -90,9 +96,11 @@ const HeroSection = () => {
         >
           <Button
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-10 py-5 text-xl font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-300 hover:shadow-[0_0_24px_4px_rgba(59,130,246,0.3)] hover:scale-105"
+            variant="outline"
+            onClick={handleCreateNewDocument}
+            className="border-2 border-slate-300 hover:border-slate-400 bg-white/80 backdrop-blur-sm text-slate-700 hover:text-slate-800 px-10 py-5 text-xl font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300 hover:shadow-[0_0_24px_4px_rgba(0,0,0,0.1)] hover:scale-105"
           >
-            Create my Resume
+            Create New Document
           </Button>
         </motion.div>
       </div>

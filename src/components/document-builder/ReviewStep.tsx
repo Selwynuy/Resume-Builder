@@ -1,7 +1,7 @@
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 
-import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/resume-builder/types'
+import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/document-builder/types'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import type { Template } from '@/lib/templates'
 

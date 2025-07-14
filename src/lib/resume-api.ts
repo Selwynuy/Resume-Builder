@@ -1,6 +1,6 @@
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 
-import { ResumeData, Experience, Education, Skill } from '@/components/resume-builder/types'
+import { ResumeData, Experience, Education, Skill } from '@/components/document-builder/types'
 // Resume API utility functions
 
 export async function fetchTemplateData(templateId: string): Promise<unknown> {

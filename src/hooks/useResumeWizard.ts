@@ -2,7 +2,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 
-import { ResumeData, PersonalInfo, Experience, Education, Skill, DocumentType } from '@/components/resume-builder/types'
+import { ResumeData, PersonalInfo, Experience, Education, Skill, DocumentType, CVData, BiodataData, StepConfig } from '@/components/document-builder/types'
 import { useResumeStepNavigation } from '@/hooks/useResumeStepNavigation'
 import { fetchTemplateData, loadResumeData, saveResume, exportPDF } from '@/lib/resume-api'
 import { StepConfigurationManager } from '@/lib/step-configuration'
@@ -34,6 +34,8 @@ export function useResumeWizard() {
   const [returnToStep, setReturnToStep] = useState<number | null>(null)
   const [currentStep, setCurrentStep] = useState(1)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [customSteps, setCustomSteps] = useState<StepConfig[]>([])
+  const [isStepCustomizationOpen, setIsStepCustomizationOpen] = useState(false)
 
   // Get current step configuration
   const getCurrentStepConfig = () => {
@@ -206,6 +208,61 @@ export function useResumeWizard() {
     }))
   }
 
+  // CV data update functions
+  const updateCVData = (data: Partial<CVData>) => {
+    setResumeData(prev => ({
+      ...prev,
+      cvData: { 
+        publications: [],
+        researchExperience: [],
+        academicAchievements: [],
+        teachingExperience: [],
+        grants: [],
+        conferences: [],
+        ...prev.cvData, 
+        ...data 
+      }
+    }))
+  }
+
+  // Individual CV step update functions
+  const updatePublications = (publications: any[]) => {
+    updateCVData({ publications })
+  }
+
+  const updateResearchExperience = (researchExperience: any[]) => {
+    updateCVData({ researchExperience })
+  }
+
+  const updateAcademicAchievements = (academicAchievements: any[]) => {
+    updateCVData({ academicAchievements })
+  }
+
+  // Biodata data update functions
+  const updateBiodataData = (data: Partial<BiodataData>) => {
+    setResumeData(prev => ({
+      ...prev,
+      biodataData: { 
+        personalDetails: [],
+        familyMembers: [],
+        hobbies: [],
+        languages: [],
+        references: [],
+        ...prev.biodataData, 
+        ...data 
+      }
+    }))
+  }
+
+  // Individual Biodata step update functions
+  const updatePersonalDetails = (personalDetails: any[]) => {
+    updateBiodataData({ personalDetails })
+  }
+
+  const updateLanguages = (languages: string[]) => {
+    updateBiodataData({ languages })
+  }
+
   // Fetch template data
   const handleFetchTemplateData = async (templateId: string) => {
     const template = await fetchTemplateData(templateId)
@@ -357,6 +414,36 @@ export function useResumeWizard() {
     } catch (e) { /* ignore */ }
   }, [setCurrentStep])
 
+  // Step customization functions
+  const openStepCustomization = () => {
+    setIsStepCustomizationOpen(true)
+  }
+
+  const closeStepCustomization = () => {
+    setIsStepCustomizationOpen(false)
+  }
+
+  const handleStepsChange = (newSteps: StepConfig[]) => {
+    setCustomSteps(newSteps)
+    // Reset to first step when steps change
+    setCurrentStep(1)
+    setCompletedSteps([])
+  }
+
+  const getCurrentSteps = (): StepConfig[] => {
+    // Return custom steps if available, otherwise return default configuration
+    if (customSteps.length > 0) {
+      return customSteps
+    }
+    return getCurrentStepConfig().steps
+  }
+
+  const resetToDefaultSteps = () => {
+    setCustomSteps([])
+    setCurrentStep(1)
+    setCompletedSteps([])
+  }
+
   return {
     status,
     isLoadingResume,
@@ -366,6 +453,7 @@ export function useResumeWizard() {
     saveMessage,
     isLoading,
     returnToStep,
+    completedSteps,
     updatePersonalInfo,
     updateExperience,
     addExperience,
@@ -402,6 +490,21 @@ export function useResumeWizard() {
     goToNextStep,
     goToPreviousStep,
     markStepAsCompleted,
-    markStepAsIncomplete
+    markStepAsIncomplete,
+    updateCVData,
+    updateBiodataData,
+    updatePublications,
+    updateResearchExperience,
+    updateAcademicAchievements,
+    updatePersonalDetails,
+    updateLanguages,
+    // Step customization
+    customSteps,
+    isStepCustomizationOpen,
+    openStepCustomization,
+    closeStepCustomization,
+    handleStepsChange,
+    getCurrentSteps,
+    resetToDefaultSteps
   }
 } 

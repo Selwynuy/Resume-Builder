@@ -5,7 +5,7 @@ import {
   getValidationSchema,
   validateDocumentData
 } from './document-validation'
-import { DocumentType } from '@/components/resume-builder/types'
+import { DocumentType } from '@/components/document-builder/types'
 
 describe('ResumeValidationSchema', () => {
   const validResumeData = {

@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'popular'
     const limit = parseInt(searchParams.get('limit') || '20')
     const page = parseInt(searchParams.get('page') || '1')
+    const documentType = searchParams.get('documentType')
 
     // Build query
     const query: { isPublic: boolean; isApproved: boolean; category?: string; $text?: { $search: string } } = {
@@ -58,12 +59,17 @@ export async function GET(request: NextRequest) {
 
     const skip = (page - 1) * limit
 
-    const templates = await Template.find(query)
-      .sort(sortOption)
-      .skip(skip)
-      .limit(limit)
-      .populate('createdBy', 'name')
-      .lean()
+    let templates
+    if (documentType) {
+      templates = await Template.findByDocumentType(documentType)
+    } else {
+      templates = await Template.find(query)
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .populate('createdBy', 'name')
+        .lean()
+    }
 
     // Transform data to include creator name and always include htmlTemplate/cssStyles
     const transformedTemplates = templates.map(template => ({
@@ -73,7 +79,9 @@ export async function GET(request: NextRequest) {
       cssStyles: template.cssStyles,
     }))
 
-    const total = await Template.countDocuments(query)
+    const total = documentType
+      ? templates.length
+      : await Template.countDocuments(query)
 
     return NextResponse.json({
       templates: transformedTemplates,
@@ -106,7 +114,8 @@ export async function POST(request: NextRequest) {
       htmlTemplate,
       cssStyles,
       placeholders,
-      layout
+      layout,
+      supportedDocumentTypes
     } = body
 
     // Validate template metadata
@@ -128,6 +137,16 @@ export async function POST(request: NextRequest) {
     if (!htmlTemplate || !placeholders) {
       return NextResponse.json(
         { error: 'HTML template and placeholders are required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate supportedDocumentTypes
+    const allowedTypes = ['resume', 'cv', 'biodata']
+    if (!Array.isArray(supportedDocumentTypes) || supportedDocumentTypes.length === 0 ||
+      !supportedDocumentTypes.every((t) => allowedTypes.includes(t))) {
+      return NextResponse.json(
+        { error: 'supportedDocumentTypes must be a non-empty array containing only resume, cv, or biodata.' },
         { status: 400 }
       )
     }
@@ -160,6 +179,7 @@ export async function POST(request: NextRequest) {
       layout: layout || 'single-column',
       createdBy: user._id,
       creatorName: user.name,
+      supportedDocumentTypes,
       validation: {
         isValid: true,
         requiredMissing: [],

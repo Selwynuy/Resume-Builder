@@ -5,7 +5,7 @@ import { authOptions } from '@/app/api/auth/options'
 import connectDB from '@/lib/db'
 import Template from '@/models/Template'
 
-export async function GET() {
+export async function GET(request) {
   try {
     const session = await getServerSession(authOptions) as { user: { email: string } } | null
     if (!session?.user?.email) {
@@ -23,10 +23,18 @@ export async function GET() {
     }
 
     await connectDB()
-    
-    const templates = await Template.find({})
-      .sort({ createdAt: -1 })
-      .populate('createdBy', 'name email')
+
+    const { searchParams } = new URL(request.url)
+    const documentType = searchParams.get('documentType')
+
+    let templates
+    if (documentType) {
+      templates = await Template.findByDocumentType(documentType)
+    } else {
+      templates = await Template.find({})
+        .sort({ createdAt: -1 })
+        .populate('createdBy', 'name email')
+    }
 
     return NextResponse.json({ templates })
   } catch (error) {

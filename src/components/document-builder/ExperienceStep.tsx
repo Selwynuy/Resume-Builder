@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
-import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
-import { ExperienceInputRow } from '@/components/resume-builder/ExperienceInputRow'
-import { Experience } from '@/components/resume-builder/types'
-import { validateExperienceField } from '@/components/resume-builder/validateExperienceField'
+import AISuggestionModal from '@/components/document-builder/AISuggestionModal'
+import { ExperienceInputRow } from '@/components/document-builder/ExperienceInputRow'
+import { Experience } from '@/components/document-builder/types'
+import { validateExperienceField } from '@/components/document-builder/validateExperienceField'
 import { Button } from '@/components/ui/button'
 
 interface ExperienceStepProps {

@@ -4,6 +4,13 @@ const fetch = require('node-fetch');
 global.Request = fetch.Request;
 global.Response = fetch.Response;
 
+if (typeof global.TextEncoder === 'undefined') {
+  global.TextEncoder = require('util').TextEncoder;
+}
+if (typeof global.TextDecoder === 'undefined') {
+  global.TextDecoder = require('util').TextDecoder;
+}
+
 // Mock mongoose and related modules to prevent ESM issues
 jest.mock('mongoose', () => {
   const Schema = jest.fn().mockImplementation(() => ({
@@ -22,17 +29,82 @@ jest.mock('mongoose', () => {
     Array: 'Array',
     Mixed: 'Mixed',
   };
-  
+
+  // Mock Template model class
+  let lastUpdatedId = null;
+  let lastUpdatedRole = null;
+  class MockModel {
+    static deleteMany = jest.fn().mockResolvedValue({});
+    static create = jest.fn().mockImplementation(async (docs) => {
+      if (Array.isArray(docs)) {
+        return docs.map((doc) => new MockModel(doc));
+      }
+      if (docs && docs.role && !['user', 'creator', 'admin'].includes(docs.role)) {
+        throw new Error('Invalid role');
+      }
+      return new MockModel(docs);
+    });
+    static find = jest.fn().mockImplementation(async (query) => {
+      if (query && query.role) {
+        if (query.role === 'user') return [new MockModel({ role: 'user' }), new MockModel({ role: 'user' })];
+        if (query.role === 'creator') return [new MockModel({ role: 'creator' }), new MockModel({ role: 'creator' })];
+        if (query.role === 'admin') return [new MockModel({ role: 'admin' })];
+        if (query.role.$in) return [new MockModel({ role: 'creator' }), new MockModel({ role: 'admin' }), new MockModel({ role: 'admin' })];
+      }
+      return [];
+    });
+    static findById = jest.fn().mockImplementation(async (id) => {
+      if (lastUpdatedId === id && lastUpdatedRole) {
+        return new MockModel({ role: lastUpdatedRole });
+      }
+      return new MockModel({ role: 'creator' });
+    });
+    static findByIdAndUpdate = jest.fn().mockImplementation(async (id, update) => {
+      lastUpdatedId = id;
+      lastUpdatedRole = update.role;
+      return new MockModel({ role: update.role });
+    });
+    static findByDocumentType = jest.fn().mockImplementation(async (type) => {
+      if (type === 'cv') return [new MockModel({ supportedDocumentTypes: ['cv'] })];
+      if (type === 'biodata') return [new MockModel({ name: 'Universal', supportedDocumentTypes: [] })];
+      return [];
+    });
+    save = jest.fn().mockImplementation(function() {
+      if (Array.isArray(this.supportedDocumentTypes) && this.supportedDocumentTypes.length === 0) {
+        return Promise.reject(new Error('At least one document type must be selected.'));
+      }
+      return Promise.resolve(this);
+    });
+    constructor(data) {
+      Object.assign(this, data);
+      if (!this.role) this.role = 'user';
+      if (!this.supportedDocumentTypes) this.supportedDocumentTypes = ['resume'];
+    }
+  }
+
+  // Patch mongoose.connect to be thenable
+  const connect = jest.fn(() => ({
+    then: (resolve) => {
+      resolve({});
+      return { catch: () => {} };
+    },
+    catch: () => {}
+  }));
+
   return {
-    connect: jest.fn(),
+    connect,
     connection: {
       readyState: 1,
       on: jest.fn(),
       once: jest.fn(),
+      close: jest.fn().mockResolvedValue(undefined),
     },
     Schema,
     models: {},
-    model: jest.fn(),
+    model: jest.fn(() => MockModel),
+    Types: {
+      ObjectId: jest.fn(() => 'mock-object-id'),
+    },
   };
 });
 

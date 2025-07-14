@@ -1,4 +1,4 @@
-import { ResumeData } from '@/components/resume-builder'
+import { ResumeData } from '@/components/document-builder'
 
 const TOTAL_STEPS = 5;
 

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react'
 
-import { AIFeatureType } from '@/components/resume-builder/AISuggestionModal'
+import { AIFeatureType } from '@/components/document-builder/AISuggestionModal'
 
 interface AISuggestionState {
   isOpen: boolean

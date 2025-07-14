@@ -10,6 +10,12 @@ import { Label } from '@/components/ui/label'
 import { sanitizeTemplateContent } from '@/lib/security'
 import { renderTemplate, extractPlaceholders, validateTemplate, getSampleResumeData } from '@/lib/template-renderer'
 
+const DOCUMENT_TYPE_OPTIONS = [
+  { value: 'resume', label: 'Resume' },
+  { value: 'cv', label: 'CV' },
+  { value: 'biodata', label: 'Biodata' }
+]
+
 interface TemplateMetadata {
   name: string
   description: string
@@ -80,6 +86,7 @@ export default function CreateTemplateClient() {
   const [templateId, setTemplateId] = useState<string | null>(null)
   const [_scale, setScale] = useState(0.5)
   const [showSettings, setShowSettings] = useState(false)
+  const [selectedDocumentTypes, setSelectedDocumentTypes] = useState<string[]>(['resume'])
 
   const sampleData = getSampleResumeData()
 
@@ -158,10 +165,22 @@ export default function CreateTemplateClient() {
     }))
   }
 
+  const handleDocumentTypeChange = (type: string) => {
+    setSelectedDocumentTypes(prev =>
+      prev.includes(type)
+        ? prev.filter(t => t !== type)
+        : [...prev, type]
+    )
+  }
+
   const handlePublish = async () => {
     setError('')
     if (!metadata.name.trim() || !metadata.category || !metadata.description.trim() || !htmlTemplate.trim()) {
       setError('Please fill in all required fields.')
+      return
+    }
+    if (!selectedDocumentTypes.length) {
+      setError('Please select at least one document type.')
       return
     }
     setIsPublishing(true)
@@ -185,7 +204,8 @@ export default function CreateTemplateClient() {
           htmlTemplate,
           cssStyles,
           placeholders,
-          layout: 'custom'
+          layout: 'custom',
+          supportedDocumentTypes: selectedDocumentTypes
         })
       })
 
@@ -311,6 +331,19 @@ export default function CreateTemplateClient() {
       </div>
       {/* Settings Modal */}
       <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} metadata={metadata} setMetadata={setMetadata} />
+      <Label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Supported Document Types</Label>
+      <div className="flex gap-4 mb-4">
+        {DOCUMENT_TYPE_OPTIONS.map(opt => (
+          <label key={opt.value} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={selectedDocumentTypes.includes(opt.value)}
+              onChange={() => handleDocumentTypeChange(opt.value)}
+            />
+            {opt.label}
+          </label>
+        ))}
+      </div>
     </div>
   )
 } 

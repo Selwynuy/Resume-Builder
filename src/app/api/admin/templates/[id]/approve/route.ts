@@ -42,7 +42,8 @@ export async function PATCH(
 
     return NextResponse.json({ 
       message: 'Template approved successfully',
-      template 
+      template,
+      supportedDocumentTypes: template.supportedDocumentTypes || []
     })
   } catch (error: unknown) {
     console.error('Error approving template:', error)

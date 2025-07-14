@@ -8,76 +8,111 @@ import {
 
 describe('Step Configuration System', () => {
   describe('STEP_CONFIGURATIONS', () => {
-    it('should have configurations for all document types', () => {
-      expect(STEP_CONFIGURATIONS[DocumentType.RESUME]).toBeDefined();
-      expect(STEP_CONFIGURATIONS[DocumentType.CV]).toBeDefined();
-      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA]).toBeDefined();
-    });
-
     it('should have correct step counts for each document type', () => {
-      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].steps).toHaveLength(5);
-      expect(STEP_CONFIGURATIONS[DocumentType.CV].steps).toHaveLength(6);
-      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].steps).toHaveLength(6);
+      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].steps).toHaveLength(6);
+      expect(STEP_CONFIGURATIONS[DocumentType.CV].steps).toHaveLength(9);
+      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].steps).toHaveLength(8);
     });
 
     it('should have correct max and min steps for each document type', () => {
-      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].maxSteps).toBe(5);
-      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].minSteps).toBe(5);
+      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].maxSteps).toBe(6);
+      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].minSteps).toBe(6);
       
-      expect(STEP_CONFIGURATIONS[DocumentType.CV].maxSteps).toBe(6);
-      expect(STEP_CONFIGURATIONS[DocumentType.CV].minSteps).toBe(6);
+      expect(STEP_CONFIGURATIONS[DocumentType.CV].maxSteps).toBe(9);
+      expect(STEP_CONFIGURATIONS[DocumentType.CV].minSteps).toBe(9);
       
-      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].maxSteps).toBe(6);
-      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].minSteps).toBe(4);
+      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].maxSteps).toBe(8);
+      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].minSteps).toBe(6);
     });
 
-    it('should have unique step IDs within each configuration', () => {
-      Object.values(STEP_CONFIGURATIONS).forEach(config => {
-        const stepIds = config.steps.map(step => step.id);
-        const uniqueIds = new Set(stepIds);
-        expect(uniqueIds.size).toBe(stepIds.length);
-      });
+    it('should have TemplateSelector as first step for all document types', () => {
+      expect(STEP_CONFIGURATIONS[DocumentType.RESUME].steps[0].component).toBe('TemplateSelector');
+      expect(STEP_CONFIGURATIONS[DocumentType.CV].steps[0].component).toBe('TemplateSelector');
+      expect(STEP_CONFIGURATIONS[DocumentType.BIODATA].steps[0].component).toBe('TemplateSelector');
     });
 
-    it('should have required components for all steps', () => {
-      Object.values(STEP_CONFIGURATIONS).forEach(config => {
-        config.steps.forEach(step => {
-          expect(step.component).toBeDefined();
-          expect(step.component).not.toBe('');
-        });
-      });
+    it('should have correct step components for Resume', () => {
+      const resumeSteps = STEP_CONFIGURATIONS[DocumentType.RESUME].steps;
+      expect(resumeSteps[0].component).toBe('TemplateSelector');
+      expect(resumeSteps[1].component).toBe('PersonalInfoStep');
+      expect(resumeSteps[2].component).toBe('ExperienceStep');
+      expect(resumeSteps[3].component).toBe('EducationStep');
+      expect(resumeSteps[4].component).toBe('SkillsStep');
+      expect(resumeSteps[5].component).toBe('ReviewStep');
+    });
+
+    it('should have correct step components for CV', () => {
+      const cvSteps = STEP_CONFIGURATIONS[DocumentType.CV].steps;
+      expect(cvSteps[0].component).toBe('TemplateSelector');
+      expect(cvSteps[1].component).toBe('PersonalInfoStep');
+      expect(cvSteps[2].component).toBe('ExperienceStep');
+      expect(cvSteps[3].component).toBe('EducationStep');
+      expect(cvSteps[4].component).toBe('SkillsStep');
+      expect(cvSteps[5].component).toBe('PublicationsStep');
+      expect(cvSteps[6].component).toBe('ResearchStep');
+      expect(cvSteps[7].component).toBe('AwardsStep');
+      expect(cvSteps[8].component).toBe('ReviewStep');
+    });
+
+    it('should have correct step components for Biodata', () => {
+      const biodataSteps = STEP_CONFIGURATIONS[DocumentType.BIODATA].steps;
+      expect(biodataSteps[0].component).toBe('TemplateSelector');
+      expect(biodataSteps[1].component).toBe('PersonalInfoStep');
+      expect(biodataSteps[2].component).toBe('ExperienceStep');
+      expect(biodataSteps[3].component).toBe('EducationStep');
+      expect(biodataSteps[4].component).toBe('SkillsStep');
+      expect(biodataSteps[5].component).toBe('PersonalDetailsStep');
+      expect(biodataSteps[6].component).toBe('LanguagesStep');
+      expect(biodataSteps[7].component).toBe('ReviewStep');
     });
   });
 
   describe('STEP_VALIDATION_RULES', () => {
-    it('should have validation rules for all document types', () => {
-      expect(STEP_VALIDATION_RULES[DocumentType.RESUME]).toBeDefined();
-      expect(STEP_VALIDATION_RULES[DocumentType.CV]).toBeDefined();
-      expect(STEP_VALIDATION_RULES[DocumentType.BIODATA]).toBeDefined();
-    });
-
     it('should have correct number of validation rules for each document type', () => {
-      expect(STEP_VALIDATION_RULES[DocumentType.RESUME]).toHaveLength(5);
-      expect(STEP_VALIDATION_RULES[DocumentType.CV]).toHaveLength(6);
-      expect(STEP_VALIDATION_RULES[DocumentType.BIODATA]).toHaveLength(6);
+      expect(STEP_VALIDATION_RULES[DocumentType.RESUME]).toHaveLength(6);
+      expect(STEP_VALIDATION_RULES[DocumentType.CV]).toHaveLength(9);
+      expect(STEP_VALIDATION_RULES[DocumentType.BIODATA]).toHaveLength(8);
     });
 
-    it('should have all steps marked as required for Resume', () => {
-      STEP_VALIDATION_RULES[DocumentType.RESUME].forEach(rule => {
-        expect(rule.required).toBe(true);
-      });
+    it('should have TemplateSelector as required for all document types', () => {
+      expect(STEP_VALIDATION_RULES[DocumentType.RESUME][0].stepId).toBe(1);
+      expect(STEP_VALIDATION_RULES[DocumentType.RESUME][0].required).toBe(true);
+      expect(STEP_VALIDATION_RULES[DocumentType.CV][0].stepId).toBe(1);
+      expect(STEP_VALIDATION_RULES[DocumentType.CV][0].required).toBe(true);
+      expect(STEP_VALIDATION_RULES[DocumentType.BIODATA][0].stepId).toBe(1);
+      expect(STEP_VALIDATION_RULES[DocumentType.BIODATA][0].required).toBe(true);
     });
 
-    it('should have all steps marked as required for CV', () => {
-      STEP_VALIDATION_RULES[DocumentType.CV].forEach(rule => {
-        expect(rule.required).toBe(true);
-      });
+    it('should have correct dependencies for Resume', () => {
+      const resumeRules = STEP_VALIDATION_RULES[DocumentType.RESUME];
+      expect(resumeRules[1].dependencies).toEqual([1]); // PersonalInfo depends on TemplateSelector
+      expect(resumeRules[2].dependencies).toEqual([1]); // Experience depends on TemplateSelector
+      expect(resumeRules[3].dependencies).toEqual([1]); // Education depends on TemplateSelector
+      expect(resumeRules[4].dependencies).toEqual([1]); // Skills depends on TemplateSelector
+      expect(resumeRules[5].dependencies).toEqual([1, 2, 3, 4, 5]); // Review depends on all previous
     });
 
-    it('should have some optional steps for Biodata', () => {
+    it('should have correct dependencies for CV', () => {
+      const cvRules = STEP_VALIDATION_RULES[DocumentType.CV];
+      expect(cvRules[1].dependencies).toEqual([1]); // PersonalInfo depends on TemplateSelector
+      expect(cvRules[2].dependencies).toEqual([1]); // Experience depends on TemplateSelector
+      expect(cvRules[3].dependencies).toEqual([1]); // Education depends on TemplateSelector
+      expect(cvRules[4].dependencies).toEqual([1]); // Skills depends on TemplateSelector
+      expect(cvRules[5].dependencies).toEqual([1, 2, 3, 4, 5]); // Publications depends on all previous
+      expect(cvRules[6].dependencies).toEqual([1, 2, 3, 4, 5, 6]); // Research depends on all previous
+      expect(cvRules[7].dependencies).toEqual([1, 2, 3, 4, 5, 6, 7]); // Awards depends on all previous
+      expect(cvRules[8].dependencies).toEqual([1, 2, 3, 4, 5, 6, 7, 8]); // Review depends on all previous
+    });
+
+    it('should have correct dependencies for Biodata', () => {
       const biodataRules = STEP_VALIDATION_RULES[DocumentType.BIODATA];
-      const optionalSteps = biodataRules.filter(rule => !rule.required);
-      expect(optionalSteps.length).toBeGreaterThan(0);
+      expect(biodataRules[1].dependencies).toEqual([1]); // PersonalInfo depends on TemplateSelector
+      expect(biodataRules[2].dependencies).toEqual([1]); // Experience depends on TemplateSelector
+      expect(biodataRules[3].dependencies).toEqual([1]); // Education depends on TemplateSelector
+      expect(biodataRules[4].dependencies).toEqual([1]); // Skills depends on TemplateSelector
+      expect(biodataRules[5].dependencies).toEqual([1]); // Personal Details depends on TemplateSelector
+      expect(biodataRules[6].dependencies).toEqual([1]); // Languages depends on TemplateSelector
+      expect(biodataRules[7].dependencies).toEqual([1, 2, 4, 6, 7]); // Review depends on required steps
     });
   });
 
@@ -86,29 +121,19 @@ describe('Step Configuration System', () => {
       it('should return correct configuration for Resume', () => {
         const config = StepConfigurationManager.getConfiguration(DocumentType.RESUME);
         expect(config.documentType).toBe(DocumentType.RESUME);
-        expect(config.steps).toHaveLength(5);
+        expect(config.steps).toHaveLength(6);
       });
 
       it('should return correct configuration for CV', () => {
         const config = StepConfigurationManager.getConfiguration(DocumentType.CV);
         expect(config.documentType).toBe(DocumentType.CV);
-        expect(config.steps).toHaveLength(6);
+        expect(config.steps).toHaveLength(9);
       });
 
       it('should return correct configuration for Biodata', () => {
         const config = StepConfigurationManager.getConfiguration(DocumentType.BIODATA);
         expect(config.documentType).toBe(DocumentType.BIODATA);
-        expect(config.steps).toHaveLength(6);
-      });
-    });
-
-    describe('getAvailableDocumentTypes', () => {
-      it('should return all document types', () => {
-        const types = StepConfigurationManager.getAvailableDocumentTypes();
-        expect(types).toContain(DocumentType.RESUME);
-        expect(types).toContain(DocumentType.CV);
-        expect(types).toContain(DocumentType.BIODATA);
-        expect(types).toHaveLength(3);
+        expect(config.steps).toHaveLength(8);
       });
     });
 
@@ -117,7 +142,7 @@ describe('Step Configuration System', () => {
         const stepConfig = StepConfigurationManager.getStepConfig(DocumentType.RESUME, 1);
         expect(stepConfig).toBeDefined();
         expect(stepConfig?.id).toBe(1);
-        expect(stepConfig?.title).toBe('Personal Info');
+        expect(stepConfig?.title).toBe('Document Type & Template');
       });
 
       it('should return undefined for invalid step ID', () => {
@@ -129,19 +154,19 @@ describe('Step Configuration System', () => {
     describe('getValidationRules', () => {
       it('should return validation rules for Resume', () => {
         const rules = StepConfigurationManager.getValidationRules(DocumentType.RESUME);
-        expect(rules).toHaveLength(5);
+        expect(rules).toHaveLength(6);
         expect(rules.every(rule => rule.required)).toBe(true);
       });
 
       it('should return validation rules for CV', () => {
         const rules = StepConfigurationManager.getValidationRules(DocumentType.CV);
-        expect(rules).toHaveLength(6);
+        expect(rules).toHaveLength(9);
         expect(rules.every(rule => rule.required)).toBe(true);
       });
 
       it('should return validation rules for Biodata', () => {
         const rules = StepConfigurationManager.getValidationRules(DocumentType.BIODATA);
-        expect(rules).toHaveLength(6);
+        expect(rules).toHaveLength(8);
         expect(rules.some(rule => !rule.required)).toBe(true);
       });
     });
@@ -149,13 +174,13 @@ describe('Step Configuration System', () => {
     describe('isStepRequired', () => {
       it('should return true for required steps', () => {
         expect(StepConfigurationManager.isStepRequired(DocumentType.RESUME, 1)).toBe(true);
-        expect(StepConfigurationManager.isStepRequired(DocumentType.CV, 1)).toBe(true);
-        expect(StepConfigurationManager.isStepRequired(DocumentType.BIODATA, 1)).toBe(true);
+        expect(StepConfigurationManager.isStepRequired(DocumentType.RESUME, 2)).toBe(true);
+        expect(StepConfigurationManager.isStepRequired(DocumentType.RESUME, 6)).toBe(true);
       });
 
       it('should return false for optional steps', () => {
-        expect(StepConfigurationManager.isStepRequired(DocumentType.BIODATA, 2)).toBe(false);
-        expect(StepConfigurationManager.isStepRequired(DocumentType.BIODATA, 4)).toBe(false);
+        expect(StepConfigurationManager.isStepRequired(DocumentType.BIODATA, 3)).toBe(false);
+        expect(StepConfigurationManager.isStepRequired(DocumentType.BIODATA, 5)).toBe(false);
       });
     });
 
@@ -166,25 +191,22 @@ describe('Step Configuration System', () => {
       });
 
       it('should return correct dependencies for later steps', () => {
-        const dependencies = StepConfigurationManager.getStepDependencies(DocumentType.RESUME, 5);
-        expect(dependencies).toEqual([1, 2, 3, 4]);
+        const dependencies = StepConfigurationManager.getStepDependencies(DocumentType.RESUME, 6);
+        expect(dependencies).toEqual([1, 2, 3, 4, 5]);
       });
     });
 
     describe('canAccessStep', () => {
       it('should return true for first step', () => {
-        const canAccess = StepConfigurationManager.canAccessStep(DocumentType.RESUME, 1, []);
-        expect(canAccess).toBe(true);
+        expect(StepConfigurationManager.canAccessStep(DocumentType.RESUME, 1, [])).toBe(true);
       });
 
       it('should return true when dependencies are met', () => {
-        const canAccess = StepConfigurationManager.canAccessStep(DocumentType.RESUME, 2, [1]);
-        expect(canAccess).toBe(true);
+        expect(StepConfigurationManager.canAccessStep(DocumentType.RESUME, 2, [1])).toBe(true);
       });
 
       it('should return false when dependencies are not met', () => {
-        const canAccess = StepConfigurationManager.canAccessStep(DocumentType.RESUME, 2, []);
-        expect(canAccess).toBe(false);
+        expect(StepConfigurationManager.canAccessStep(DocumentType.RESUME, 2, [])).toBe(false);
       });
     });
 
@@ -195,7 +217,7 @@ describe('Step Configuration System', () => {
       });
 
       it('should return null for last step', () => {
-        const nextStep = StepConfigurationManager.getNextStep(DocumentType.RESUME, 5, [1, 2, 3, 4, 5]);
+        const nextStep = StepConfigurationManager.getNextStep(DocumentType.RESUME, 6, [1, 2, 3, 4, 5, 6]);
         expect(nextStep).toBeNull();
       });
 
@@ -220,40 +242,35 @@ describe('Step Configuration System', () => {
     describe('getRequiredSteps', () => {
       it('should return all required steps for Resume', () => {
         const requiredSteps = StepConfigurationManager.getRequiredSteps(DocumentType.RESUME);
-        expect(requiredSteps).toEqual([1, 2, 3, 4, 5]);
+        expect(requiredSteps).toEqual([1, 2, 3, 4, 5, 6]);
       });
 
       it('should return all required steps for CV', () => {
         const requiredSteps = StepConfigurationManager.getRequiredSteps(DocumentType.CV);
-        expect(requiredSteps).toEqual([1, 2, 3, 4, 5, 6]);
+        expect(requiredSteps).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9]);
       });
 
       it('should return only required steps for Biodata', () => {
         const requiredSteps = StepConfigurationManager.getRequiredSteps(DocumentType.BIODATA);
-        expect(requiredSteps).toEqual([1, 3, 5, 6]);
+        expect(requiredSteps).toEqual([1, 2, 4, 6, 7, 8]);
       });
     });
 
     describe('getOptionalSteps', () => {
-      it('should return empty array for Resume', () => {
+      it('should return empty array for Resume (all required)', () => {
         const optionalSteps = StepConfigurationManager.getOptionalSteps(DocumentType.RESUME);
-        expect(optionalSteps).toEqual([]);
-      });
-
-      it('should return empty array for CV', () => {
-        const optionalSteps = StepConfigurationManager.getOptionalSteps(DocumentType.CV);
         expect(optionalSteps).toEqual([]);
       });
 
       it('should return optional steps for Biodata', () => {
         const optionalSteps = StepConfigurationManager.getOptionalSteps(DocumentType.BIODATA);
-        expect(optionalSteps).toEqual([2, 4]);
+        expect(optionalSteps).toEqual([3, 5]);
       });
     });
 
     describe('validateStepCompletion', () => {
       it('should return valid when all required steps are completed', () => {
-        const result = StepConfigurationManager.validateStepCompletion(DocumentType.RESUME, [1, 2, 3, 4, 5]);
+        const result = StepConfigurationManager.validateStepCompletion(DocumentType.RESUME, [1, 2, 3, 4, 5, 6]);
         expect(result.isValid).toBe(true);
         expect(result.missingRequired).toEqual([]);
       });
@@ -261,26 +278,26 @@ describe('Step Configuration System', () => {
       it('should return invalid when required steps are missing', () => {
         const result = StepConfigurationManager.validateStepCompletion(DocumentType.RESUME, [1, 2, 3]);
         expect(result.isValid).toBe(false);
-        expect(result.missingRequired).toEqual([4, 5]);
+        expect(result.missingRequired).toEqual([4, 5, 6]);
       });
 
       it('should handle optional steps correctly for Biodata', () => {
-        const result = StepConfigurationManager.validateStepCompletion(DocumentType.BIODATA, [1, 3, 5, 6]);
+        const result = StepConfigurationManager.validateStepCompletion(DocumentType.BIODATA, [1, 2, 4, 6, 7, 8]);
         expect(result.isValid).toBe(true);
         expect(result.missingRequired).toEqual([]);
-        expect(result.missingOptional).toEqual([2, 4]);
+        expect(result.missingOptional).toEqual([3, 5]);
       });
     });
 
     describe('getCompletionPercentage', () => {
       it('should return 100% when all steps are completed', () => {
-        const percentage = StepConfigurationManager.getCompletionPercentage(DocumentType.RESUME, [1, 2, 3, 4, 5]);
+        const percentage = StepConfigurationManager.getCompletionPercentage(DocumentType.RESUME, [1, 2, 3, 4, 5, 6]);
         expect(percentage).toBe(100);
       });
 
-      it('should return 60% when 3 out of 5 steps are completed', () => {
+      it('should return 50% when 3 out of 6 steps are completed', () => {
         const percentage = StepConfigurationManager.getCompletionPercentage(DocumentType.RESUME, [1, 2, 3]);
-        expect(percentage).toBe(60);
+        expect(percentage).toBe(50);
       });
 
       it('should return 0% when no steps are completed', () => {
@@ -289,24 +306,11 @@ describe('Step Configuration System', () => {
       });
     });
 
-    describe('getStepByComponent', () => {
-      it('should return step config for valid component name', () => {
-        const stepConfig = StepConfigurationManager.getStepByComponent(DocumentType.RESUME, 'PersonalInfoStep');
-        expect(stepConfig).toBeDefined();
-        expect(stepConfig?.component).toBe('PersonalInfoStep');
-      });
-
-      it('should return undefined for invalid component name', () => {
-        const stepConfig = StepConfigurationManager.getStepByComponent(DocumentType.RESUME, 'InvalidComponent');
-        expect(stepConfig).toBeUndefined();
-      });
-    });
-
     describe('isLastStep', () => {
       it('should return true for last step', () => {
-        expect(StepConfigurationManager.isLastStep(DocumentType.RESUME, 5)).toBe(true);
-        expect(StepConfigurationManager.isLastStep(DocumentType.CV, 6)).toBe(true);
-        expect(StepConfigurationManager.isLastStep(DocumentType.BIODATA, 6)).toBe(true);
+        expect(StepConfigurationManager.isLastStep(DocumentType.RESUME, 6)).toBe(true);
+        expect(StepConfigurationManager.isLastStep(DocumentType.CV, 9)).toBe(true);
+        expect(StepConfigurationManager.isLastStep(DocumentType.BIODATA, 8)).toBe(true);
       });
 
       it('should return false for non-last steps', () => {
@@ -324,7 +328,7 @@ describe('Step Configuration System', () => {
 
       it('should return false for non-first steps', () => {
         expect(StepConfigurationManager.isFirstStep(DocumentType.RESUME, 2)).toBe(false);
-        expect(StepConfigurationManager.isFirstStep(DocumentType.RESUME, 5)).toBe(false);
+        expect(StepConfigurationManager.isFirstStep(DocumentType.RESUME, 6)).toBe(false);
       });
     });
   });

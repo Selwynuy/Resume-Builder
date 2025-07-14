@@ -11,10 +11,18 @@ import {
   EducationStep,
   SkillsStep,
   ReviewStep,
-  STEPS
-} from '@/components/resume-builder'
+  CVStep,
+  BiodataStep,
+  TemplateSelector,
+  PublicationsStep,
+  ResearchStep,
+  AwardsStep,
+  PersonalDetailsStep,
+  LanguagesStep,
+  StepCustomizationModal
+} from '@/components/document-builder'
 import { useResumeWizard } from '@/hooks/useResumeWizard'
-
+import { DocumentType } from '@/components/document-builder/types'
 
 // Client-side rendering for resume builder - highly interactive
 export const dynamic = 'force-dynamic'
@@ -27,6 +35,9 @@ export default function NewResumePage() {
     selectedTemplateData,
     saveMessage,
     isLoading,
+    documentType,
+    currentStep,
+    completedSteps,
     updatePersonalInfo,
     updateExperience,
     addExperience,
@@ -41,10 +52,30 @@ export default function NewResumePage() {
     handleExportPDF,
     handleStepClick,
     handleChangeTemplate,
-    currentStep,
-    nextStep,
-    prevStep,
-    canProceed
+    handleDocumentTypeChange,
+    goToNextStep,
+    goToPreviousStep,
+    canAccessStep,
+    getCurrentStepDetails,
+    getCurrentStepConfig,
+    isLastStep,
+    isFirstStep,
+    canProceed,
+    updateCVData,
+    updateBiodataData,
+    updatePublications,
+    updateResearchExperience,
+    updateAcademicAchievements,
+    updatePersonalDetails,
+    updateLanguages,
+    // Step customization
+    customSteps,
+    isStepCustomizationOpen,
+    openStepCustomization,
+    closeStepCustomization,
+    handleStepsChange,
+    getCurrentSteps,
+    resetToDefaultSteps
   } = useResumeWizard()
   const { status: authStatus } = useSession()
   const searchParams = useSearchParams()
@@ -83,15 +114,31 @@ export default function NewResumePage() {
   }, [resumeData.template])
 
   const renderCurrentStep = () => {
-    switch (currentStep) {
-      case 1:
+    const currentStepDetails = getCurrentStepDetails()
+    const stepConfig = getCurrentStepConfig()
+    
+    if (!currentStepDetails) {
+      return <div>Step {currentStep} - Configuration not found!</div>
+    }
+
+    switch (currentStepDetails.component) {
+      case 'TemplateSelector':
+        return (
+          <TemplateSelector 
+            selectedTemplate={selectedTemplateData as any}
+            selectedDocumentType={documentType}
+            onChangeTemplate={handleChangeTemplate}
+            onDocumentTypeChange={handleDocumentTypeChange}
+          />
+        )
+      case 'PersonalInfoStep':
         return (
           <PersonalInfoStep 
             personalInfo={resumeData.personalInfo}
             updatePersonalInfo={updatePersonalInfo}
           />
         )
-      case 2:
+      case 'ExperienceStep':
         return (
           <ExperienceStep 
             experiences={resumeData.experiences}
@@ -100,7 +147,7 @@ export default function NewResumePage() {
             removeExperience={removeExperience}
           />
         )
-      case 3:
+      case 'EducationStep':
         return (
           <EducationStep 
             education={resumeData.education}
@@ -109,7 +156,7 @@ export default function NewResumePage() {
             removeEducation={removeEducation}
           />
         )
-      case 4:
+      case 'SkillsStep':
         return (
           <SkillsStep 
             skills={resumeData.skills}
@@ -119,7 +166,83 @@ export default function NewResumePage() {
             resumeData={resumeData}
           />
         )
-      case 5:
+      case 'PublicationsStep':
+        return (
+          <PublicationsStep 
+            publications={resumeData.cvData?.publications || []}
+            onUpdate={updatePublications}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'ResearchStep':
+        return (
+          <ResearchStep 
+            researchExperience={resumeData.cvData?.researchExperience || []}
+            onUpdate={updateResearchExperience}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'AwardsStep':
+        return (
+          <AwardsStep 
+            academicAchievements={resumeData.cvData?.academicAchievements || []}
+            onUpdate={updateAcademicAchievements}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'PersonalDetailsStep':
+        return (
+          <PersonalDetailsStep 
+            personalDetails={resumeData.biodataData?.personalDetails || []}
+            onUpdate={updatePersonalDetails}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'LanguagesStep':
+        return (
+          <LanguagesStep 
+            languages={resumeData.biodataData?.languages || []}
+            onUpdate={updateLanguages}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'CVStep':
+        return (
+          <CVStep 
+            cvData={resumeData.cvData || {
+              publications: [],
+              researchExperience: [],
+              academicAchievements: [],
+              teachingExperience: [],
+              grants: [],
+              conferences: []
+            }}
+            onUpdate={updateCVData}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'BiodataStep':
+        return (
+          <BiodataStep 
+            biodataData={resumeData.biodataData || {
+              personalDetails: [],
+              familyMembers: [],
+              hobbies: [],
+              languages: [],
+              references: []
+            }}
+            onUpdate={updateBiodataData}
+            onNext={goToNextStep}
+            onPrevious={goToPreviousStep}
+          />
+        )
+      case 'ReviewStep':
         return (
           <ReviewStep 
             resumeData={resumeData}
@@ -142,7 +265,7 @@ export default function NewResumePage() {
           />
         )
       default:
-        return <div>Step {currentStep} - Coming Soon!</div>
+        return <div>Step {currentStep} - Component "{currentStepDetails.component}" not found!</div>
     }
   }
 
@@ -153,10 +276,10 @@ export default function NewResumePage() {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
           <p className="text-slate-600">
             {authStatus === 'loading' ? 'Loading...' : 'Loading resume data...'}
-                                  </p>
-                              </div>
-                            </div>
-                          )
+          </p>
+        </div>
+      </div>
+    )
   }
 
   if (authStatus === 'unauthenticated') {
@@ -168,66 +291,92 @@ export default function NewResumePage() {
           <Link href="/login" className="btn-gradient">
             Sign In
           </Link>
-                        </div>
-                      </div>
-                    )
+        </div>
+      </div>
+    )
   }
 
-    return (
+  const stepConfig = getCurrentStepConfig()
+  const currentStepDetails = getCurrentStepDetails()
+
+  return (
     <>
       <div className="min-h-screen pt-32 pb-12">
         <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <ProgressBar currentStep={currentStep} onStepClick={handleStepClick} />
+          <ProgressBar 
+            currentStep={currentStep} 
+            onStepClick={handleStepClick} 
+            steps={stepConfig.steps}
+          />
 
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
             {renderCurrentStep()}
           </div>
 
-        <div className="flex justify-between items-center">
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className={`
-              px-6 py-3 rounded-xl font-medium transition-all duration-300
-              ${currentStep === 1 
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }
-            `}
-          >
-            ← Previous
-          </button>
-
-          <div className="text-center">
-            <span className="text-sm text-slate-500">
-              Step {currentStep} of {STEPS.length}
-            </span>
-                              </div>
-
-          {currentStep < STEPS.length ? (
+          <div className="flex justify-between items-center">
+            <div className="flex space-x-3">
             <button
-              onClick={() => {
-                if (canProceed()) nextStep()
-              }}
-              disabled={!canProceed()}
+              onClick={goToPreviousStep}
+              disabled={isFirstStep()}
               className={`
                 px-6 py-3 rounded-xl font-medium transition-all duration-300
-                ${!canProceed()
+                ${isFirstStep() 
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:scale-105'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }
               `}
             >
-              Next →
+              ← Previous
             </button>
-          ) : (
-            <div className="px-6 py-3 text-slate-500 text-sm">
-              ✨ All steps completed! Use the buttons above to save or export.
-          </div>
-              )}
+              
+              <button
+                onClick={openStepCustomization}
+                className="px-4 py-3 rounded-xl font-medium transition-all duration-300 bg-gray-100 text-gray-700 hover:bg-gray-200"
+                title="Customize steps"
+              >
+                ⚙️ Customize
+              </button>
             </div>
+
+            <div className="text-center">
+              <span className="text-sm text-slate-500">
+                Step {currentStep} of {stepConfig.steps.length}
+              </span>
+            </div>
+
+            {!isLastStep() ? (
+              <button
+                onClick={() => {
+                  if (canProceed()) goToNextStep()
+                }}
+                disabled={!canProceed()}
+                className={`
+                  px-6 py-3 rounded-xl font-medium transition-all duration-300
+                  ${!canProceed()
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:scale-105'
+                  }
+                `}
+              >
+                Next →
+              </button>
+            ) : (
+              <div className="px-6 py-3 text-slate-500 text-sm">
+                ✨ All steps completed! Use the buttons above to save or export.
+              </div>
+            )}
           </div>
         </div>
-      </>
+      </div>
+
+      {/* Step Customization Modal */}
+      <StepCustomizationModal
+        isOpen={isStepCustomizationOpen}
+        onClose={closeStepCustomization}
+        documentType={documentType}
+        currentSteps={getCurrentSteps()}
+        onStepsChange={handleStepsChange}
+      />
+    </>
   )
 } 

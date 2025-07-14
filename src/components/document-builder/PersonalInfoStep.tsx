@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react'
 
-import { ValidatedInput, validatePersonalInfoField } from '@/components/resume-builder'
-import AISuggestionModal from '@/components/resume-builder/AISuggestionModal'
-import { PersonalInfo } from '@/components/resume-builder/types'
+import { ValidatedInput, validatePersonalInfoField } from '@/components/document-builder'
+import AISuggestionModal from '@/components/document-builder/AISuggestionModal'
+import { PersonalInfo } from '@/components/document-builder/types'
 import { INPUT_LIMITS } from '@/lib/security'
 
 interface PersonalInfoStepProps {

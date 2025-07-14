@@ -341,6 +341,7 @@ describe('AISuggestionModal', () => {
       })
 
       render(<AISuggestionModal {...mockProps} featureType="skills" />)
+      await waitFor(() => expect(screen.queryByLabelText('Loading suggestions')).not.toBeInTheDocument());
       const addButton = await screen.findByRole('button', { name: /add skill/i })
       await act(async () => {
         addButton.click()

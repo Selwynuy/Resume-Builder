@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import { EducationInputRow } from '@/components/resume-builder/EducationInputRow'
-import { Education } from '@/components/resume-builder/types'
-import { validateEducationField } from '@/components/resume-builder/validateEducationField'
+import { EducationInputRow } from '@/components/document-builder/EducationInputRow'
+import { Education } from '@/components/document-builder/types'
+import { validateEducationField } from '@/components/document-builder/validateEducationField'
 import { Button } from '@/components/ui/button'
 
 interface EducationStepProps {

@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useEffect, useState } from 'react'
 
 import { sanitizeTemplateContent } from '@/lib/security'
@@ -26,7 +27,7 @@ interface CustomTemplate {
   isApproved: boolean
 }
 
-export default function TemplatePreview({ template }: { template: CustomTemplate }) {
+export default function TemplatePreview({ template }: { template: CustomTemplate & { supportedDocumentTypes?: string[] } }) {
   const [preview, setPreview] = useState<{ html: string; css: string }>({ html: '', css: '' })
   const [isLoading, setIsLoading] = useState(true)
 
@@ -75,6 +76,23 @@ export default function TemplatePreview({ template }: { template: CustomTemplate
       className="bg-white shadow-lg rounded-md border w-full max-w-[320px] aspect-[8.5/11] overflow-hidden flex items-center justify-center"
       style={{ position: "relative" }}
     >
+      {/* Document Type Badges */}
+      {template.supportedDocumentTypes && template.supportedDocumentTypes.length > 0 && (
+        <div className="absolute top-2 left-2 flex gap-1 z-10">
+          {template.supportedDocumentTypes.map((type) => (
+            <span
+              key={type}
+              className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm
+                ${type === 'resume' ? 'bg-blue-100 text-blue-800' :
+                  type === 'cv' ? 'bg-purple-100 text-purple-800' :
+                  type === 'biodata' ? 'bg-green-100 text-green-800' :
+                  'bg-gray-100 text-gray-800'}`}
+            >
+              {type === 'resume' ? 'Resume' : type === 'cv' ? 'CV' : type === 'biodata' ? 'Biodata' : type}
+            </span>
+          ))}
+        </div>
+      )}
       <style>{preview.css}</style>
       <div
         dangerouslySetInnerHTML={{ __html: preview.html }}

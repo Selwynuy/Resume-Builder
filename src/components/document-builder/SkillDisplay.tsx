@@ -1,4 +1,4 @@
-import { Skill } from '@/components/resume-builder/types'
+import { Skill } from '@/components/document-builder/types'
 
 export function SkillDisplay({ skill }: { skill: Skill }) {
   if (!skill.name) return null;
