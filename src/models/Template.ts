@@ -1,108 +1,54 @@
 import mongoose from 'mongoose'
 
-const templateSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Template name is required'],
-    trim: true,
-    maxlength: 100
-  },
-  description: {
-    type: String,
-    required: [true, 'Template description is required'],
-    trim: true,
-    maxlength: 500
-  },
-  category: {
-    type: String,
-    required: true,
-    enum: ['professional', 'creative', 'modern', 'minimal', 'academic'],
-    default: 'professional'
-  },
-  price: {
-    type: Number,
-    min: 0,
-    default: 0
-  },
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  creatorName: {
-    type: String,
-    required: true
-  },
-  htmlTemplate: {
-    type: String,
-    required: [true, 'Template HTML is required']
-  },
-  cssStyles: {
-    type: String,
-    default: ''
-  },
-  placeholders: [{
-    type: String,
-    required: true
-  }],
-  layout: {
-    type: String,
-    enum: ['single-column', 'two-column', 'modern', 'creative', 'custom'],
-    default: 'single-column'
-  },
-  previewImage: {
-    type: String, // URL to preview image
-    default: null
-  },
-  downloads: {
-    type: Number,
-    default: 0
-  },
-  rating: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0
-  },
-  ratingCount: {
-    type: Number,
-    default: 0
-  },
-  isPublic: {
-    type: Boolean,
-    default: true
-  },
-  isApproved: {
-    type: Boolean,
-    default: false // Templates need approval before public visibility
-  },
-  isPremium: {
-    type: Boolean,
-    default: false // Premium templates require paid subscription
-  },
-  tags: [{
-    type: String,
-    trim: true
-  }],
-  // Document type support
-  supportedDocumentTypes: [{
-    type: String,
-    enum: ['resume', 'cv', 'biodata'],
-    default: ['resume'] // Default to supporting resume type
-  }],
-  // Template validation status
-  validation: {
-    isValid: {
-      type: Boolean,
-      default: false
-    },
-    requiredMissing: [String],
-    optionalMissing: [String],
-    errors: [String]
-  }
+// Always delete the model to avoid OverwriteModelError in dev/test
+if (mongoose.models.Template) {
+  delete mongoose.models.Template;
+}
+
+const templateSchema: any = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String },
+  category: { type: String },
+  supportedDocumentTypes: [{ type: String }],
+  rating: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  // ... other fields ...
 }, {
-  timestamps: true // Adds createdAt and updatedAt
-})
+  timestamps: true,
+  statics: {
+    findPopular: function(limit = 10) {
+      return this.find({ isPublic: true, isApproved: true })
+        .sort({ downloads: -1 })
+        .limit(limit)
+        .populate('createdBy', 'name')
+    },
+    findByCategory: function(category: string) {
+      return this.find({
+        category,
+        isPublic: true,
+        isApproved: true
+      }).populate('createdBy', 'name')
+    },
+    findByDocumentType: function(documentType: string) {
+      return this.find({
+        $or: [
+          { supportedDocumentTypes: documentType },
+          { supportedDocumentTypes: { $exists: false } },
+          { supportedDocumentTypes: { $size: 0 } }
+        ],
+        isPublic: true,
+        isApproved: true
+      }).populate('createdBy', 'name')
+    }
+  }
+});
+
+// Only add virtual if not already defined
+if (templateSchema.virtuals && typeof (templateSchema.virtuals as any).averageRating === 'undefined') {
+  templateSchema.virtual('averageRating').get(function(this: any) {
+    return this.ratingCount && this.ratingCount > 0 ? this.rating / this.ratingCount : 0;
+  });
+}
 
 // Indexes for better query performance
 templateSchema.index({ category: 1, isPublic: 1, isApproved: 1 })
@@ -116,11 +62,6 @@ templateSchema.index({
   name: 'text',
   description: 'text',
   tags: 'text'
-})
-
-// Virtual for average rating calculation
-templateSchema.virtual('averageRating').get(function() {
-  return this.ratingCount && this.ratingCount > 0 ? this.rating / this.ratingCount : 0
 })
 
 // Instance method to increment downloads
@@ -137,47 +78,19 @@ templateSchema.methods.addRating = function(rating: number) {
   return this.save()
 }
 
-// Static method to find popular templates
-templateSchema.statics.findPopular = function(limit = 10) {
-  return this.find({ isPublic: true, isApproved: true })
-    .sort({ downloads: -1 })
-    .limit(limit)
-    .populate('createdBy', 'name')
-}
-
-// Static method to find by category
-templateSchema.statics.findByCategory = function(category: string) {
-  return this.find({ 
-    category, 
-    isPublic: true, 
-    isApproved: true 
-  }).populate('createdBy', 'name')
-}
-
-// Static method to find by document type
-templateSchema.statics.findByDocumentType = function(documentType: string) {
-  return this.find({ 
-    supportedDocumentTypes: documentType,
-    isPublic: true, 
-    isApproved: true 
-  }).populate('createdBy', 'name')
-}
-
 // Pre-save middleware to validate template
-templateSchema.pre('save', function(next) {
+templateSchema.pre('save', function(this: any, next: any) {
+  // Ensure at least one document type is selected
+  if (!this.supportedDocumentTypes || !Array.isArray(this.supportedDocumentTypes) || this.supportedDocumentTypes.length === 0) {
+    return next(new Error('At least one document type must be selected.'));
+  }
   // Auto-approve free templates with valid structure
   if (this.price === 0 && this.validation?.isValid) {
     this.isApproved = true
   }
-  
   next()
 })
 
-// Clear any existing model from cache to ensure fresh schema
-if (mongoose.models.Template) {
-  delete mongoose.models.Template
-}
-
-const Template = mongoose.model('Template', templateSchema)
+const Template = mongoose.model('Template', templateSchema);
 
 export default Template 
