@@ -26,11 +26,11 @@ const HeroSection = () => {
         <div className="flex-1 flex flex-col items-start justify-center text-left max-w-xl">
           <span className="inline-flex items-center px-4 py-1 mb-6 rounded-full bg-blue-100 text-blue-600 font-semibold text-xs tracking-wider border border-blue-200">
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
-            PROFESSIONAL AI RESUME BUILDER
+            SMART AI RESUME BUILDER
           </span>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-2 leading-tight">
-            Make your professional resume<br />
-            <span className="text-blue-600">in minutes</span>
+            Build your professional resume<br />
+            <span className="text-blue-600">in 5 easy steps</span>
           </h1>
           <p className="mt-4 mb-8 text-lg text-slate-600 font-normal">
             Try our free resume builder and create a resume with the power of AI. Let the Genius resume maker help build your resume quickly and effortlessly.

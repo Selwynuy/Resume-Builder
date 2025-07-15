@@ -19,7 +19,7 @@ interface BillingPageClientProps {
 }
 
 export default function BillingPageClient({ session }: BillingPageClientProps) {
-  const { data: session: clientSession } = useSession();
+  const { data: clientSession } = useSession();
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState(false);

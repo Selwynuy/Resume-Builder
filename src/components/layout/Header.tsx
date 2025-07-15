@@ -11,15 +11,6 @@ import { useState } from 'react'
 
 const navItems = [
   {
-    name: "Dashboard",
-    href: "/dashboard",
-    dropdown: [
-      { name: "My Resumes", href: "/dashboard/resumes" },
-      { name: "Analytics", href: "/dashboard/analytics" },
-      { name: "Settings", href: "/dashboard/settings" },
-    ],
-  },
-  {
     name: "Templates",
     href: "/templates",
     dropdown: [
@@ -29,19 +20,10 @@ const navItems = [
       { name: "Executive", href: "/templates/executive" },
     ],
   },
-  {
-    name: "Create Resume",
-    href: "/resume/new",
-    dropdown: [
-      { name: "From Scratch", href: "/create/new" },
-      { name: "Import LinkedIn", href: "/create/linkedin" },
-      { name: "Upload Resume", href: "/create/upload" },
-    ],
-  },
-  {
-    name: "Pricing",
-    href: "/pricing",
-  },
+  { name: "Resumes", href: "/resumes" },
+  { name: "Cover Letters", href: "/cover-letters" },
+  { name: "CVs", href: "/cvs" },
+  { name: "Biodata", href: "/biodata" },
   {
     name: "Resources",
     href: "/resources",
@@ -117,11 +99,11 @@ export default function Header() {
                 {accountDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
                     <Link
-                      href="/profile"
+                      href="/dashboard"
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
                       onClick={() => setAccountDropdownOpen(false)}
                     >
-                      Profile
+                      Dashboard
                     </Link>
                     <Link
                       href="/billing"
@@ -129,6 +111,13 @@ export default function Header() {
                       onClick={() => setAccountDropdownOpen(false)}
                     >
                       Billing
+                    </Link>
+                    <Link
+                      href="/pricing"
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                      onClick={() => setAccountDropdownOpen(false)}
+                    >
+                      Pricing
                     </Link>
                     <hr className="my-2 border-slate-200" />
                     <button
