@@ -1,6 +1,6 @@
 'use client'
 
-import { motion, useAnimation } from "framer-motion"
+// Removed framer-motion for hero image
 import { CheckCircle } from "lucide-react"
 import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
@@ -9,23 +9,18 @@ import { Button } from "@/components/ui/button"
 import React from 'react'
 
 const HeroSection = () => {
-  const robotRef = useRef(null)
-  const controls = useAnimation()
+  // const robotRef = useRef(null)
+  // const controls = useAnimation()
   const router = useRouter()
 
   const handleCreateNewDocument = () => {
     router.push('/templates?modal=open')
   }
 
-  useEffect(() => {
-    controls.start({
-      y: [ -24, 24, -24 ],
-      transition: { duration: 4, repeat: Infinity, repeatType: "loop", ease: "easeInOut" }
-    })
-  }, [controls])
+  // Removed animation effect
 
   return (
-    <section className="relative overflow-hidden pt-24 pb-10 px-4 sm:px-6 lg:px-8 min-h-[80vh] flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 via-white to-white">
+    <section className="relative overflow-hidden pt-24 pb-10 px-4 sm:px-6 lg:px-8 min-h-[80vh] flex flex-col justify-center items-center bg-white">
       <div className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
         {/* Left column: text and buttons */}
         <div className="flex-1 flex flex-col items-start justify-center text-left max-w-xl">
@@ -61,16 +56,14 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-        {/* Right column: robot image */}
+        {/* Right column: hero image */}
         <div className="flex-1 flex items-center justify-center relative">
-          <motion.img
-            ref={robotRef}
-            src="/images/Roboto.png"
+          <img
+            src="/images/hero.png"
             alt="AI Robot holding resume"
-            width={420}
-            height={420}
-            className="relative z-10 drop-shadow-xl"
-            animate={controls}
+            width={540}
+            height={540}
+            className="relative z-10"
           />
         </div>
       </div>

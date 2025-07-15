@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Check, Star, GraduationCap } from 'lucide-react';
+import { Check, Star, GraduationCap, ChevronDown } from 'lucide-react';
 import { isStudentEmail } from '@/lib/paypal';
 import PayPalButton from '@/components/ui/PayPalButton';
 
@@ -211,48 +211,48 @@ export default function PricingPageClient({ session: serverSession }: PricingPag
       </div>
 
       {/* FAQ Section */}
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-2xl mx-auto mt-20">
         <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
           Frequently Asked Questions
         </h2>
-        
-        <div className="grid gap-8">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              How does the student discount work?
-            </h3>
-            <p className="text-gray-600">
-              Students with .edu email addresses automatically receive a 30% discount on all paid plans. 
-              The discount is applied at checkout.
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Can I cancel my subscription anytime?
-            </h3>
-            <p className="text-gray-600">
-              Yes, you can cancel your subscription at any time. You'll continue to have access until the end of your current billing period.
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              What payment methods do you accept?
-            </h3>
-            <p className="text-gray-600">
-              We accept all major credit cards, debit cards, and digital wallets through our secure Stripe payment processor.
-            </p>
-          </div>
-          
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Is there a free trial?
-            </h3>
-            <p className="text-gray-600">
-              We offer a free tier with basic features. You can upgrade to a paid plan anytime to unlock premium features.
-            </p>
-          </div>
+        <div className="divide-y divide-slate-200">
+          {[
+            {
+              question: 'How does the student discount work?',
+              answer: `Students with .edu email addresses automatically receive a 30% discount on all paid plans. The discount is applied at checkout.`,
+            },
+            {
+              question: 'Can I cancel my subscription anytime?',
+              answer: `Yes, you can cancel your subscription at any time. You\'ll continue to have access until the end of your current billing period.`,
+            },
+            {
+              question: 'What payment methods do you accept?',
+              answer: `We accept all major credit cards, debit cards, and digital wallets through our secure Stripe payment processor.`,
+            },
+            {
+              question: 'Is there a free trial?',
+              answer: `We offer a free tier with basic features. You can upgrade to a paid plan anytime to unlock premium features.`,
+            },
+          ].map((faq, idx) => {
+            const [open, setOpen] = useState(false);
+            return (
+              <div key={idx}>
+                <button
+                  className="w-full flex items-center justify-between py-6 px-4 text-left focus:outline-none group"
+                  onClick={() => setOpen((prev) => !prev)}
+                  aria-expanded={open}
+                >
+                  <span className="text-base md:text-lg font-medium text-slate-900 group-hover:text-blue-700 transition-colors">{faq.question}</span>
+                  <ChevronDown className={`w-5 h-5 text-blue-500 ml-2 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+                </button>
+                {open && (
+                  <div className="px-4 pb-6 text-slate-600 text-base leading-relaxed animate-fade-in">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

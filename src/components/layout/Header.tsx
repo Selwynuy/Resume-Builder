@@ -1,7 +1,6 @@
 'use client'
 
 import {
-  ChevronDown,
   Menu,
   X,
 } from "lucide-react"
@@ -88,7 +87,6 @@ export default function Header() {
               >
                 <Link href={item.href} className="flex items-center space-x-1 text-slate-700 hover:text-blue-600 transition-colors duration-200">
                   <span>{item.name}</span>
-                  <ChevronDown className="w-4 h-4" />
                 </Link>
                 {activeDropdown === item.name && item.dropdown && (
                   <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 animate-in fade-in-0 zoom-in-95 duration-200">
@@ -115,7 +113,6 @@ export default function Header() {
                   onClick={() => setAccountDropdownOpen((v) => !v)}
                 >
                   <span>My Account</span>
-                  <ChevronDown className="w-4 h-4" />
                 </button>
                 {accountDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
