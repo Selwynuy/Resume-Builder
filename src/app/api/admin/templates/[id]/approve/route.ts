@@ -50,3 +50,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to approve template' }, { status: 500 })
   }
 } 
+
+export async function POST(req: Request, ctx: any) {
+  return PATCH(req, ctx)
+} 

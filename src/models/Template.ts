@@ -12,6 +12,8 @@ const templateSchema: any = new mongoose.Schema({
   supportedDocumentTypes: [{ type: String }],
   rating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
+  isPublic: { type: Boolean, default: true },
+  isApproved: { type: Boolean, default: false },
   // ... other fields ...
 }, {
   timestamps: true,

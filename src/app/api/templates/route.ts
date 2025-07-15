@@ -61,7 +61,12 @@ export async function GET(request: NextRequest) {
 
     let templates
     if (documentType) {
-      templates = await Template.findByDocumentType(documentType)
+      templates = await Template.find({ ...query, supportedDocumentTypes: documentType })
+        .sort(sortOption)
+        .skip(skip)
+        .limit(limit)
+        .populate('createdBy', 'name')
+        .lean()
     } else {
       templates = await Template.find(query)
         .sort(sortOption)
@@ -180,6 +185,8 @@ export async function POST(request: NextRequest) {
       createdBy: user._id,
       creatorName: user.name,
       supportedDocumentTypes,
+      isPublic: true,
+      isApproved: false,
       validation: {
         isValid: true,
         requiredMissing: [],

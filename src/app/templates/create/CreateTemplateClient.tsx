@@ -23,10 +23,19 @@ interface TemplateMetadata {
   price: number
 }
 
-function SettingsModal({ open, onClose, metadata, setMetadata }: { open: boolean, onClose: () => void, metadata: TemplateMetadata, setMetadata: (v: TemplateMetadata) => void }) {
+function SettingsModal({ open, onClose, metadata, setMetadata, selectedDocumentTypes, setSelectedDocumentTypes }: { open: boolean, onClose: () => void, metadata: TemplateMetadata, setMetadata: (v: TemplateMetadata) => void, selectedDocumentTypes: string[], setSelectedDocumentTypes: React.Dispatch<React.SetStateAction<string[]>> }) {
   const [localMeta, setLocalMeta] = useState(metadata)
   useEffect(() => { setLocalMeta(metadata) }, [metadata])
   if (!open) return null
+
+  const handleDocumentTypeChange = (type: string) => {
+    setSelectedDocumentTypes((prev: string[]) =>
+      prev.includes(type)
+        ? prev.filter((t: string) => t !== type)
+        : [...prev, type]
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
@@ -52,12 +61,25 @@ function SettingsModal({ open, onClose, metadata, setMetadata }: { open: boolean
           rows={3}
           placeholder="A clean, professional template perfect for corporate positions..."
         />
+        <Label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Supported Document Types</Label>
+        <div className="flex gap-4 mb-4">
+          {DOCUMENT_TYPE_OPTIONS.map(opt => (
+            <label key={opt.value} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedDocumentTypes.includes(opt.value)}
+                onChange={() => handleDocumentTypeChange(opt.value)}
+              />
+              {opt.label}
+            </label>
+          ))}
+        </div>
         <div className="flex justify-end mt-6 gap-2">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button
             onClick={() => { setMetadata(localMeta); onClose(); }}
             className="bg-blue-600 hover:bg-blue-700"
-            disabled={!localMeta.category || !localMeta.description.trim()}
+            disabled={!localMeta.category || !localMeta.description.trim() || !selectedDocumentTypes.length}
           >Save</Button>
         </div>
       </div>
@@ -163,14 +185,6 @@ export default function CreateTemplateClient() {
       name: data.name,
       description: data.description
     }))
-  }
-
-  const handleDocumentTypeChange = (type: string) => {
-    setSelectedDocumentTypes(prev =>
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
-    )
   }
 
   const handlePublish = async () => {
@@ -330,20 +344,7 @@ export default function CreateTemplateClient() {
         </div>
       </div>
       {/* Settings Modal */}
-      <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} metadata={metadata} setMetadata={setMetadata} />
-      <Label className="block text-sm font-medium text-gray-700 mb-2 mt-4">Supported Document Types</Label>
-      <div className="flex gap-4 mb-4">
-        {DOCUMENT_TYPE_OPTIONS.map(opt => (
-          <label key={opt.value} className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={selectedDocumentTypes.includes(opt.value)}
-              onChange={() => handleDocumentTypeChange(opt.value)}
-            />
-            {opt.label}
-          </label>
-        ))}
-      </div>
+      <SettingsModal open={showSettings} onClose={() => setShowSettings(false)} metadata={metadata} setMetadata={setMetadata} selectedDocumentTypes={selectedDocumentTypes} setSelectedDocumentTypes={setSelectedDocumentTypes} />
     </div>
   )
 } 
