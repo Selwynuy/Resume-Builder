@@ -84,12 +84,17 @@ export const isStudentEmail = (email: string): boolean => {
 
 // Get amount for subscription tier and billing cycle
 export const getAmount = (tier: string, billingCycle: string, isStudent: boolean = false): number => {
+  const normalizeCycle = (cycle: string) => {
+    if (cycle === "month") return "monthly";
+    if (cycle === "quarter") return "quarterly";
+    return cycle;
+  };
   const pricing = PRICING[tier];
   if (!pricing) {
     throw new Error(`Invalid tier: ${tier}`);
   }
   
-  const cyclePricing = pricing[billingCycle];
+  const cyclePricing = pricing[normalizeCycle(billingCycle)];
   if (!cyclePricing) {
     throw new Error(`Invalid billing cycle: ${billingCycle} for tier: ${tier}`);
   }
