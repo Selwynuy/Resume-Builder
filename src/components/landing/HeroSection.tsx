@@ -25,40 +25,44 @@ const HeroSection = () => {
   }, [controls])
 
   return (
-    <section className="relative overflow-hidden pt-24 pb-10 px-4 sm:px-6 lg:px-8 h-screen bg-gradient-radial from-blue-50 via-white to-white">
-      {/* Big heading behind robot */}
-      <h1
-        className="absolute z-10 left-1/2 top-16 -translate-x-1/2 text-[clamp(2.5rem,10vw,6rem)] font-extrabold text-slate-800 select-none pointer-events-none whitespace-nowrap tracking-tight opacity-95"
-        style={{ textShadow: '0 4px 24px rgba(0,0,0,0.18), 0 1.5px 0 #fff' }}
-      >
-        Build Your Future
-      </h1>
-      {/* Animated blue blob background */}
-      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-blue-400/70 rounded-full blur-3xl opacity-80 animate-pulse z-0 pointer-events-none" />
-      {/* Animated purple blob */}
-      <div className="absolute top-40 -left-40 w-[400px] h-[300px] bg-purple-400/60 rounded-full blur-3xl opacity-70 animate-pulse z-0 pointer-events-none" />
-      {/* Animated teal blob */}
-      <div className="absolute bottom-0 right-0 w-[350px] h-[250px] bg-teal-400/60 rounded-full blur-3xl opacity-70 animate-pulse z-0 pointer-events-none" />
-      {/* Animated bubble blobs */}
-      <div className="absolute z-0 pointer-events-none w-full h-full">
-        <div className="absolute left-20 top-24 w-12 h-12 bg-blue-300/70 rounded-full blur-md opacity-80 animate-bounce" />
-        <div className="absolute left-1/4 top-2/3 w-8 h-8 bg-indigo-200/80 rounded-full blur-sm opacity-70 animate-bounce" style={{ left: '25%', top: '66%' }} />
-        <div className="absolute right-40 top-1/3 w-10 h-10 bg-cyan-200/80 rounded-full blur-md opacity-60 animate-bounce" />
-        <div className="absolute right-1/4 bottom-24 w-7 h-7 bg-blue-200/80 rounded-full blur-sm opacity-70 animate-bounce" style={{ right: '25%' }} />
-        <div className="absolute left-1/2 bottom-10 w-9 h-9 bg-indigo-300/70 rounded-full blur-md opacity-60 animate-bounce" style={{ left: '50%' }} />
-      </div>
-      <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-center gap-12">
-        {/* Left value prop */}
-        <div className="flex-1 max-w-md text-slate-700 font-semibold text-lg mb-8 lg:mb-0">
-          <div className="bg-white/30 rounded-xl p-6">
-            Create stunning, ATS-optimized resumes with AI-powered suggestions and a futuristic design.<br />Free, fast, and easy.
+    <section className="relative overflow-hidden pt-24 pb-10 px-4 sm:px-6 lg:px-8 min-h-[80vh] flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 via-white to-white">
+      <div className="max-w-7xl w-full mx-auto flex flex-col lg:flex-row items-center justify-between gap-12 z-10">
+        {/* Left column: text and buttons */}
+        <div className="flex-1 flex flex-col items-start justify-center text-left max-w-xl">
+          <span className="inline-flex items-center px-4 py-1 mb-6 rounded-full bg-blue-100 text-blue-600 font-semibold text-xs tracking-wider border border-blue-200">
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>
+            PROFESSIONAL AI RESUME BUILDER
+          </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-2 leading-tight">
+            Make your professional resume<br />
+            <span className="text-blue-600">in minutes</span>
+          </h1>
+          <p className="mt-4 mb-8 text-lg text-slate-600 font-normal">
+            Try our free resume builder and create a resume with the power of AI. Let the Genius resume maker help build your resume quickly and effortlessly.
+          </p>
+          <div className="flex flex-row gap-4 w-full mb-8">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-5 text-lg font-bold rounded-xl shadow-md transition-all duration-200"
+              onClick={handleCreateNewDocument}
+            >
+              Build My Resume Now
+            </Button>
+            <div className="flex flex-col items-center">
+              <Button
+                size="lg"
+                variant="outline"
+                disabled
+                className="border border-slate-300 bg-white text-slate-400 px-8 py-5 text-lg font-bold rounded-xl shadow-md cursor-not-allowed"
+              >
+                Upload My Existing Resume
+              </Button>
+              <span className="text-xs text-slate-400 mt-1">Coming soon</span>
+            </div>
           </div>
         </div>
-        {/* Robot + ellipse */}
-        <div className="relative flex flex-col items-center justify-center">
-          {/* Ellipse */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-72 h-32 bg-gradient-to-r from-blue-400/60 to-indigo-400/60 rounded-full blur-2xl z-0" data-testid="hero-ellipse" />
-          {/* Robot */}
+        {/* Right column: robot image */}
+        <div className="flex-1 flex items-center justify-center relative">
           <motion.img
             ref={robotRef}
             src="/images/Roboto.png"
@@ -69,43 +73,6 @@ const HeroSection = () => {
             animate={controls}
           />
         </div>
-        {/* Right features */}
-        <div className="flex-1 max-w-md text-slate-700 font-semibold text-lg flex flex-col gap-4 items-end">
-          <div className="bg-white/30 rounded-xl p-6 w-full">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              100% Free Forever
-            </div>
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              No Credit Card Required
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-500" />
-              ATS Optimized
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* CTA Buttons below hero */}
-      <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-12">
-        <motion.div
-          whileHover={{ scale: 1.07 }}
-          whileTap={{ scale: 0.97 }}
-          className=""
-        >
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={handleCreateNewDocument}
-            className="border-2 border-slate-300 hover:border-slate-400 bg-white/80 backdrop-blur-sm text-slate-700 hover:text-slate-800 px-10 py-5 text-xl font-bold rounded-2xl shadow-lg transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-slate-300 hover:shadow-[0_0_24px_4px_rgba(0,0,0,0.1)] hover:scale-105"
-          >
-            Create New Document
-          </Button>
-        </motion.div>
-      </div>
-      {/* Trust badges & testimonial */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-8 mt-14">
       </div>
     </section>
   )
