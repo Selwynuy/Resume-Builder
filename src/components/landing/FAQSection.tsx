@@ -38,12 +38,11 @@ const FAQSection = () => (
   <section className="py-20 px-4 sm:px-6 lg:px-8">
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-16">
-        <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-100 mb-4">FAQ</Badge>
         <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
         <p className="text-xl text-slate-600">Everything you need to know about our resume builder.</p>
       </div>
       <motion.div
-        className="mx-auto w-full max-w-2xl divide-y divide-slate-200 bg-white rounded-xl shadow"
+        className="mx-auto w-full max-w-2xl divide-y divide-slate-200"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.5 }}
