@@ -9,12 +9,28 @@ const templateSchema: any = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String },
   category: { type: String },
-  supportedDocumentTypes: [{ type: String }],
+  supportedDocumentTypes: [{ type: String, required: true }],
   rating: { type: Number, default: 0 },
   ratingCount: { type: Number, default: 0 },
   isPublic: { type: Boolean, default: true },
   isApproved: { type: Boolean, default: false },
-  // ... other fields ...
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  creatorName: { type: String },
+  htmlTemplate: { type: String },
+  cssStyles: { type: String },
+  downloads: { type: Number, default: 0 },
+  price: { type: Number, default: 0 },
+  layout: { type: String, default: 'single-column' },
+  placeholders: [{ type: String }],
+  validation: {
+    isValid: { type: Boolean, default: true },
+    requiredMissing: [{ type: String }],
+    optionalMissing: [{ type: String }],
+    errors: [{ type: String }]
+  },
+  tags: [{ type: String }],
+  approvalStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  rejectionReason: { type: String }
 }, {
   timestamps: true,
   statics: {
