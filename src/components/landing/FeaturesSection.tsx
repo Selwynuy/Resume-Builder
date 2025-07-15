@@ -53,23 +53,26 @@ const FeaturesSection = () => (
         </p>
       </div>
       <motion.div
-        className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
         {features.map((feature, index) => (
           <Card
             key={index}
             className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-0 bg-white/80 backdrop-blur-sm"
           >
-            <CardContent className="p-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <feature.icon className="w-6 h-6 text-white" />
+            <CardContent className="p-6 flex flex-row items-start gap-4">
+              <div className="w-14 h-14 flex-shrink-0 rounded-xl flex items-center justify-center mt-1"
+                style={{ background: index === 0 ? '#F3F6FF' : index === 1 ? '#FFF6E5' : index === 2 ? '#FFF3F0' : index === 3 ? '#F3F6FF' : index === 4 ? '#F3F6FF' : '#FFFBEA' }}>
+                <feature.icon className={`w-8 h-8 ${index === 0 ? 'text-blue-800' : index === 1 ? 'text-orange-500' : index === 2 ? 'text-orange-500' : index === 3 ? 'text-blue-800' : index === 4 ? 'text-blue-800' : 'text-yellow-500'}`} />
               </div>
-              <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
-              <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+              <div>
+                <h3 className="text-lg md:text-xl font-bold text-blue-900 mb-1">{feature.title}</h3>
+                <p className="text-base text-slate-600 leading-relaxed">{feature.description}</p>
+              </div>
             </CardContent>
           </Card>
         ))}
