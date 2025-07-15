@@ -6,6 +6,7 @@ import FinalCTASection from '@/components/landing/FinalCTASection'
 import HeroSection from '@/components/landing/HeroSection'
 import HowItWorksSection from '@/components/landing/HowItWorksSection'
 import TestimonialsSection from '@/components/landing/TestimonialsSection'
+import FooterSection from '@/components/landing/FooterSection'
 
 export const metadata: Metadata = {
   title: 'Resume Builder - Create Professional Resumes in Minutes',
@@ -28,9 +29,9 @@ export default function HomePage() {
       <HeroSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <TestimonialsSection />
       <FAQSection />
       <FinalCTASection />
+      <FooterSection />
     </main>
   )
 }
