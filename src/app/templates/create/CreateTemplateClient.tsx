@@ -225,7 +225,7 @@ export default function CreateTemplateClient() {
 
       if (response.ok) {
         alert(`Template ${isEditing ? 'updated' : 'published'} successfully!`)
-        router.push('/templates')
+        router.push('/creator')
       } else {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to publish template.')
