@@ -3,7 +3,8 @@
 import { motion } from "framer-motion"
 
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+import { ChevronDown } from "lucide-react"
+import { useState } from "react"
 
 const faqs = [
   {
@@ -42,20 +43,32 @@ const FAQSection = () => (
         <p className="text-xl text-slate-600">Everything you need to know about our resume builder.</p>
       </div>
       <motion.div
-        className="space-y-6"
+        className="mx-auto w-full max-w-2xl divide-y divide-slate-200 bg-white rounded-xl shadow"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
       >
-        {faqs.map((faq, index) => (
-          <Card key={index} className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardContent className="p-8">
-              <h3 className="text-lg font-semibold text-slate-900 mb-3">{faq.question}</h3>
-              <p className="text-slate-600 leading-relaxed">{faq.answer}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {faqs.map((faq, index) => {
+          const [open, setOpen] = useState(false)
+          return (
+            <div key={index}>
+              <button
+                className="w-full flex items-center justify-between py-6 px-4 text-left focus:outline-none group"
+                onClick={() => setOpen((prev) => !prev)}
+                aria-expanded={open}
+              >
+                <span className="text-base md:text-lg font-medium text-slate-900 group-hover:text-blue-700 transition-colors">{faq.question}</span>
+                <ChevronDown className={`w-5 h-5 text-blue-500 ml-2 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+              </button>
+              {open && (
+                <div className="px-4 pb-6 text-slate-600 text-base leading-relaxed animate-fade-in">
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </motion.div>
     </div>
   </section>
