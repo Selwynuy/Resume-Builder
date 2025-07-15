@@ -102,10 +102,7 @@ templateSchema.pre('save', function(this: any, next: any) {
   if (!this.supportedDocumentTypes || !Array.isArray(this.supportedDocumentTypes) || this.supportedDocumentTypes.length === 0) {
     return next(new Error('At least one document type must be selected.'));
   }
-  // Auto-approve free templates with valid structure
-  if (this.price === 0 && this.validation?.isValid) {
-    this.isApproved = true
-  }
+  // Removed auto-approve logic. All templates require admin approval.
   next()
 })
 

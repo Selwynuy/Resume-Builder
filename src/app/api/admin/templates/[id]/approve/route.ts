@@ -31,7 +31,9 @@ export async function PATCH(
       params.id,
       { 
         isApproved: true,
-        isPublic: true
+        isPublic: true,
+        approvalStatus: 'approved',
+        rejectionReason: undefined
       },
       { new: true }
     )

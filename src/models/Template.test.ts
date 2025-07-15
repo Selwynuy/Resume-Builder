@@ -1,5 +1,4 @@
-const connectDB = require('@/lib/db').default;
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 let Template: any;
 

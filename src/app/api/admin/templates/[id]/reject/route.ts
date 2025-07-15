@@ -32,7 +32,9 @@ export async function PATCH(
       params.id,
       { 
         isApproved: false,
-        isPublic: false
+        isPublic: false,
+        approvalStatus: 'rejected',
+        rejectionReason: 'Your template was rejected by an admin.'
       },
       { new: true }
     )
