@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { CSRFTokenInput } from '@/components/ui/csrf-token'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 interface Template {
   _id: string
@@ -26,14 +26,77 @@ export default function AdminDashboardClient({ templates }: { templates: Templat
   const searchParams = useSearchParams()
   const selectedDocumentType = searchParams?.get('documentType') ?? null
 
+  // Modal state
+  const [modalOpen, setModalOpen] = useState<null | { id: string, action: 'approve' | 'reject', name: string }>(null)
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null)
+  const [loading, setLoading] = useState(false)
+
   // Filter templates client-side by document type (optional, or could be server-side)
   const filteredTemplates = useMemo(() => {
     if (!selectedDocumentType) return templates
     return templates.filter(t => t.supportedDocumentTypes?.includes(selectedDocumentType))
   }, [templates, selectedDocumentType])
 
+  // Approve/Reject handler
+  const handleAction = async () => {
+    if (!modalOpen) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/admin/templates/${modalOpen.id}/${modalOpen.action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setToast({ message: `Template "${modalOpen.name}" ${modalOpen.action === 'approve' ? 'approved' : 'rejected'} successfully!`, type: 'success' })
+        setModalOpen(null)
+        // Optionally, refresh the page or re-fetch data
+        router.refresh()
+      } else {
+        setToast({ message: data.error || 'Something went wrong.', type: 'error' })
+      }
+    } catch (e) {
+      setToast({ message: 'Network error. Please try again.', type: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {/* Toast/Modal for feedback */}
+      {toast && (
+        <div className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded shadow-lg text-white ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}
+          onClick={() => setToast(null)}
+        >
+          {toast.message}
+        </div>
+      )}
+      {/* Modal for Approve/Reject confirmation */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm text-center">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              {modalOpen.action === 'approve' ? 'Approve Template' : 'Reject Template'}
+            </h2>
+            <p className="mb-6 text-gray-700">
+              Are you sure you want to <span className={modalOpen.action === 'approve' ? 'text-green-600' : 'text-red-600'}>{modalOpen.action}</span> <b>{modalOpen.name}</b>?
+            </p>
+            <div className="flex justify-center gap-3">
+              <button
+                className="px-4 py-2 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+                onClick={() => setModalOpen(null)}
+                disabled={loading}
+              >Cancel</button>
+              <button
+                className={`px-4 py-2 rounded text-white ${modalOpen.action === 'approve' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
+                onClick={handleAction}
+                disabled={loading}
+              >{loading ? 'Processing...' : (modalOpen.action === 'approve' ? 'Approve' : 'Reject')}</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -122,24 +185,18 @@ export default function AdminDashboardClient({ templates }: { templates: Templat
 
                       {!template.isApproved && (
                         <div className="flex space-x-2">
-                          <form action={`/api/admin/templates/${template._id}/approve`} method="POST">
-                            <CSRFTokenInput />
-                            <button
-                              type="submit"
-                              className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
-                            >
-                              Approve
-                            </button>
-                          </form>
-                          <form action={`/api/admin/templates/${template._id}/reject`} method="POST">
-                            <CSRFTokenInput />
-                            <button
-                              type="submit"
-                              className="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700"
-                            >
-                              Reject
-                            </button>
-                          </form>
+                          <button
+                            className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700"
+                            onClick={() => setModalOpen({ id: template._id, action: 'approve', name: template.name })}
+                          >
+                            Approve
+                          </button>
+                          <button
+                            className="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700"
+                            onClick={() => setModalOpen({ id: template._id, action: 'reject', name: template.name })}
+                          >
+                            Reject
+                          </button>
                         </div>
                       )}
                     </div>
