@@ -59,6 +59,7 @@ export const authOptions = {
       // If logging in (user is defined)
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       // Always ensure token.id is a MongoDB ObjectId string
       if (!token.id || !mongoose.Types.ObjectId.isValid(String(token.id))) {
@@ -83,11 +84,12 @@ export const authOptions = {
         }
         if (dbUser) {
           token.id = dbUser._id.toString();
+          token.role = dbUser.role;
         }
       }
       if (process.env.NODE_ENV !== 'production') {
         // eslint-disable-next-line no-console
-        console.log('[NextAuth] token.id set to:', token.id);
+        console.log('[NextAuth] token.id set to:', token.id, 'role:', token.role);
       }
       return token;
     },
@@ -99,9 +101,11 @@ export const authOptions = {
           name: token.name as string | undefined,
           email: token.email as string | undefined,
           image: token.picture as string | undefined,
+          role: token.role as string | undefined,
         };
       } else {
         session.user.id = token.id as string;
+        session.user.role = token.role as string | undefined;
       }
       return session;
     }

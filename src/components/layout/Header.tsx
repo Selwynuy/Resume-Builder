@@ -98,6 +98,26 @@ export default function Header() {
                 </button>
                 {accountDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50 animate-in fade-in-0 zoom-in-95 duration-200">
+                    {/* Admin Dashboard link for admins */}
+                    {(session.user as any)?.role === 'admin' && (
+                      <Link
+                        href="/admin"
+                        className="block px-4 py-2 text-sm text-blue-700 font-semibold hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                        onClick={() => setAccountDropdownOpen(false)}
+                      >
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    {/* Creator Dashboard link for creators */}
+                    {(session.user as any)?.role === 'creator' && (
+                      <Link
+                        href="/creator"
+                        className="block px-4 py-2 text-sm text-purple-700 font-semibold hover:bg-purple-50 hover:text-purple-600 transition-colors duration-200"
+                        onClick={() => setAccountDropdownOpen(false)}
+                      >
+                        Creator Dashboard
+                      </Link>
+                    )}
                     <Link
                       href="/dashboard"
                       className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
