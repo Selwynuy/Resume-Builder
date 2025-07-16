@@ -2,6 +2,7 @@ import { getCurrentSession, getCurrentUserRole } from '@/auth'
 import connectDB from '@/lib/db'
 import User from '@/models/User'
 import UserTable from './UserTable'
+import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,7 +22,7 @@ export default async function AdminUsersPage() {
   const session = await getCurrentSession()
   const role = await getCurrentUserRole()
   if (!session?.user || role !== 'admin') {
-    return <div className="p-8 text-center text-red-600 font-bold">Access denied</div>
+    redirect('/dashboard')
   }
   const users = await getUsers()
   return (

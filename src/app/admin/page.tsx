@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
-import { getCurrentSession } from '@/auth'
+import { getCurrentSession, getCurrentUserRole } from '@/auth'
 import { CSRFTokenInput } from '@/components/ui/csrf-token'
 import connectDB from '@/lib/db'
 import Template from '@/models/Template'
@@ -59,17 +59,15 @@ async function getTemplates(): Promise<Template[]> {
 
 export default async function AdminPage() {
   const session = await getCurrentSession()
-  
+  const role = await getCurrentUserRole()
   if (!session?.user) {
     redirect('/login')
   }
-
-  // Check if user is admin (you can add admin role to user model)
-  // For now, we'll allow any authenticated user to access admin
-  // In production, add proper role-based access control
+  if (role !== 'admin') {
+    redirect('/dashboard')
+  }
 
   await connectDB()
-  
   const templates = await Template.find({ isApproved: false })
     .sort({ createdAt: -1 })
     .limit(50)
