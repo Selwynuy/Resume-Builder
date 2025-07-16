@@ -77,36 +77,6 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpires: {
     type: Date,
   },
-  // PayPal subscription fields
-  subscription: {
-    tier: {
-      type: String,
-      enum: ['free', 'basic', 'pro', 'enterprise'],
-      default: 'free',
-    },
-    billingCycle: {
-      type: String,
-      enum: ['monthly', 'quarterly'],
-      default: 'monthly',
-    },
-    status: {
-      type: String,
-      enum: ['active', 'canceled', 'expired'],
-      default: 'active',
-    },
-    startDate: {
-      type: Date,
-    },
-    endDate: {
-      type: Date,
-    },
-    paypalOrderId: {
-      type: String,
-    },
-    paypalCaptureId: {
-      type: String,
-    },
-  },
 });
 
 // Hash password before saving

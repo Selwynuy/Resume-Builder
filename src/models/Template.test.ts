@@ -1,3 +1,4 @@
+import connectDB from '../lib/db';
 import mongoose from 'mongoose';
 
 let Template: any;

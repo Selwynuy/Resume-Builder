@@ -99,16 +99,6 @@ export default function ResumePreview({ resumeData, template, onEdit, documentTy
           <Button onClick={onEdit} variant="outline" size="sm">
             Edit
           </Button>
-          <div className="relative inline-block">
-            <Button 
-              onClick={() => handleExport('pdf')} 
-              disabled={isExporting || !resumeData._id}
-              size="sm"
-            >
-              {isExporting ? 'Exporting...' : 'Export PDF'}
-            </Button>
-            {/* TODO: Add dropdown for other export formats when implemented */}
-          </div>
         </div>
       </div>
 

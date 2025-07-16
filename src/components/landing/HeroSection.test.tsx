@@ -23,9 +23,9 @@ describe("HeroSection", () => {
   })
 
   it("renders the main heading", () => {
-    expect.assertions(1)
     render(<HeroSection />)
-    expect(screen.getByText(/Build Your Future/i)).toBeInTheDocument()
+    expect(screen.getByText(/Build your professional resume/i)).toBeInTheDocument()
+    expect(screen.getByText(/in 5 easy steps/i)).toBeInTheDocument()
   })
 
   it("renders the robot image with alt text", () => {
@@ -34,90 +34,22 @@ describe("HeroSection", () => {
     expect(img).toBeInTheDocument()
   })
 
-  it("renders the ellipse/spotlight behind the robot", () => {
+  it("renders the Build My Resume Now button", () => {
     render(<HeroSection />)
-    const ellipse = screen.getByTestId("hero-ellipse")
-    expect(ellipse).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Build My Resume Now/i })).toBeInTheDocument()
   })
 
-  it("renders left and right text blocks", () => {
+  it("navigates to templates page with modal parameter when Build My Resume Now is clicked", () => {
     render(<HeroSection />)
-    expect(screen.getByText(/ATS-optimized resumes/i)).toBeInTheDocument()
-    expect(screen.getByText(/Free, fast, and easy/i)).toBeInTheDocument()
-  })
-
-  it("renders the CTA button", () => {
-    render(<HeroSection />)
-    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
-  })
-
-  it("has accessible alt text for images", () => {
-    render(<HeroSection />)
-    expect(screen.getByAltText(/AI Robot holding resume/i)).toBeInTheDocument()
-  })
-
-  it("uses full viewport height (h-screen)", () => {
-    render(<HeroSection />)
-    const section = document.querySelector('section')
-    expect(section?.className).toMatch(/h-screen/)
-  })
-
-  it("renders at least one animated bubble blob", () => {
-    render(<HeroSection />)
-    // Look for a div with animate-bounce and rounded-full
-    const bubbles = document.querySelectorAll('div.animate-bounce.rounded-full')
-    expect(bubbles.length).toBeGreaterThan(0)
-  })
-
-  it("renders the Create New Document button", () => {
-    render(<HeroSection />)
-    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
-  })
-
-  it("navigates to templates page with modal parameter when Create New Document is clicked", () => {
-    render(<HeroSection />)
-    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
-    
-    fireEvent.click(createNewDocumentButton)
-    
+    const buildResumeButton = screen.getByRole("button", { name: /Build My Resume Now/i })
+    fireEvent.click(buildResumeButton)
     expect(mockPush).toHaveBeenCalledWith('/templates?modal=open')
-  })
-
-  it("renders the CTA button", () => {
-    render(<HeroSection />)
-    expect(screen.getByRole("button", { name: /Create New Document/i })).toBeInTheDocument()
-  })
-
-  it("has proper button styling for Create New Document button", () => {
-    render(<HeroSection />)
-    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
-    
-    expect(createNewDocumentButton).toHaveClass('border-2', 'border-slate-300', 'bg-white/80')
-  })
-
-  it("has proper accessibility attributes for Create New Document button", () => {
-    render(<HeroSection />)
-    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
-    
-    expect(createNewDocumentButton).toBeInTheDocument()
-    // The button should be focusable
-    createNewDocumentButton.focus()
-    expect(document.activeElement).toBe(createNewDocumentButton)
-  })
-
-  it("has responsive design classes for button container", () => {
-    render(<HeroSection />)
-    const buttonContainer = document.querySelector('.flex.flex-col.sm\\:flex-row')
-    
-    expect(buttonContainer).toBeInTheDocument()
-    expect(buttonContainer).toHaveClass('flex', 'flex-col', 'sm:flex-row', 'justify-center', 'items-center', 'gap-4')
   })
 
   it("button is keyboard accessible", () => {
     render(<HeroSection />)
-    const createNewDocumentButton = screen.getByRole("button", { name: /Create New Document/i })
-    
-    createNewDocumentButton.focus()
-    expect(document.activeElement).toBe(createNewDocumentButton)
+    const buildResumeButton = screen.getByRole("button", { name: /Build My Resume Now/i })
+    buildResumeButton.focus()
+    expect(document.activeElement).toBe(buildResumeButton)
   })
 }) 

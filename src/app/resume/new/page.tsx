@@ -75,7 +75,8 @@ export default function NewResumePage() {
     closeStepCustomization,
     handleStepsChange,
     getCurrentSteps,
-    resetToDefaultSteps
+    resetToDefaultSteps,
+    markStepAsCompleted
   } = useResumeWizard()
   const { status: authStatus } = useSession()
   const searchParams = useSearchParams()
@@ -347,7 +348,10 @@ export default function NewResumePage() {
             {!isLastStep() ? (
               <button
                 onClick={() => {
-                  if (canProceed()) goToNextStep()
+                  if (canProceed()) {
+                    markStepAsCompleted(currentStep)
+                    goToNextStep()
+                  }
                 }}
                 disabled={!canProceed()}
                 className={`
@@ -369,14 +373,15 @@ export default function NewResumePage() {
         </div>
       </div>
 
-      {/* Step Customization Modal */}
-      <StepCustomizationModal
-        isOpen={isStepCustomizationOpen}
-        onClose={closeStepCustomization}
-        documentType={documentType}
-        currentSteps={getCurrentSteps()}
-        onStepsChange={handleStepsChange}
-      />
+      {isStepCustomizationOpen && (
+        <StepCustomizationModal
+          isOpen={isStepCustomizationOpen}
+          onClose={closeStepCustomization}
+          steps={customSteps}
+          onStepsChange={handleStepsChange}
+          onResetToDefault={resetToDefaultSteps}
+        />
+      )}
     </>
   )
-} 
+}

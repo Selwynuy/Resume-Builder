@@ -33,17 +33,14 @@ export async function POST(request: NextRequest) {
       const customId = capture.purchase_units?.[0]?.custom_id;
       if (customId) {
         const [tier, billingCycle, studentStatus] = customId.split('_');
-        user.subscription = {
-          tier,
-          billingCycle,
-          status: 'active',
-          startDate: new Date(),
-          endDate: billingCycle === 'monthly' 
-            ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-            : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
-          paypalOrderId: orderId,
-          paypalCaptureId: capture.id,
-        };
+        user.subscriptionTier = tier;
+        user.billingCycle = billingCycle;
+        user.subscriptionStatus = 'active';
+        user.subscriptionEndDate = billingCycle === 'monthly' 
+          ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000); // 90 days
+        user.isStudent = studentStatus === 'student';
+        // Optionally: user.paypalOrderId = orderId; user.paypalCaptureId = capture.id;
         await user.save();
       }
     }

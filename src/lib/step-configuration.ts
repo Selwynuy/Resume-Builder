@@ -5,15 +5,14 @@ export const STEP_CONFIGURATIONS: Record<DocumentType, DocumentStructure> = {
   [DocumentType.RESUME]: {
     documentType: DocumentType.RESUME,
     steps: [
-      { id: 1, title: 'Document Type & Template', icon: '🎨', description: 'Choose your document type and template', required: true, component: 'TemplateSelector' },
-      { id: 2, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
-      { id: 3, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
-      { id: 4, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
-      { id: 5, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
-      { id: 6, title: 'Review', icon: '✨', description: 'Finalize your resume', required: true, component: 'ReviewStep' }
+      { id: 1, title: 'Personal Info', icon: '👤', description: 'Tell us about yourself', required: true, component: 'PersonalInfoStep' },
+      { id: 2, title: 'Work Experience', icon: '💼', description: 'Add your work history', required: true, component: 'ExperienceStep' },
+      { id: 3, title: 'Education', icon: '🎓', description: 'Add your education', required: true, component: 'EducationStep' },
+      { id: 4, title: 'Skills', icon: '⚡', description: 'Showcase your abilities', required: true, component: 'SkillsStep' },
+      { id: 5, title: 'Review', icon: '✨', description: 'Finalize your resume', required: true, component: 'ReviewStep' }
     ],
-    maxSteps: 6,
-    minSteps: 6
+    maxSteps: 5,
+    minSteps: 5
   },
   [DocumentType.CV]: {
     documentType: DocumentType.CV,
@@ -58,12 +57,11 @@ export interface StepValidationRule {
 
 export const STEP_VALIDATION_RULES: Record<DocumentType, StepValidationRule[]> = {
   [DocumentType.RESUME]: [
-    { stepId: 1, required: true }, // TemplateSelector
-    { stepId: 2, required: true, dependencies: [1] }, // PersonalInfo
-    { stepId: 3, required: true, dependencies: [1] }, // Experience
-    { stepId: 4, required: true, dependencies: [1] }, // Education
-    { stepId: 5, required: true, dependencies: [1] }, // Skills
-    { stepId: 6, required: true, dependencies: [1, 2, 3, 4, 5] } // Review
+    { stepId: 1, required: true }, // PersonalInfo
+    { stepId: 2, required: true, dependencies: [1] }, // Experience
+    { stepId: 3, required: true, dependencies: [1] }, // Education
+    { stepId: 4, required: true, dependencies: [1] }, // Skills
+    { stepId: 5, required: true, dependencies: [1, 2, 3, 4] } // Review
   ],
   [DocumentType.CV]: [
     { stepId: 1, required: true }, // TemplateSelector

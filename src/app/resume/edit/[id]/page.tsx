@@ -46,7 +46,8 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
     currentStep,
     nextStep,
     prevStep,
-    canProceed
+    canProceed,
+    markStepAsCompleted
   } = useResumeWizard()
   
   const { status: authStatus } = useSession()
@@ -182,7 +183,10 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
             {currentStep < STEPS.length ? (
               <button
                 onClick={() => {
-                  if (canProceed()) nextStep()
+                  if (canProceed()) {
+                    markStepAsCompleted(currentStep)
+                    nextStep()
+                  }
                 }}
                 disabled={!canProceed()}
                 className={`
@@ -205,4 +209,4 @@ export default function EditResumePage({ params }: { params: { id: string } }) {
       </div>
     </>
   )
-} 
+}

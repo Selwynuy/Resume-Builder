@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { ResumeData, PersonalInfo, Experience, Education, Skill } from '@/components/document-builder/types'
 import ConfirmModal from '@/components/ui/ConfirmModal'
@@ -18,7 +18,7 @@ interface ReviewStepProps {
   resumeData: ResumeData
   selectedTemplate: Template | null
   onSave: () => Promise<void>
-  onExport: () => Promise<void>
+  onExport: (format?: 'pdf' | 'docx' | 'txt') => Promise<void>
   onChangeTemplate: () => void
   isLoading?: boolean
   saveMessage?: string
@@ -33,6 +33,9 @@ interface ReviewStepProps {
   updateSkill: (index: number, field: keyof Skill, value: string) => void
   addSkill: () => void
   removeSkill: (index: number) => void
+  // Add these for TemplateSelector
+  selectedDocumentType?: import('./types').DocumentType
+  onDocumentTypeChange?: (documentType: import('./types').DocumentType) => void
 }
 
 export const ReviewStep = ({ 
@@ -52,7 +55,9 @@ export const ReviewStep = ({
   updateSkill,
   addSkill,
   removeSkill,
-  onChangeTemplate
+  onChangeTemplate,
+  selectedDocumentType,
+  onDocumentTypeChange
 }: ReviewStepProps) => {
   const _router = useRouter();
   const [editingSection, setEditingSection] = useState<string | null>(null)
@@ -65,6 +70,13 @@ export const ReviewStep = ({
   const [removeType, setRemoveType] = useState<'experience' | 'education' | 'skill' | null>(null)
   const [removing, setRemoving] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [downloadModalOpen, setDownloadModalOpen] = useState(false)
+  const [isPremiumUser, setIsPremiumUser] = useState(false)
+
+  // TEMP: Allow all users to download PDF/Word for testing
+  useEffect(() => {
+    setIsPremiumUser(true);
+  }, []);
 
   const getCompletionPercentage = () => {
     let totalFields = 0
@@ -183,18 +195,82 @@ export const ReviewStep = ({
         loading={removing}
       />
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex flex-wrap gap-2 justify-center mb-4">
+        {/* Action Buttons - moved to top left */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-end mb-4">
           <button
-            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold hover:bg-blue-700"
-            onClick={() => openModal('feedback')}
+            onClick={onSave}
+            disabled={isLoading}
+            className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            aria-label={isLoading ? 'Saving resume...' : 'Save resume to your account'}
           >
-            AI Feedback
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" aria-hidden="true"></div>
+                Saving...
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                Save Resume
+              </>
+            )}
+          </button>
+          {/* Download Button */}
+          <button
+            onClick={() => setDownloadModalOpen(true)}
+            disabled={isLoading}
+            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            aria-label="Download resume"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Download
           </button>
         </div>
+        {/* Download Modal */}
+        {downloadModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-xs space-y-4">
+              <h3 className="text-lg font-semibold mb-2">Download as...</h3>
+              <button
+                onClick={() => { onExport('pdf'); setDownloadModalOpen(false) }}
+                disabled={!isPremiumUser || isLoading}
+                className={`w-full px-4 py-3 rounded-lg font-medium mb-2 transition-all duration-200 ${!isPremiumUser ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:scale-105'}`}
+              >
+                PDF { !isPremiumUser && <span className="ml-2 text-xs">(Premium)</span> }
+              </button>
+              <button
+                onClick={() => { onExport('docx'); setDownloadModalOpen(false) }}
+                disabled={!isPremiumUser || isLoading}
+                className={`w-full px-4 py-3 rounded-lg font-medium mb-2 transition-all duration-200 ${!isPremiumUser ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:scale-105'}`}
+              >
+                Word { !isPremiumUser && <span className="ml-2 text-xs">(Premium)</span> }
+              </button>
+              <button
+                onClick={() => { onExport('txt'); setDownloadModalOpen(false) }}
+                disabled={isLoading}
+                className="w-full px-4 py-3 rounded-lg font-medium bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:scale-105 transition-all duration-200"
+              >
+                Text Only
+              </button>
+              <button
+                onClick={() => setDownloadModalOpen(false)}
+                className="w-full mt-2 px-4 py-2 rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all duration-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         <TemplateSelector 
           selectedTemplate={selectedTemplate} 
+          selectedDocumentType={selectedDocumentType || resumeData.documentType}
           onChangeTemplate={onChangeTemplate} 
+          onDocumentTypeChange={onDocumentTypeChange || (() => {})}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -538,42 +614,6 @@ export const ReviewStep = ({
             template={selectedTemplate} 
             onEdit={() => setEditingSection('personal')}
           />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={onSave}
-            disabled={isLoading}
-            className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            aria-label={isLoading ? 'Saving resume...' : 'Save resume to your account'}
-          >
-            {isLoading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" aria-hidden="true"></div>
-                Saving...
-              </>
-            ) : (
-              <>
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                </svg>
-                Save Resume
-              </>
-            )}
-          </button>
-          
-          <button
-            onClick={onExport}
-            disabled={isLoading}
-            className="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-3 rounded-xl font-medium hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            aria-label="Export resume as PDF"
-          >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Export PDF
-          </button>
         </div>
 
         {saveMessage && (
